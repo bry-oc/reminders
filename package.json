@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/bry-oc/reminders/issues"
   },
-  "homepage": "https://github.com/bry-oc/reminders#readme"
+  "homepage": "https://github.com/bry-oc/reminders#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
