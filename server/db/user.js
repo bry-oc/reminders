@@ -10,14 +10,10 @@ const pool = new Pool({
     port: process.env.PG_PORT,
 });
 
-exports.getUserByEmailOrUsername = async function (email, username) {
-    try {
-        console.log(email);
-        console.log(username);
-        const result = await pool.query('SELECT * FROM reminder');
-        console.log(result.rowCount);
-        return result.rowCount;
-    } catch (err) { 
-        console.log(err);
-    }
+exports.getUserByUsername = async function (username) {
+    return await pool.query('SELECT * FROM user WHERE username=$2', [username]);
+}
+
+exports.getUserByEmail = async function (email) {
+    return await pool.query('SELECT * FROM user WHERE email=$1', [email]);
 }
