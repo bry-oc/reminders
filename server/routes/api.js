@@ -1,12 +1,15 @@
+'use strict';
+
 const multer = require('multer');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 //sign up
 //sign in
 //crud reminders
 modules.export = function(app) {
     const upload = multer();
-    const tokenList = {};
 
     app.route('/signup')
         .post(upload.none(), (req, res) => {
@@ -14,7 +17,7 @@ modules.export = function(app) {
             const username = req.body.username;
             const password = req.body.password;
             //verify email is unique and username is unique
-
+            
             //email or username is not unique            
 
             //generate verfication token and send verification email
