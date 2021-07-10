@@ -17,6 +17,11 @@
   },
   "homepage": "https://github.com/bry-oc/reminders#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.2",
+    "nodemailer": "^6.6.2",
+    "pg": "^8.6.0"
   }
 }

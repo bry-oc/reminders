@@ -3,42 +3,43 @@
 const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const usersDB = require('../db/user');
 require('dotenv').config();
 
 //sign up
 //sign in
 //crud reminders
-modules.export = function(app) {
+module.exports = function(app) {
     const upload = multer();
 
-    app.route('/signup')
+    app.route('/api/signup')
         .post(upload.none(), (req, res) => {
             const email = req.body.email;
             const username = req.body.username;
             const password = req.body.password;
             //verify email is unique and username is unique
-            
+            usersDB.getUserByEmailOrUsername(email, username);
             //email or username is not unique            
 
             //generate verfication token and send verification email
 
         })
     
-    app.route('/emailconfirmation/:email/:token')
+    app.route('/api/emailconfirmation/:email/:token')
         .get((req, res) => {
             //lookup token
             //ensure token is still valid then validate and create user
             //generate and send tokens and redirect
         });
 
-    app.route('/resendemailconfirmation/:email')
+    app.route('/api/resendemailconfirmation/:email')
         .get((req, res) => {
             //lookup email
             //the email is already validated
             //the email is not validated, send a verification email
         });
 
-    app.route('/login')
+    app.route('/api/login')
         .post(upload.none(), (req, res) => {
             //user provides username and password
             const username = req.body.username;
