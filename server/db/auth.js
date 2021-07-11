@@ -1,5 +1,6 @@
 'use strict';
 const { Pool } = require('pg');
+require('dotenv').config();
 
 const pool = new Pool({
     user: process.env.PG_USER,

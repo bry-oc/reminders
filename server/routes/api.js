@@ -37,14 +37,15 @@ module.exports = function (app) {
                         if (!userID) {
                             res.status(500).end();
                         }
-                        //userID and a 
-                        //generate verfication token
+                        //generate verfication token and store it
                         const hexString = crypto.randomBytes(16).toString('hex');
+                        //set two week expiration
                         const emailToken = await authQuery.createEmailToken(userID, hexString);
                         if(!emailToken) {
                             res.status(500).end();
                         }
                         //send verification email
+
                     } else {
                         //username is being used
                         res.status(403).send('That username is already being used.').end();
@@ -60,14 +61,14 @@ module.exports = function (app) {
 
         })
 
-    app.route('/api/emailconfirmation/:hash/:token')
+    app.route('/api/emailconfirmation/:userID/:token')
         .get((req, res) => {
             //lookup token
             //ensure token is still valid then validate and create user
             //generate and send tokens and redirect
         });
 
-    app.route('/api/resendemailconfirmation/:hash')
+    app.route('/api/resendemailconfirmation/:email')
         .get((req, res) => {
             //lookup email
             //the email is already validated
