@@ -21,22 +21,22 @@ module.exports = function (app) {
                 const email = req.body.email;
                 const username = req.body.username;
                 const password = req.body.password;
-                if(!email || !username || !password){
+                if (!email || !username || !password) {
                     return res.status(500).send('Missing required field(s)!').end();
                 }
                 //verify email is unique and username is unique
                 let lookup = await userQuery.getUserByEmail(email);
-                if(lookup.rowCount === 0) {
+                if (lookup.rowCount === 0) {
                     //email is unique
                     let lookup = await userQuery.getUserByUsername(username);
-                    if(lookup.rowCount === 0) {
+                    if (lookup.rowCount === 0) {
                         //username is also unique                        
                         //hash password
                         const passwordHash = await argon2.hash(password);
                         //create user that is unverified; they must become verified to use the app
                         lookup = await userQuery.createUser(username, email, passwordHash);
                         if (!lookup.rows[0].userid) {
-                            return res.status(500).end();
+                            return res.status(500).send('User creation failed.').end();
                         }
                         const userID = lookup.rows[0].userid;
                         //create hash
@@ -45,8 +45,8 @@ module.exports = function (app) {
                         const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 14;
                         //generate verfication token and store it
                         lookup = await authQuery.createEmailToken(userID, hexString, expirationDate);
-                        if(!lookup.rows[0].token) {
-                            return res.status(500).end();
+                        if (!lookup.rows[0].token) {
+                            return res.status(500).send('Email token failed to generate.').end();
                         }
                         const emailToken = lookup.rows[0].token;
                         //send verification email
@@ -67,9 +67,9 @@ module.exports = function (app) {
 
                         transporter.sendMail(mailOptions, function (err) {
                             if (err) {
-                                return res.status(500).end();
+                                return res.status(500).send('Email failed to send.').end();
                             } else {
-                                return res.status(200).send('A verification email has been sent to ' +email + '.')
+                                return res.status(200).send('A verification email has been sent to ' + email + '.')
                             }
                         })
                     } else {
@@ -79,22 +79,44 @@ module.exports = function (app) {
                 } else {
                     //email is being used
                     return res.status(403).send('That email is already being used.').end();
-                }                
+                }
             } catch (err) {
-                console.log(err);
-                return res.status(500).end();
+                return res.status(500).send('Interal Server Error').end();
             }
 
         })
 
-    app.route('/api/emailconfirmation/:userID/:token')
-        .get((req, res) => {
-            //lookup token
-            const userID = req.params.userID;
-            const token = req.params.token;
-            const timestamp = new Date(Date.now());
-            //ensure token is still valid then validate user
-            //generate and send tokens and redirect
+    app.route('/api/emailconfirmation/:userid/:token')
+        .get(async (req, res) => {
+            try {
+                const userID = req.params.userid;
+                const token = req.params.token;
+                const timestamp = new Date().getTime();
+                //lookup token
+                //ensure token is still valid then validate user
+                let lookup = await authQuery.getEmailToken(userID, token, timestamp);
+                if (lookup.rowCount <= 0) {
+                    //userid and token failed to validate
+                    return res.status(400).send('Your verification link is invalid. Please request another link.').end();
+                } else {
+                    //the token is valid
+                    //check if the user is already verified
+                    lookup = await userQuery.getUserByUserID(userID);
+                    if (lookup.rowCount <= 0) {
+                        //the user was not found
+                        return res.status(400).send('That user does not exist.').end();
+                    } else if(lookup.rows[0].verified === true){
+                        //the user is already verified
+                        return res.status(400).send('Your account is already verified.').end();                        
+                    } else {
+                        //update the user to verified
+                        await authQuery.updateVerifiedUser(userID);
+                        return res.status(200).send('Your account is now verified.').end();
+                    }
+                }
+            } catch (err) {
+                return res.status(500).send('Internal Server Error').end();
+            }
         });
 
     app.route('/api/resendemailconfirmation/:email')
