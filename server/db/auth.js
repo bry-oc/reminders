@@ -11,5 +11,5 @@ const pool = new Pool({
 });
 
 exports.createEmailToken = async function(userID, token, expirationDate) {
-    return await pool.query('INSERT INTO email_token (userID, emailToken, expires) VALUES ($1, $2, $3) RETURNING token', [userID, token, expirationDate]);
+    return await pool.query('INSERT INTO "email_token" ("userid", "token", "expires") VALUES ($1, $2, $3) RETURNING "token"', [userID, token, expirationDate]);
 }
