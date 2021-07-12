@@ -10,6 +10,6 @@ const pool = new Pool({
     port: process.env.PG_PORT,
 });
 
-exports.createEmailToken = async function(userID, token) {
-    return await pool.query('INSERT INTO email_token (userID, emailToken) VALUES ($1, $2) RETURNING token', [userID, token]);
+exports.createEmailToken = async function(userID, token, expirationDate) {
+    return await pool.query('INSERT INTO email_token (userID, emailToken, expires) VALUES ($1, $2, $3) RETURNING token', [userID, token, expirationDate]);
 }
