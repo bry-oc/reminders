@@ -42,7 +42,7 @@ module.exports = function (app) {
                         //create hash
                         const hexString = crypto.randomBytes(16).toString('hex');
                         //set two week expiration
-                        const expirationDate = new Date(Date.now() + 14);
+                        const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 14;
                         //generate verfication token and store it
                         lookup = await authQuery.createEmailToken(userID, hexString, expirationDate);
                         if(!lookup.rows[0].token) {
@@ -90,7 +90,10 @@ module.exports = function (app) {
     app.route('/api/emailconfirmation/:userID/:token')
         .get((req, res) => {
             //lookup token
-            //ensure token is still valid then validate and create user
+            const userID = req.params.userID;
+            const token = req.params.token;
+            const timestamp = new Date(Date.now());
+            //ensure token is still valid then validate user
             //generate and send tokens and redirect
         });
 
