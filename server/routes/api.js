@@ -120,7 +120,7 @@ module.exports = function (app) {
         });
 
     app.route('/api/resendemailconfirmation/:email')
-        .get((req, res) => {
+        .get( async (req, res) => {
             try {
                 //lookup email
                 const email = req.params.email;
@@ -134,6 +134,7 @@ module.exports = function (app) {
                     //the email is not validated, send a verification email
                     //create email token
                     const userID = lookup.rows[0].userid;
+                    const username = lookup.rows[0].username;
                     //create hash
                     const hexString = crypto.randomBytes(16).toString('hex');
                     //set two week expiration
@@ -171,6 +172,7 @@ module.exports = function (app) {
                 
                 
             } catch (err) {
+                console.log(err);
                 return res.status(500).send('Internal Server Error').end();
             }
         });
