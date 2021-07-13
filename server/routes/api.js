@@ -5,6 +5,8 @@ const crypto = require('crypto');
 const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const passport = require('passport');
+const passportJWT = require('passport-jwt');
 const userQuery = require('../db/user');
 const authQuery = require('../db/auth');
 require('dotenv').config();
@@ -14,6 +16,24 @@ require('dotenv').config();
 //crud reminders
 module.exports = function (app) {
     const upload = multer();
+    let ExtractJWT = passportJWT.ExtractJwt;
+    let JwtStrategy = passportJWT.Strategy;
+    let jwtOptions = {};
+
+    jwtOptions.jwtFromRequest = ExtractJWT.fromAuthHeaderAsBearerToken();
+    jwtOptions.secretOrKey = process.env.JWT_SECRET;
+
+    let strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
+        let lookup = userQuery.getUserByUserID(jwt_payload.userid);
+        if(lookup.rowCount <= 0 ) {
+            next(null, false);
+        } else {
+            let user = lookup.rows[0];
+            next(null, user);
+        }
+    });
+
+    passport.use(strategy);
 
     app.route('/api/signup')
         .post(upload.none(), async (req, res) => {
