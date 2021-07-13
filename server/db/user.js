@@ -11,9 +11,17 @@ const pool = new Pool({
 });
 
 exports.getUserByUsername = async function (username) {
-    return await pool.query('SELECT * FROM user WHERE username=$2', [username]);
+    return await pool.query('SELECT * FROM "user" WHERE "username" = $1', [username]);
 }
 
 exports.getUserByEmail = async function (email) {
-    return await pool.query('SELECT * FROM user WHERE email=$1', [email]);
+    return await pool.query('SELECT * FROM "user" WHERE "email" = $1', [email]);
+}
+
+exports.getUserByUserID = async function (userID) {
+    return await pool.query('SELECT * from "user" WHERE "userid" = $1', [userID]);
+}
+
+exports.createUser = async function(username, email, password) {
+    return await pool.query('INSERT INTO "user"(username, email, password) VALUES($1,$2,$3) RETURNING userid', [username, email, password]);
 }
