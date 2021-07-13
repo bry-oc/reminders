@@ -22,7 +22,7 @@ module.exports = function (app) {
                 const username = req.body.username;
                 const password = req.body.password;
                 if (!email || !username || !password) {
-                    return res.status(500).send('Missing required field(s)!').end();
+                    return res.status(400).send('Missing required field(s)!').end();
                 }
                 //verify email is unique and username is unique
                 let lookup = await userQuery.getUserByEmail(email);
@@ -69,7 +69,7 @@ module.exports = function (app) {
                             if (err) {
                                 return res.status(500).send('Email failed to send.').end();
                             } else {
-                                return res.status(200).send('A verification email has been sent to ' + email + '.')
+                                return res.status(200).send('A verification email has been sent to ' + email + '.').end();
                             }
                         });
                     } else {
@@ -124,12 +124,15 @@ module.exports = function (app) {
             try {
                 //lookup email
                 const email = req.body.email;
+                if(!email){
+                    return res.status(400).send('Missing required field!').end();
+                }
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
-                    return res.status(400).send('That email was not found.')
+                    return res.status(400).send('That email was not found.').end();
                 } else if (lookup.rows[0].verified === true){
                     //the email is already validated
-                    return res.status(200).send('Your account is already verified.')
+                    return res.status(200).send('Your account is already verified.').end();
                 } else {
                     //the email is not validated, send a verification email
                     //create email token
@@ -165,7 +168,7 @@ module.exports = function (app) {
                         if (err) {
                             return res.status(500).send('Email failed to send.').end();
                         } else {
-                            return res.status(200).send('A verification email has been sent to ' + email + '.')
+                            return res.status(200).send('A verification email has been sent to ' + email + '.').end();
                         }
                     });
                 }               
@@ -175,19 +178,30 @@ module.exports = function (app) {
         });
 
     app.route('/api/login')
-        .post(upload.none(), (req, res) => {
+        .post(upload.none(), async (req, res) => {
             try {
                 //user provides username and password
                 const username = req.body.username;
                 const password = req.body.password;
-
+                if(!username || !password){
+                    return res.status(400).send('Missing required field(s)!').end();
+                }
                 //verify the username and password in the database
-
-                //user does not exist
-
-                //user is verified, generate and send tokens and redirect
-
-                //invalid password
+                let lookup = await userQuery.getUserByUsername(username);
+                if(lookup.rowCount <= 0) {
+                    //user does not exist
+                    return res.status(404).send('Login failed. Username or password did not match.').end();
+                } else {
+                    passwordHash = lookup.rows[0].password;
+                    if(await argon2.verify(passwordHash, password)) {
+                        //password match
+                        //user is verified, generate and send tokens
+                    } else {
+                        //password failed
+                        //invalid password
+                        return res.status(404).send('Login failed. Username or password did not match.').end();
+                    }
+                }
             } catch (err) {
                 return res.status(500).send('Internal Server Error').end();
             }
