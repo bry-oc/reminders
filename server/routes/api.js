@@ -192,7 +192,7 @@ module.exports = function (app) {
                     //user does not exist
                     return res.status(404).send('Login failed. Username or password did not match.').end();
                 } else {
-                    passwordHash = lookup.rows[0].password;
+                    const passwordHash = lookup.rows[0].password;
                     if(await argon2.verify(passwordHash, password)) {
                         //password match
                         //user is verified, generate and send tokens
