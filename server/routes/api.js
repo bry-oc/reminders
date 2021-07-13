@@ -119,11 +119,11 @@ module.exports = function (app) {
             }
         });
 
-    app.route('/api/resendemailconfirmation/:email')
-        .get( async (req, res) => {
+    app.route('/api/resendemailconfirmation')
+        .post(upload.none(), async (req, res) => {
             try {
                 //lookup email
-                const email = req.params.email;
+                const email = req.body.email;
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
                     return res.status(400).send('That email was not found.')
@@ -168,11 +168,8 @@ module.exports = function (app) {
                             return res.status(200).send('A verification email has been sent to ' + email + '.')
                         }
                     });
-                }
-                
-                
+                }               
             } catch (err) {
-                console.log(err);
                 return res.status(500).send('Internal Server Error').end();
             }
         });
@@ -192,7 +189,7 @@ module.exports = function (app) {
 
                 //invalid password
             } catch (err) {
-
+                return res.status(500).send('Internal Server Error').end();
             }
-        })
+        });
 }

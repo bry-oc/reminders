@@ -21,3 +21,4 @@ exports.getEmailToken = async function(userID, token, currentDate) {
 exports.updateVerifiedUser = async function(userID) {
     return await pool.query('UPDATE "user" SET "verified" = true');
 }
+
