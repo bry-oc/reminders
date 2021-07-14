@@ -24,18 +24,21 @@ module.exports = function (app) {
     jwtOptions.jwtFromRequest = cookieHandler.cookieExtractor;
     jwtOptions.secretOrKey = process.env.JWT_SECRET;
     jwtOptions.refreshSecretOrKey = process.env.JWT_REFRESH_SECRET;
+    
 
-    let strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
-        let lookup = userQuery.getUserByUserID(jwt_payload.userid);
+    let strategy = new JwtStrategy(jwtOptions, async function(jwt_payload, next) {        
+        let lookup = await userQuery.getUserByUserID(jwt_payload.userid);
+        let user;
         if(lookup.rowCount <= 0 ) {
             next(null, false);
         } else {
-            let user = lookup.rows[0];
+            user = lookup.rows[0];
             next(null, user);
         }
     });
 
     passport.use(strategy);
+    
 
     app.route('/api/signup')
         .post(upload.none(), async (req, res) => {
@@ -223,8 +226,8 @@ module.exports = function (app) {
                         const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
                         const refreshPayload = { userid: user.userid, admin: user.admin }
                         const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
-                        res.cookie('jwt', token);
-                        res.cookie('refresh', refreshToken);
+                        res.cookie('jwt', token, { httpOnly: true, sameSite: true});
+                        res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: true });
                         res.json({success: true, token: token});
                     } else {
                         //password failed
@@ -235,5 +238,10 @@ module.exports = function (app) {
             } catch (err) {
                 return res.status(500).send('Internal Server Error').end();
             }
+        });
+    
+    app.route('/api/profile')
+        .get(passport.authenticate('jwt', {session: false}), (req, res) => {
+            res.send('access granted');
         });
 }
