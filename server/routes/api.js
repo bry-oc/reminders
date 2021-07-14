@@ -9,6 +9,7 @@ const passport = require('passport');
 const passportJWT = require('passport-jwt');
 const userQuery = require('../db/user');
 const authQuery = require('../db/auth');
+const cookieHandler = require('../tools/cookieExtractor');
 require('dotenv').config();
 
 //sign up
@@ -20,8 +21,9 @@ module.exports = function (app) {
     let JwtStrategy = passportJWT.Strategy;
     let jwtOptions = {};
 
-    jwtOptions.jwtFromRequest = ExtractJWT.fromAuthHeaderAsBearerToken();
+    jwtOptions.jwtFromRequest = cookieHandler.cookieExtractor;
     jwtOptions.secretOrKey = process.env.JWT_SECRET;
+    jwtOptions.refreshSecretOrKey = process.env.JWT_REFRESH_SECRET;
 
     let strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
         let lookup = userQuery.getUserByUserID(jwt_payload.userid);
@@ -213,9 +215,17 @@ module.exports = function (app) {
                     return res.status(404).send('Login failed. Username or password did not match.').end();
                 } else {
                     const passwordHash = lookup.rows[0].password;
-                    if(await argon2.verify(passwordHash, password)) {
+                    if(await argon2.verify(passwordHash, password)) {                        
                         //password match
                         //user is verified, generate and send tokens
+                        const user = lookup.rows[0];
+                        const payload = { userid: user.userid, username: user.username, email: user.email, admin: user.admin }
+                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
+                        const refreshPayload = { userid: user.userid, admin: user.admin }
+                        const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
+                        res.cookie('jwt', token);
+                        res.cookie('refresh', refreshToken);
+                        res.json({success: true, token: token});
                     } else {
                         //password failed
                         //invalid password
