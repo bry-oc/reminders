@@ -69,7 +69,7 @@ module.exports = function (app) {
                         //set two week expiration
                         const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 14;
                         //generate verfication token and store it
-                        lookup = await authQuery.createEmailToken(userID, hexString, expirationDate);
+                        lookup = await authQuery.createEmailVerificationToken(userID, hexString, expirationDate);
                         if (!lookup.rows[0].token) {
                             return res.status(500).send('Email token failed to generate.').end();
                         }
@@ -119,7 +119,7 @@ module.exports = function (app) {
                 const timestamp = new Date().getTime();
                 //lookup token
                 //ensure token is still valid then validate user
-                let lookup = await authQuery.getEmailToken(userID, token, timestamp);
+                let lookup = await authQuery.getEmailVerificationToken(userID, token, timestamp);
                 if (lookup.rowCount <= 0) {
                     //userid and token failed to validate
                     return res.status(404).send('Your verification link is invalid. Please request another link.').end();
@@ -168,7 +168,7 @@ module.exports = function (app) {
                     //set two week expiration
                     const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 14;
                     //generate verfication token and store it
-                    lookup = await authQuery.createEmailToken(userID, hexString, expirationDate);
+                    lookup = await authQuery.createEmailVerificationToken(userID, hexString, expirationDate);
                     if (!lookup.rows[0].token) {
                         return res.status(500).send('Email token failed to generate.').end();
                     }
@@ -313,4 +313,62 @@ module.exports = function (app) {
                 return res.status(500).send('Internal Server Error').end();
             }    
         });
+
+    app.route('/api/password/reset')
+        .post(async (req, res) => {
+            try {
+                //receive user email
+                const email = req.body.email
+                //lookup email in database
+                let lookup = await userQuery.getUserByEmail(email);
+                if(lookup.rowCount <= 0) {
+                    //email did not return a match
+                    return res.status(400).send('User does not exist');
+                } else {
+                    //create & store id and reset token in password_reset table
+                    const username = lookup.rows[0].username;
+                    const userID = lookup.rows[0].userid;
+                    const resetToken = crypto.randomBytes(16).toString('hex');
+                    //users have two days to use the reset token
+                    const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 2;
+                    let lookup = await authQuery.createResetEmailToken(userID, resetToken, expirationDate);
+                    //send email with id and reset token as parameters
+                    //send verification email
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: process.env.EMAIL_ACCOUNT,
+                            pass: process.env.EMAIL_PASSWORD
+                        }
+                    });
+
+                    const mailOptions = {
+                        from: process.env.EMAIL_ACCOUNT,
+                        to: email,
+                        subject: 'Password Reset Request',
+                        text: 'Hello ' + username + ',\n\nA password reset was requested. Please reset your password by clicking the link: \nhttp://localhost:3001/api/password/reset/' + userID + '/' + resetToken + '\nThis link will expire in two days.  If this password reset was not requested by you, please ignore this email.'
+                    }
+
+                    transporter.sendMail(mailOptions, function (err) {
+                        if (err) {
+                            return res.status(500).send('Email failed to send.').end();
+                        } else {
+                            return res.status(200).send('A reset password email has been sent to ' + email + '.').end();
+                        }
+                    });
+                }                
+            } catch (err) {
+                return res.status(500).send('Internal Server Error').end();
+            }
+        })
+    
+    app.route('/api/password/reset/:userid/:token')
+        .post(async (req, res) => {
+            try {
+                //receive new password
+                //lookup id and token in password_reset table
+            } catch (err) {
+
+            }
+        })
 }
