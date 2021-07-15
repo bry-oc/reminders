@@ -319,6 +319,9 @@ module.exports = function (app) {
             try {
                 //receive user email
                 const email = req.body.email
+                if(!email) {
+                    return res.status(400).send('Missing Required field!').end();
+                }
                 //lookup email in database
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
@@ -366,9 +369,26 @@ module.exports = function (app) {
         .post(async (req, res) => {
             try {
                 //receive new password
+                const password = req.body.password;
+                const userID = req.params.userid;
+                const token = req.params.token;
+                const timestamp = new Date().getTime();
+                if(!password) {
+                    return res.status(400).send('Missing required field!').end();
+                }
                 //lookup id and token in password_reset table
+                let lookup = await authQuery.getResetEmailToken(userID, token, timestamp);
+                if(lookup.rowCount <= 0) {
+                    return res.status(404).send('Your reset password link is invalid. Please request another link.').end();
+                } else {
+                    //id and token are valid
+                    //update password
+                    const passwordHash = await argon2.hash(password);
+                    await authQuery.updatePassword(userID, passwordHash);
+                    return res.status(200).send('Password has been reset successfully.').end();
+                }
             } catch (err) {
-
+                return res.status(500).send('Internal Server Error').end();
             }
         })
 }
