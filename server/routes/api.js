@@ -222,9 +222,11 @@ module.exports = function (app) {
                         //password match
                         //user is verified, generate and send tokens
                         const user = lookup.rows[0];
-                        const payload = { userid: user.userid, username: user.username, email: user.email, admin: user.admin }
+                        let jti = crypto.randomBytes(16).toString('hex');
+                        const payload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
                         const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
-                        const refreshPayload = { userid: user.userid, admin: user.admin }
+                        jti = crypto.randomBytes(16).toString('hex');
+                        const refreshPayload = { jti: jti, userid: user.userid }
                         const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
                         res.cookie('jwt', token, { httpOnly: true, sameSite: true});
                         res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: true });
@@ -243,5 +245,55 @@ module.exports = function (app) {
     app.route('/api/profile')
         .get(passport.authenticate('jwt', {session: false}), (req, res) => {
             res.send('access granted');
+        });
+    
+    //renew access token by verifying refresh token
+    //check the refresh token blacklist to ensure refresh token is still valid
+    //issue a renewed access token
+    app.route('/api/token/refresh')
+        .post(async (req, res) => {
+            try {
+
+            } catch (err) {
+
+            }
+        });
+    
+    //admins can revoke refresh tokens by blacklisting them
+    //the user will need to login again to generate a new refresh token
+    app.route('/api/token/revoke')
+        .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //receive admin cookies and given refresh token                
+                //decode access token jwt from cookie
+                const token = req.cookies['jwt'];
+                const blacklistToken = req.body.blacklistToken;
+                if(!token || !blacklistToken) {
+                    return res.status(400).send('Missing required field(s)!').end();
+                }
+                let decoded = jwt.verify(token, process.env.JWT_SECRET);
+                //verify user is an admin
+
+                let lookup = await authQuery.isAdmin(decoded.userid);
+                const isAdmin = lookup.rows[0].admin;
+                if(isAdmin) {
+                    decoded = jwt.verify(blacklistToken, process.env.JWT_REFRESH_SECRET)
+                    //blacklist requested refresh token
+                    //store jti and expiration timestamp of the token
+                    const decodedBlacklistToken = jwt.verify(blacklistToken, process.env.JWT_REFRESH_SECRET);
+                    const blacklistJTI = decodedBlacklistToken.jti;
+                    const blacklistExpirationDate = decodedBlacklistToken.exp;
+                    await authQuery.blacklistRefreshToken(blacklistJTI, blacklistExpirationDate);
+                    return res.status(200).send('Refresh token was successfully blacklisted.').end();
+                } else {
+                    //user is not an admin
+                    return res.status(401).send('User is unauthorized').end();
+                }
+            } catch (err) {
+                if(err.name === "JsonWebTokenError") {
+                    return res.status(400).send('Invalid Refresh Token').end();
+                }
+                return res.status(500).send('Internal Server Error ' +err).end();
+            }    
         });
 }
