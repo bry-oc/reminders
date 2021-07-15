@@ -270,7 +270,7 @@ module.exports = function (app) {
                 }
             } catch (err) {
                 if (err.name === "JsonWebTokenError") {
-                    return res.status(400).send('Invalid Refresh Token').end();
+                    return res.status(401).send('Invalid Refresh Token').end();
                 }
                 return res.status(500).send('Internal Server Error').end();
             }
