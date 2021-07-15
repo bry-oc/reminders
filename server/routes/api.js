@@ -5,8 +5,11 @@ const crypto = require('crypto');
 const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const passport = require('passport');
+const passportJWT = require('passport-jwt');
 const userQuery = require('../db/user');
 const authQuery = require('../db/auth');
+const cookieHandler = require('../tools/cookieExtractor');
 require('dotenv').config();
 
 //sign up
@@ -14,6 +17,28 @@ require('dotenv').config();
 //crud reminders
 module.exports = function (app) {
     const upload = multer();
+    let ExtractJWT = passportJWT.ExtractJwt;
+    let JwtStrategy = passportJWT.Strategy;
+    let jwtOptions = {};
+
+    jwtOptions.jwtFromRequest = cookieHandler.cookieExtractor;
+    jwtOptions.secretOrKey = process.env.JWT_SECRET;
+    jwtOptions.refreshSecretOrKey = process.env.JWT_REFRESH_SECRET;
+    
+
+    let strategy = new JwtStrategy(jwtOptions, async function(jwt_payload, next) {        
+        let lookup = await userQuery.getUserByUserID(jwt_payload.userid);
+        let user;
+        if(lookup.rowCount <= 0 ) {
+            next(null, false);
+        } else {
+            user = lookup.rows[0];
+            next(null, user);
+        }
+    });
+
+    passport.use(strategy);
+    
 
     app.route('/api/signup')
         .post(upload.none(), async (req, res) => {
@@ -22,7 +47,7 @@ module.exports = function (app) {
                 const username = req.body.username;
                 const password = req.body.password;
                 if (!email || !username || !password) {
-                    return res.status(500).send('Missing required field(s)!').end();
+                    return res.status(400).send('Missing required field(s)!').end();
                 }
                 //verify email is unique and username is unique
                 let lookup = await userQuery.getUserByEmail(email);
@@ -69,7 +94,7 @@ module.exports = function (app) {
                             if (err) {
                                 return res.status(500).send('Email failed to send.').end();
                             } else {
-                                return res.status(200).send('A verification email has been sent to ' + email + '.')
+                                return res.status(200).send('A verification email has been sent to ' + email + '.').end();
                             }
                         });
                     } else {
@@ -124,12 +149,15 @@ module.exports = function (app) {
             try {
                 //lookup email
                 const email = req.body.email;
+                if(!email){
+                    return res.status(400).send('Missing required field!').end();
+                }
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
-                    return res.status(400).send('That email was not found.')
+                    return res.status(400).send('That email was not found.').end();
                 } else if (lookup.rows[0].verified === true){
                     //the email is already validated
-                    return res.status(200).send('Your account is already verified.')
+                    return res.status(200).send('Your account is already verified.').end();
                 } else {
                     //the email is not validated, send a verification email
                     //create email token
@@ -165,7 +193,7 @@ module.exports = function (app) {
                         if (err) {
                             return res.status(500).send('Email failed to send.').end();
                         } else {
-                            return res.status(200).send('A verification email has been sent to ' + email + '.')
+                            return res.status(200).send('A verification email has been sent to ' + email + '.').end();
                         }
                     });
                 }               
@@ -175,21 +203,114 @@ module.exports = function (app) {
         });
 
     app.route('/api/login')
-        .post(upload.none(), (req, res) => {
+        .post(upload.none(), async (req, res) => {
             try {
                 //user provides username and password
                 const username = req.body.username;
                 const password = req.body.password;
-
+                if(!username || !password){
+                    return res.status(400).send('Missing required field(s)!').end();
+                }
                 //verify the username and password in the database
-
-                //user does not exist
-
-                //user is verified, generate and send tokens and redirect
-
-                //invalid password
+                let lookup = await userQuery.getUserByUsername(username);
+                if(lookup.rowCount <= 0) {
+                    //user does not exist
+                    return res.status(404).send('Login failed. Username or password did not match.').end();
+                } else {
+                    const passwordHash = lookup.rows[0].password;
+                    if(await argon2.verify(passwordHash, password)) {                        
+                        //password match
+                        //user is verified, generate and send tokens
+                        const user = lookup.rows[0];
+                        let jti = crypto.randomBytes(16).toString('hex');
+                        const payload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
+                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
+                        jti = crypto.randomBytes(16).toString('hex');
+                        const refreshPayload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
+                        const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
+                        res.cookie('jwt', token, { httpOnly: true, sameSite: true});
+                        res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: true });
+                        res.json({ success: true, token: token }).end();
+                    } else {
+                        //password failed
+                        //invalid password
+                        return res.status(404).send('Login failed. Username or password did not match.').end();
+                    }
+                }
             } catch (err) {
                 return res.status(500).send('Internal Server Error').end();
             }
+        });
+    
+    app.route('/api/profile')
+        .get(passport.authenticate('jwt', {session: false}), (req, res) => {
+            res.send('access granted');
+        });
+    
+    //renew access token by verifying refresh token
+    //check the refresh token blacklist to ensure refresh token is still valid
+    //issue a renewed access token
+    app.route('/api/token/refresh')
+        .post(async (req, res) => {
+            try {
+                const token = req.cookies['refresh'];
+                if(!token) {
+                    return res.status(401).send('Unauthorized').end();
+                }
+                const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+                let lookup = await authQuery.checkRefreshBlacklist(decoded.jti);
+                const isBlacklisted = lookup.rows[0].exists;
+                if(isBlacklisted) {
+                    return res.status(401).send('Unauthorized').end();
+                } else {
+                    const jti = crypto.randomBytes(16).toString('hex');
+                    const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
+                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
+                    res.cookie('jwt', token, { httpOnly: true, sameSite: true }).json({ success: true, token: token }).end();;
+                }
+            } catch (err) {
+                if (err.name === "JsonWebTokenError") {
+                    return res.status(401).send('Invalid Refresh Token').end();
+                }
+                return res.status(500).send('Internal Server Error').end();
+            }
+        });
+    
+    //admins can revoke refresh tokens by blacklisting them
+    //the user will need to login again to generate a new refresh token
+    app.route('/api/token/revoke')
+        .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //receive admin cookies and given refresh token                
+                //decode access token jwt from cookie
+                const token = req.cookies['jwt'];
+                const blacklistToken = req.body.blacklistToken;
+                if(!token || !blacklistToken) {
+                    return res.status(400).send('Missing required field(s)!').end();
+                }
+                let decoded = jwt.verify(token, process.env.JWT_SECRET);
+                //verify user is an admin
+
+                let lookup = await authQuery.isAdmin(decoded.userid);
+                const isAdmin = lookup.rows[0].admin;
+                if(isAdmin) {
+                    decoded = jwt.verify(blacklistToken, process.env.JWT_REFRESH_SECRET)
+                    //blacklist requested refresh token
+                    //store jti and expiration timestamp of the token
+                    const decodedBlacklistToken = jwt.verify(blacklistToken, process.env.JWT_REFRESH_SECRET);
+                    const blacklistJTI = decodedBlacklistToken.jti;
+                    const blacklistExpirationDate = decodedBlacklistToken.exp;
+                    await authQuery.blacklistRefreshToken(blacklistJTI, blacklistExpirationDate);
+                    return res.status(200).send('Refresh token was successfully blacklisted.').end();
+                } else {
+                    //user is not an admin
+                    return res.status(401).send('User is unauthorized').end();
+                }
+            } catch (err) {
+                if(err.name === "JsonWebTokenError") {
+                    return res.status(400).send('Invalid Refresh Token').end();
+                }
+                return res.status(500).send('Internal Server Error').end();
+            }    
         });
 }

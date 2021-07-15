@@ -1,8 +1,15 @@
 const express = require('express');
+const passport = require('passport');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const port = process.env.PORT || 3001;
 const apiRoutes = require('./routes/api.js');
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+app.use(passport.initialize());
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
     res.send('Hello World!');

@@ -18,11 +18,14 @@
   "homepage": "https://github.com/bry-oc/reminders#readme",
   "dependencies": {
     "argon2": "^0.28.2",
+    "cookie-parser": "^1.4.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2",
     "nodemailer": "^6.6.2",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
     "pg": "^8.6.0"
   }
 }
