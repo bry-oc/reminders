@@ -22,8 +22,8 @@ exports.updateVerifiedUser = async function(userid) {
     return await pool.query('UPDATE "user" SET "verified" = true WHERE "userid" = $1', [userid]);
 }
 
-exports.checkRefreshBlacklist = async function(token) {
-    return await pool.query('SELECT EXISTS (SELECT 1 FROM "refresh_blacklist" WHERE "token" = $1', [token]);
+exports.checkRefreshBlacklist = async function(tokenid) {
+    return await pool.query('SELECT EXISTS (SELECT 1 FROM "refresh_blacklist" WHERE "jti" = $1)', [tokenid]);
 }
 
 exports.blacklistRefreshToken = async function(tokenid, expirationDAte) {

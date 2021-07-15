@@ -226,11 +226,11 @@ module.exports = function (app) {
                         const payload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
                         const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
                         jti = crypto.randomBytes(16).toString('hex');
-                        const refreshPayload = { jti: jti, userid: user.userid }
+                        const refreshPayload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
                         const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
                         res.cookie('jwt', token, { httpOnly: true, sameSite: true});
                         res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: true });
-                        res.json({success: true, token: token});
+                        res.json({ success: true, token: token }).end();
                     } else {
                         //password failed
                         //invalid password
@@ -253,9 +253,26 @@ module.exports = function (app) {
     app.route('/api/token/refresh')
         .post(async (req, res) => {
             try {
-
+                const token = req.cookies['refresh'];
+                if(!token) {
+                    return res.status(401).send('Unauthorized').end();
+                }
+                const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+                let lookup = await authQuery.checkRefreshBlacklist(decoded.jti);
+                const isBlacklisted = lookup.rows[0].exists;
+                if(isBlacklisted) {
+                    return res.status(401).send('Unauthorized').end();
+                } else {
+                    const jti = crypto.randomBytes(16).toString('hex');
+                    const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
+                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
+                    res.cookie('jwt', token, { httpOnly: true, sameSite: true }).json({ success: true, token: token }).end();;
+                }
             } catch (err) {
-
+                if (err.name === "JsonWebTokenError") {
+                    return res.status(400).send('Invalid Refresh Token').end();
+                }
+                return res.status(500).send('Internal Server Error').end();
             }
         });
     
@@ -293,7 +310,7 @@ module.exports = function (app) {
                 if(err.name === "JsonWebTokenError") {
                     return res.status(400).send('Invalid Refresh Token').end();
                 }
-                return res.status(500).send('Internal Server Error ' +err).end();
+                return res.status(500).send('Internal Server Error').end();
             }    
         });
 }
