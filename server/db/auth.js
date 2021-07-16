@@ -42,6 +42,6 @@ exports.getResetEmailToken = async function(userID, token, currentDate) {
     return await pool.query('SELECT * FROM "password_reset" WHERE userid = $1 AND token = $2 AND ("expires" - $3 > 0)', [userID, token, currentDate]);
 }
 
-exports.updatePassword = async function(userID, password) {
-    return await pool.query('INSERT INTO "user" ("password") VALUES ($1) WHERE "userid" = $2', [password, userID]);
+exports.updatePasswordAndID = async function(userID, newUserID, password) {
+    return await pool.query('UPDATE "user" SET "password" = $1, "userid" = $2 WHERE "userid" = $3', [password, newUserID, userID]);
 }

@@ -58,12 +58,12 @@ module.exports = function (app) {
                         //username is also unique                        
                         //hash password
                         const passwordHash = await argon2.hash(password);
+                        const userID = crypto.randomBytes(16).toString('hex');
                         //create user that is unverified; they must become verified to use the app
-                        lookup = await userQuery.createUser(username, email, passwordHash);
+                        lookup = await userQuery.createUser(userID, username, email, passwordHash);
                         if (!lookup.rows[0].userid) {
                             return res.status(500).send('User creation failed.').end();
                         }
-                        const userID = lookup.rows[0].userid;
                         //create hash
                         const hexString = crypto.randomBytes(16).toString('hex');
                         //set two week expiration
@@ -106,6 +106,7 @@ module.exports = function (app) {
                     return res.status(403).send('That email is already being used.').end();
                 }
             } catch (err) {
+                console.log(err);
                 return res.status(500).send('Interal Server Error').end();
             }
 
@@ -258,9 +259,15 @@ module.exports = function (app) {
                     return res.status(401).send('Unauthorized').end();
                 }
                 const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-                let lookup = await authQuery.checkRefreshBlacklist(decoded.jti);
-                const isBlacklisted = lookup.rows[0].exists;
+                let lookup = await userQuery.getUserByUserID(decoded.userid);
+                if(lookup.rowCount <= 0) {
+                    res.clearCookie('refresh');
+                    return res.status(401).send('Unauthorized').end();
+                }
+                lookup = await authQuery.checkRefreshBlacklist(decoded.jti);
+                const isBlacklisted = lookup.rows[0].exists;               
                 if(isBlacklisted) {
+                    res.clearCookie('refresh');
                     return res.status(401).send('Unauthorized').end();
                 } else {
                     const jti = crypto.randomBytes(16).toString('hex');
@@ -270,6 +277,7 @@ module.exports = function (app) {
                 }
             } catch (err) {
                 if (err.name === "JsonWebTokenError") {
+                    res.clearCookie('refresh');
                     return res.status(401).send('Invalid Refresh Token').end();
                 }
                 return res.status(500).send('Internal Server Error').end();
@@ -315,7 +323,7 @@ module.exports = function (app) {
         });
 
     app.route('/api/password/reset')
-        .post(async (req, res) => {
+        .post(upload.none(), async (req, res) => {
             try {
                 //receive user email
                 const email = req.body.email
@@ -334,7 +342,7 @@ module.exports = function (app) {
                     const resetToken = crypto.randomBytes(16).toString('hex');
                     //users have two days to use the reset token
                     const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 2;
-                    let lookup = await authQuery.createResetEmailToken(userID, resetToken, expirationDate);
+                    lookup = await authQuery.createResetEmailToken(userID, resetToken, expirationDate);
                     //send email with id and reset token as parameters
                     //send verification email
                     const transporter = nodemailer.createTransport({
@@ -361,12 +369,13 @@ module.exports = function (app) {
                     });
                 }                
             } catch (err) {
+                console.log(err);
                 return res.status(500).send('Internal Server Error').end();
             }
         })
     
     app.route('/api/password/reset/:userid/:token')
-        .post(async (req, res) => {
+        .post(upload.none(), async (req, res) => {
             try {
                 //receive new password
                 const password = req.body.password;
@@ -382,12 +391,14 @@ module.exports = function (app) {
                     return res.status(404).send('Your reset password link is invalid. Please request another link.').end();
                 } else {
                     //id and token are valid
-                    //update password
+                    //update password and user id to prevent previous tokens having access
                     const passwordHash = await argon2.hash(password);
-                    await authQuery.updatePassword(userID, passwordHash);
+                    const newUserID = crypto.randomBytes(16).toString('hex');
+                    await authQuery.updatePasswordAndID(userID, newUserID, passwordHash);
                     return res.status(200).send('Password has been reset successfully.').end();
                 }
             } catch (err) {
+                console.log(err);
                 return res.status(500).send('Internal Server Error').end();
             }
         })

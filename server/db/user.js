@@ -22,6 +22,6 @@ exports.getUserByUserID = async function (userID) {
     return await pool.query('SELECT * from "user" WHERE "userid" = $1', [userID]);
 }
 
-exports.createUser = async function(username, email, password) {
-    return await pool.query('INSERT INTO "user"(username, email, password) VALUES($1,$2,$3) RETURNING userid', [username, email, password]);
+exports.createUser = async function(userID, username, email, password) {
+    return await pool.query('INSERT INTO "user"(userid, username, email, password) VALUES($1,$2,$3,$4) RETURNING userid', [userID, username, email, password]);
 }
