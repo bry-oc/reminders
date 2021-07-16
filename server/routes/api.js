@@ -1,56 +1,405 @@
 'use strict';
 
+const argon2 = require('argon2');
+const crypto = require('crypto');
 const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-const usersDB = require('../db/user');
+const passport = require('passport');
+const passportJWT = require('passport-jwt');
+const userQuery = require('../db/user');
+const authQuery = require('../db/auth');
+const cookieHandler = require('../tools/cookieExtractor');
 require('dotenv').config();
 
 //sign up
 //sign in
 //crud reminders
-module.exports = function(app) {
+module.exports = function (app) {
     const upload = multer();
+    let ExtractJWT = passportJWT.ExtractJwt;
+    let JwtStrategy = passportJWT.Strategy;
+    let jwtOptions = {};
+
+    jwtOptions.jwtFromRequest = cookieHandler.cookieExtractor;
+    jwtOptions.secretOrKey = process.env.JWT_SECRET;
+    jwtOptions.refreshSecretOrKey = process.env.JWT_REFRESH_SECRET;
+    
+
+    let strategy = new JwtStrategy(jwtOptions, async function(jwt_payload, next) {        
+        let lookup = await userQuery.getUserByUserID(jwt_payload.userid);
+        let user;
+        if(lookup.rowCount <= 0 ) {
+            next(null, false);
+        } else {
+            user = lookup.rows[0];
+            next(null, user);
+        }
+    });
+
+    passport.use(strategy);
+    
 
     app.route('/api/signup')
-        .post(upload.none(), (req, res) => {
-            const email = req.body.email;
-            const username = req.body.username;
-            const password = req.body.password;
-            //verify email is unique and username is unique
-            usersDB.getUserByEmailOrUsername(email, username);
-            //email or username is not unique            
+        .post(upload.none(), async (req, res) => {
+            try {
+                const email = req.body.email;
+                const username = req.body.username;
+                const password = req.body.password;
+                if (!email || !username || !password) {
+                    return res.status(400).send('Missing required field(s)!').end();
+                }
+                //verify email is unique and username is unique
+                let lookup = await userQuery.getUserByEmail(email);
+                if (lookup.rowCount === 0) {
+                    //email is unique
+                    let lookup = await userQuery.getUserByUsername(username);
+                    if (lookup.rowCount === 0) {
+                        //username is also unique                        
+                        //hash password
+                        const passwordHash = await argon2.hash(password);
+                        const userID = crypto.randomBytes(16).toString('hex');
+                        //create user that is unverified; they must become verified to use the app
+                        lookup = await userQuery.createUser(userID, username, email, passwordHash);
+                        if (!lookup.rows[0].userid) {
+                            return res.status(500).send('User creation failed.').end();
+                        }
+                        //create hash
+                        const hexString = crypto.randomBytes(16).toString('hex');
+                        //set two week expiration
+                        const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 14;
+                        //generate verfication token and store it
+                        lookup = await authQuery.createEmailVerificationToken(userID, hexString, expirationDate);
+                        if (!lookup.rows[0].token) {
+                            return res.status(500).send('Email token failed to generate.').end();
+                        }
+                        const emailToken = lookup.rows[0].token;
+                        //send verification email
+                        const transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: process.env.EMAIL_ACCOUNT,
+                                pass: process.env.EMAIL_PASSWORD
+                            }
+                        });
 
-            //generate verfication token and send verification email
+                        const mailOptions = {
+                            from: process.env.EMAIL_ACCOUNT,
+                            to: email,
+                            subject: 'Account Verification Link',
+                            text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3001/api/emailconfirmation/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
+                        }
+
+                        transporter.sendMail(mailOptions, function (err) {
+                            if (err) {
+                                return res.status(500).send('Email failed to send.').end();
+                            } else {
+                                return res.status(200).send('A verification email has been sent to ' + email + '.').end();
+                            }
+                        });
+                    } else {
+                        //username is being used
+                        return res.status(403).send('That username is already being used.').end();
+                    }
+                } else {
+                    //email is being used
+                    return res.status(403).send('That email is already being used.').end();
+                }
+            } catch (err) {
+                console.log(err);
+                return res.status(500).send('Interal Server Error').end();
+            }
 
         })
-    
-    app.route('/api/emailconfirmation/:email/:token')
-        .get((req, res) => {
-            //lookup token
-            //ensure token is still valid then validate and create user
-            //generate and send tokens and redirect
+
+    app.route('/api/emailconfirmation/:userid/:token')
+        .get(async (req, res) => {
+            try {
+                const userID = req.params.userid;
+                const token = req.params.token;
+                const timestamp = new Date().getTime();
+                //lookup token
+                //ensure token is still valid then validate user
+                let lookup = await authQuery.getEmailVerificationToken(userID, token, timestamp);
+                if (lookup.rowCount <= 0) {
+                    //userid and token failed to validate
+                    return res.status(404).send('Your verification link is invalid. Please request another link.').end();
+                } else {
+                    //the token is valid
+                    //check if the user is already verified
+                    lookup = await userQuery.getUserByUserID(userID);
+                    if (lookup.rowCount <= 0) {
+                        //the user was not found
+                        return res.status(404).send('That user does not exist.').end();
+                    } else if (lookup.rows[0].verified === true) {
+                        //the user is already verified
+                        return res.status(200).send('Your account is already verified.').end();
+                    } else {
+                        //update the user to verified
+                        await authQuery.updateVerifiedUser(userID);
+                        return res.status(200).send('Your account is now verified.').end();
+                    }
+                }
+            } catch (err) {
+                return res.status(500).send('Internal Server Error').end();
+            }
         });
 
-    app.route('/api/resendemailconfirmation/:email')
-        .get((req, res) => {
-            //lookup email
-            //the email is already validated
-            //the email is not validated, send a verification email
+    app.route('/api/resendemailconfirmation')
+        .post(upload.none(), async (req, res) => {
+            try {
+                //lookup email
+                const email = req.body.email;
+                if(!email){
+                    return res.status(400).send('Missing required field!').end();
+                }
+                let lookup = await userQuery.getUserByEmail(email);
+                if(lookup.rowCount <= 0) {
+                    return res.status(400).send('That email was not found.').end();
+                } else if (lookup.rows[0].verified === true){
+                    //the email is already validated
+                    return res.status(200).send('Your account is already verified.').end();
+                } else {
+                    //the email is not validated, send a verification email
+                    //create email token
+                    const userID = lookup.rows[0].userid;
+                    const username = lookup.rows[0].username;
+                    //create hash
+                    const hexString = crypto.randomBytes(16).toString('hex');
+                    //set two week expiration
+                    const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 14;
+                    //generate verfication token and store it
+                    lookup = await authQuery.createEmailVerificationToken(userID, hexString, expirationDate);
+                    if (!lookup.rows[0].token) {
+                        return res.status(500).send('Email token failed to generate.').end();
+                    }
+                    const emailToken = lookup.rows[0].token;
+                    //send verification email
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: process.env.EMAIL_ACCOUNT,
+                            pass: process.env.EMAIL_PASSWORD
+                        }
+                    });
+
+                    const mailOptions = {
+                        from: process.env.EMAIL_ACCOUNT,
+                        to: email,
+                        subject: 'Account Verification Link',
+                        text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3001/api/emailconfirmation/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
+                    }
+
+                    transporter.sendMail(mailOptions, function (err) {
+                        if (err) {
+                            return res.status(500).send('Email failed to send.').end();
+                        } else {
+                            return res.status(200).send('A verification email has been sent to ' + email + '.').end();
+                        }
+                    });
+                }               
+            } catch (err) {
+                return res.status(500).send('Internal Server Error').end();
+            }
         });
 
     app.route('/api/login')
-        .post(upload.none(), (req, res) => {
-            //user provides username and password
-            const username = req.body.username;
-            const password = req.body.password;
+        .post(upload.none(), async (req, res) => {
+            try {
+                //user provides username and password
+                const username = req.body.username;
+                const password = req.body.password;
+                if(!username || !password){
+                    return res.status(400).send('Missing required field(s)!').end();
+                }
+                //verify the username and password in the database
+                let lookup = await userQuery.getUserByUsername(username);
+                if(lookup.rowCount <= 0) {
+                    //user does not exist
+                    return res.status(404).send('Login failed. Username or password did not match.').end();
+                } else {
+                    const passwordHash = lookup.rows[0].password;
+                    if(await argon2.verify(passwordHash, password)) {                        
+                        //password match
+                        //user is verified, generate and send tokens
+                        const user = lookup.rows[0];
+                        let jti = crypto.randomBytes(16).toString('hex');
+                        const payload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
+                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
+                        jti = crypto.randomBytes(16).toString('hex');
+                        const refreshPayload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
+                        const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
+                        res.cookie('jwt', token, { httpOnly: true, sameSite: true});
+                        res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: true });
+                        res.json({ success: true, token: token }).end();
+                    } else {
+                        //password failed
+                        //invalid password
+                        return res.status(404).send('Login failed. Username or password did not match.').end();
+                    }
+                }
+            } catch (err) {
+                return res.status(500).send('Internal Server Error').end();
+            }
+        });
+    
+    app.route('/api/profile')
+        .get(passport.authenticate('jwt', {session: false}), (req, res) => {
+            res.send('access granted');
+        });
+    
+    //renew access token by verifying refresh token
+    //check the refresh token blacklist to ensure refresh token is still valid
+    //issue a renewed access token
+    app.route('/api/token/refresh')
+        .post(async (req, res) => {
+            try {
+                const token = req.cookies['refresh'];
+                if(!token) {
+                    return res.status(401).send('Unauthorized').end();
+                }
+                const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+                let lookup = await userQuery.getUserByUserID(decoded.userid);
+                if(lookup.rowCount <= 0) {
+                    res.clearCookie('refresh');
+                    return res.status(401).send('Unauthorized').end();
+                }
+                lookup = await authQuery.checkRefreshBlacklist(decoded.jti);
+                const isBlacklisted = lookup.rows[0].exists;               
+                if(isBlacklisted) {
+                    res.clearCookie('refresh');
+                    return res.status(401).send('Unauthorized').end();
+                } else {
+                    const jti = crypto.randomBytes(16).toString('hex');
+                    const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
+                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
+                    res.cookie('jwt', token, { httpOnly: true, sameSite: true }).json({ success: true, token: token }).end();;
+                }
+            } catch (err) {
+                if (err.name === "JsonWebTokenError") {
+                    res.clearCookie('refresh');
+                    return res.status(401).send('Invalid Refresh Token').end();
+                }
+                return res.status(500).send('Internal Server Error').end();
+            }
+        });
+    
+    //admins can revoke refresh tokens by blacklisting them
+    //the user will need to login again to generate a new refresh token
+    app.route('/api/token/revoke')
+        .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //receive admin cookies and given refresh token                
+                //decode access token jwt from cookie
+                const token = req.cookies['jwt'];
+                const blacklistToken = req.body.blacklistToken;
+                if(!token || !blacklistToken) {
+                    return res.status(400).send('Missing required field(s)!').end();
+                }
+                let decoded = jwt.verify(token, process.env.JWT_SECRET);
+                //verify user is an admin
 
-            //verify the username and password in the database
+                let lookup = await authQuery.isAdmin(decoded.userid);
+                const isAdmin = lookup.rows[0].admin;
+                if(isAdmin) {
+                    decoded = jwt.verify(blacklistToken, process.env.JWT_REFRESH_SECRET)
+                    //blacklist requested refresh token
+                    //store jti and expiration timestamp of the token
+                    const decodedBlacklistToken = jwt.verify(blacklistToken, process.env.JWT_REFRESH_SECRET);
+                    const blacklistJTI = decodedBlacklistToken.jti;
+                    const blacklistExpirationDate = decodedBlacklistToken.exp;
+                    await authQuery.blacklistRefreshToken(blacklistJTI, blacklistExpirationDate);
+                    return res.status(200).send('Refresh token was successfully blacklisted.').end();
+                } else {
+                    //user is not an admin
+                    return res.status(401).send('User is unauthorized').end();
+                }
+            } catch (err) {
+                if(err.name === "JsonWebTokenError") {
+                    return res.status(400).send('Invalid Refresh Token').end();
+                }
+                return res.status(500).send('Internal Server Error').end();
+            }    
+        });
 
-            //user does not exist
+    app.route('/api/password/reset')
+        .post(upload.none(), async (req, res) => {
+            try {
+                //receive user email
+                const email = req.body.email
+                if(!email) {
+                    return res.status(400).send('Missing Required field!').end();
+                }
+                //lookup email in database
+                let lookup = await userQuery.getUserByEmail(email);
+                if(lookup.rowCount <= 0) {
+                    //email did not return a match
+                    return res.status(400).send('User does not exist');
+                } else {
+                    //create & store id and reset token in password_reset table
+                    const username = lookup.rows[0].username;
+                    const userID = lookup.rows[0].userid;
+                    const resetToken = crypto.randomBytes(16).toString('hex');
+                    //users have two days to use the reset token
+                    const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 2;
+                    lookup = await authQuery.createResetEmailToken(userID, resetToken, expirationDate);
+                    //send email with id and reset token as parameters
+                    //send verification email
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: process.env.EMAIL_ACCOUNT,
+                            pass: process.env.EMAIL_PASSWORD
+                        }
+                    });
 
-            //user is verified, generate and send tokens and redirect
+                    const mailOptions = {
+                        from: process.env.EMAIL_ACCOUNT,
+                        to: email,
+                        subject: 'Password Reset Request',
+                        text: 'Hello ' + username + ',\n\nA password reset was requested. Please reset your password by clicking the link: \nhttp://localhost:3001/api/password/reset/' + userID + '/' + resetToken + '\nThis link will expire in two days.  If this password reset was not requested by you, please ignore this email.'
+                    }
 
-            //invalid password
+                    transporter.sendMail(mailOptions, function (err) {
+                        if (err) {
+                            return res.status(500).send('Email failed to send.').end();
+                        } else {
+                            return res.status(200).send('A reset password email has been sent to ' + email + '.').end();
+                        }
+                    });
+                }                
+            } catch (err) {
+                console.log(err);
+                return res.status(500).send('Internal Server Error').end();
+            }
+        })
+    
+    app.route('/api/password/reset/:userid/:token')
+        .post(upload.none(), async (req, res) => {
+            try {
+                //receive new password
+                const password = req.body.password;
+                const userID = req.params.userid;
+                const token = req.params.token;
+                const timestamp = new Date().getTime();
+                if(!password) {
+                    return res.status(400).send('Missing required field!').end();
+                }
+                //lookup id and token in password_reset table
+                let lookup = await authQuery.getResetEmailToken(userID, token, timestamp);
+                if(lookup.rowCount <= 0) {
+                    return res.status(404).send('Your reset password link is invalid. Please request another link.').end();
+                } else {
+                    //id and token are valid
+                    //update password and user id to prevent previous tokens having access
+                    const passwordHash = await argon2.hash(password);
+                    const newUserID = crypto.randomBytes(16).toString('hex');
+                    await authQuery.updatePasswordAndID(userID, newUserID, passwordHash);
+                    return res.status(200).send('Password has been reset successfully.').end();
+                }
+            } catch (err) {
+                console.log(err);
+                return res.status(500).send('Internal Server Error').end();
+            }
         })
 }
