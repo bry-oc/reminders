@@ -9,6 +9,7 @@ const passport = require('passport');
 const passportJWT = require('passport-jwt');
 const userQuery = require('../db/user');
 const authQuery = require('../db/auth');
+const reminderQuery = require('../db/reminder');
 const cookieHandler = require('../tools/cookieExtractor');
 require('dotenv').config();
 
@@ -372,7 +373,7 @@ module.exports = function (app) {
                 console.log(err);
                 return res.status(500).send('Internal Server Error').end();
             }
-        })
+        });
     
     app.route('/api/password/reset/:userid/:token')
         .post(upload.none(), async (req, res) => {
@@ -398,8 +399,48 @@ module.exports = function (app) {
                     return res.status(200).send('Password has been reset successfully.').end();
                 }
             } catch (err) {
+                return res.status(500).send('Internal Server Error').end();
+            }
+        });
+    
+    app.route('/api/reminder/create')
+        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const reminderName = req.body.reminderName;
+                const timezone = req.body.timezone;
+                let reminderDescription = req.body.reminderDescription;
+                let reminderRepeat = req.body.reminderRepeat;
+                let reminderDate = req.body.reminderDate;
+                let reminderTime = req.body.reminderTime;   
+                
+                if(!userID || !reminderName || !reminderDate || !reminderTime) {
+                    return res.status(400).send('Missing required field(s)!').end();
+                }
+
+                if(!reminderRepeat) {
+                    reminderRepeat = 'never';
+                }
+                if(!reminderDescription) {
+                    reminderDescription = '';
+                }
+
+                const reminderHours = reminderTime.split(':')[0];
+                const reminderMinutes = reminderTime.split(':')[1];
+                reminderDate = new Date(reminderDate);
+                reminderDate.setUTCHours = reminderHours + timezone;
+                reminderDate.setUTCMinutes = reminderMinutes;
+                reminderDate = reminderDate.getTime();
+                
+                
+                await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
+                return res.send('success').end();
+            } catch(err) {
                 console.log(err);
                 return res.status(500).send('Internal Server Error').end();
             }
         })
+        
 }
