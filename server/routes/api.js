@@ -441,7 +441,7 @@ module.exports = function (app) {
                 //create the reminder and return its id
                 let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
                 const reminderid = lookup.rows[0].reminderid;
-                return res.json({ reminderid: reminderid }).end();
+                return res.status(200).json({ reminderid: reminderid }).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).send('Internal Server Error').end();
@@ -451,15 +451,30 @@ module.exports = function (app) {
     app.route('/api/reminder/update')
         .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
+                //recieve user info and reminder data
+                //frontend will provide all fields
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
+                const reminderID = req.body.reminderid;
                 const reminderName = req.body.reminderName;
                 const timezone = req.body.timezone;
                 let reminderDescription = req.body.reminderDescription;
                 let reminderRepeat = req.body.reminderRepeat;
                 let reminderDate = req.body.reminderDate;
                 let reminderTime = req.body.reminderTime;
+
+                //get timestamp from the given date and time
+                const reminderHours = reminderTime.split(':')[0];
+                const reminderMinutes = reminderTime.split(':')[1];
+                reminderDate = new Date(reminderDate);
+                reminderDate.setUTCHours = reminderHours + timezone;
+                reminderDate.setUTCMinutes = reminderMinutes;
+                reminderDate = reminderDate.getTime();
+
+                //update the reminder and return the values
+                await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderDate);
+                return res.status(200).json({ reminderid: reminderid, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).send('Internal Server Error').end();
