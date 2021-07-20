@@ -491,7 +491,22 @@ module.exports = function (app) {
             //get all reminders and return them
             let lookup = await reminderQuery.getAllReminders(userID);
             return res.status(200).json(lookup.rows).end();
+        });    
+
+    app.route('/api/reminder/delete')
+        .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const reminderID = req.body.reminderid;
+
+                await reminderQuery.deleteReminder(userID, reminderID);
+                return res.status(200).send('Reminder Deleted').end();
+            } catch (err) {
+                console.log(err);
+                return res.status(500).send('Internal Server Error').end();
+            }
         });
-    
-    
+
 }
