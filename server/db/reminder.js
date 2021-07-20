@@ -11,7 +11,7 @@ const pool = new Pool({
 });
 
 exports.createReminder = async function(userid, name, description, repeat, date) {
-    return await pool.query('INSERT INTO "reminder" ("userid", "name", "description", "repeat", "date") VALUES ($1, $2, $3, $4, $5)', [userid, name, description, repeat, date]);
+    return await pool.query('INSERT INTO "reminder" ("userid", "name", "description", "repeat", "date") VALUES ($1, $2, $3, $4, $5) RETURNING "reminderid"', [userid, name, description, repeat, date]);
 }
 
 exports.getAllReminders = async function(userID) {
