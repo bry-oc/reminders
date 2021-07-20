@@ -28,3 +28,11 @@ exports.deleteReminder = async function(userID, reminderID) {
 exports.updateUserID = async function(newUserID, userID) {
     return await pool.query('UPDATE "reminder" SET userid = $1 WHERE userid = $2', [newUserID, userID]);
 }
+
+exports.checkMissedReminders = async function(currentDate) {
+    return await pool.query('SELECT * FROM "reminder" WHERE ("date" - $1) < 0 AND "sent" = $2', [currentDate, false]);
+}
+
+exports.setReminderSent = async function(reminderID) {
+    return await pool.query('UPDATE "reminder" SET "sent" = $1 WHERE "reminderid" = $2',[true, reminderID]);
+}
