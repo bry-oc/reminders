@@ -9,6 +9,7 @@ const passport = require('passport');
 const passportJWT = require('passport-jwt');
 const userQuery = require('../db/user');
 const authQuery = require('../db/auth');
+const reminderQuery = require('../db/reminder');
 const cookieHandler = require('../tools/cookieExtractor');
 require('dotenv').config();
 
@@ -372,7 +373,7 @@ module.exports = function (app) {
                 console.log(err);
                 return res.status(500).send('Internal Server Error').end();
             }
-        })
+        });
     
     app.route('/api/password/reset/:userid/:token')
         .post(upload.none(), async (req, res) => {
@@ -392,14 +393,127 @@ module.exports = function (app) {
                 } else {
                     //id and token are valid
                     //update password and user id to prevent previous tokens having access
+                    //update associated reminders
                     const passwordHash = await argon2.hash(password);
                     const newUserID = crypto.randomBytes(16).toString('hex');
                     await authQuery.updatePasswordAndID(userID, newUserID, passwordHash);
+                    await reminderQuery.updateUserID(newUserID, userID);
                     return res.status(200).send('Password has been reset successfully.').end();
                 }
+            } catch (err) {
+                return res.status(500).send('Internal Server Error').end();
+            }
+        });
+    
+    app.route('/api/reminder/create')
+        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //receieve user info and reminder data
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const reminderName = req.body.reminderName;
+                const timezone = req.body.timezone;
+                let reminderDescription = req.body.reminderDescription;
+                let reminderRepeat = req.body.reminderRepeat;
+                let reminderDate = req.body.reminderDate;
+                let reminderTime = req.body.reminderTime;   
+                
+                //return error if required fields are missing
+                if(!userID || !reminderName || !reminderDate || !reminderTime) {
+                    return res.status(400).send('Missing required field(s)!').end();
+                }
+
+                //set default values for optional parameters if not provided
+                if(!reminderRepeat) {
+                    reminderRepeat = 'never';
+                }
+                if(!reminderDescription) {
+                    reminderDescription = '';
+                }
+
+                //get timestamp from the given date and time
+                const reminderHours = reminderTime.split(':')[0];
+                const reminderMinutes = reminderTime.split(':')[1];
+                reminderDate = new Date(reminderDate);
+                reminderDate.setUTCHours = reminderHours + timezone;
+                reminderDate.setUTCMinutes = reminderMinutes;
+                reminderDate = reminderDate.getTime();                
+                
+                //create the reminder and return its id
+                let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
+                const reminderid = lookup.rows[0].reminderid;
+                return res.status(200).json({ reminderid: reminderid }).end();
+            } catch(err) {
+                console.log(err);
+                return res.status(500).send('Internal Server Error').end();
+            }
+        });
+    
+    app.route('/api/reminder/update')
+        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //recieve user info and reminder data
+                //frontend will provide all fields
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const reminderID = req.body.reminderid;
+                const reminderName = req.body.reminderName;
+                const timezone = req.body.timezone;
+                let reminderDescription = req.body.reminderDescription;
+                let reminderRepeat = req.body.reminderRepeat;
+                let reminderDate = req.body.reminderDate;
+                let reminderTime = req.body.reminderTime;
+
+                //get timestamp from the given date and time
+                const reminderHours = reminderTime.split(':')[0];
+                const reminderMinutes = reminderTime.split(':')[1];
+                reminderDate = new Date(reminderDate);
+                reminderDate.setUTCHours = reminderHours + timezone;
+                reminderDate.setUTCMinutes = reminderMinutes;
+                reminderDate = reminderDate.getTime();
+
+                //update the reminder and return the values
+                await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderDate);
+                return res.status(200).json({ reminderid: reminderid, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
+            } catch(err) {
+                console.log(err);
+                return res.status(500).send('Internal Server Error').end();
+            }
+        });
+    
+    app.route('/api/reminder/list')
+        .get(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //get user id
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+
+                //get all reminders and return them
+                let lookup = await reminderQuery.getAllReminders(userID);
+                return res.status(200).json(lookup.rows).end();
+            } catch(err) {
+                console.log(err);
+                return res.status(500).send('Internal Server Error').end();
+            }            
+        });    
+
+    app.route('/api/reminder/delete')
+        .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const reminderID = req.body.reminderid;
+
+                await reminderQuery.deleteReminder(userID, reminderID);
+                return res.status(200).send('Reminder Deleted').end();
             } catch (err) {
                 console.log(err);
                 return res.status(500).send('Internal Server Error').end();
             }
-        })
+        });
+
 }
