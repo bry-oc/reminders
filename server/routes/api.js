@@ -480,5 +480,18 @@ module.exports = function (app) {
                 return res.status(500).send('Internal Server Error').end();
             }
         });
-        
+    
+    app.route('/api/reminder/list')
+        .get(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            //get user id
+            const token = req.cookies['jwt'];
+            const user = jwt.verify(token, process.env.JWT_SECRET);
+            const userID = user.userid;
+
+            //get all reminders and return them
+            let lookup = await reminderQuery.getAllReminders(userID);
+            return res.status(200).json(lookup.rows).end();
+        });
+    
+    
 }
