@@ -393,9 +393,11 @@ module.exports = function (app) {
                 } else {
                     //id and token are valid
                     //update password and user id to prevent previous tokens having access
+                    //update associated reminders
                     const passwordHash = await argon2.hash(password);
                     const newUserID = crypto.randomBytes(16).toString('hex');
                     await authQuery.updatePasswordAndID(userID, newUserID, passwordHash);
+                    await reminderQuery.updateUserID(newUserID, userID);
                     return res.status(200).send('Password has been reset successfully.').end();
                 }
             } catch (err) {

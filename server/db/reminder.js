@@ -24,3 +24,7 @@ exports.updateReminder = async function(userID, reminderID, name, description, r
 exports.deleteReminder = async function(userID, reminderID) {
     return await pool.query('DELETE FROM "reminder" WHERE "userid" = $1 AND "reminderid" = $2', [userID, reminderID]);
 }
+
+exports.updateUserID = async function(newUserID, userID) {
+    return await pool.query('UPDATE "reminder" SET userid = $1 WHERE userid = $2', [newUserID, userID]);
+}
