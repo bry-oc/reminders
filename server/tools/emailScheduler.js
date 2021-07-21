@@ -67,3 +67,15 @@ exports.checkMissedReminders = async function() {
     
     return;
 }
+
+exports.initializeAllReminders = async function() {
+    //set cron jobs for all active reminders after server restart
+}
+
+exports.createReminder = async function() {
+    //create cron job when reminder is created
+}
+
+exports.updateReminder = async function() {
+    //delete ongoing cron job and create new job with updated information
+}
