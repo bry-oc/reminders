@@ -1,8 +1,10 @@
 'use strict';
+
+const nodemailer = require('nodemailer');
 const { Pool } = require('pg');
+const schedule = require('node-schedule');
 const reminderQuery = require('../db/reminder');
 const userQuery = require('../db/user');
-const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const pool = new Pool({
@@ -72,8 +74,35 @@ exports.initializeAllReminders = async function() {
     //set cron jobs for all active reminders after server restart
 }
 
-exports.createReminder = async function() {
+exports.createReminder = async function(user, reminder) {
     //create cron job when reminder is created
+    const date = new Date(reminder.timestamp);
+
+    const job = schedule.scheduleJob(date, function(){
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_ACCOUNT,
+                pass: process.env.EMAIL_PASSWORD
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_ACCOUNT,
+            to: user.email,
+            subject: 'Reminder Notification: ' + reminder.name,
+            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + reminder.userid + "/reminder/" + reminder.reminderid + "'>here</a>."
+        }
+
+
+        transporter.sendMail(mailOptions, async function (err) {
+            if (err) {
+                console.log(err);
+            } else {
+                await reminderQuery.setReminderSent(reminder.reminderid);
+            }
+        });
+    });
 }
 
 exports.updateReminder = async function() {
