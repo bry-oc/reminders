@@ -72,6 +72,54 @@ exports.checkMissedReminders = async function() {
 
 exports.initializeAllReminders = async function() {
     //set cron jobs for all active reminders after server restart
+    const currentDate = new Date().getTime();
+    let lookup = await reminderQuery.listCurrentReminders(currentDate);
+    let count = lookup.rowCount;
+    const reminders = lookup.rows;
+    let email;
+    let username;
+    let reminderName;
+    let reminderID;
+    let userID;
+    let jobs;
+
+    //for each reminder, create a job
+    for (let i = 0; i < count; i++) {
+        userID = reminders[i].userid;
+        lookup = await userQuery.getUserByUserID(userID);
+        email = lookup.rows[0].email;
+        username = lookup.rows[0].username;
+        reminderName = reminders[i].name;
+        reminderID = reminders[i].reminderid;
+
+        const job = schedule.scheduleJob(date, function () {
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_ACCOUNT,
+                    pass: process.env.EMAIL_PASSWORD
+                }
+            });
+
+            const mailOptions = {
+                from: process.env.EMAIL_ACCOUNT,
+                to: user.email,
+                subject: 'Reminder Notification: ' + reminder.name,
+                html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + reminder.userid + "/reminder/" + reminder.reminderid + "'>here</a>."
+            }
+
+
+            transporter.sendMail(mailOptions, async function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    jobs.push(job);
+                }
+            });
+        });
+    }
+
+    return jobs;
 }
 
 exports.createReminder = async function(user, reminder) {
