@@ -100,11 +100,42 @@ exports.createReminder = async function(user, reminder) {
                 console.log(err);
             } else {
                 await reminderQuery.setReminderSent(reminder.reminderid);
+                return job;
             }
         });
     });
 }
 
-exports.updateReminder = async function() {
+exports.updateReminder = async function(job, reminder, user) {
     //delete ongoing cron job and create new job with updated information
+    const currentJob = schedule.scheduleJob[job];
+    currentJob.cancel();
+
+    const job = schedule.scheduleJob(date, function () {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_ACCOUNT,
+                pass: process.env.EMAIL_PASSWORD
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_ACCOUNT,
+            to: user.email,
+            subject: 'Reminder Notification: ' + reminder.name,
+            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + reminder.userid + "/reminder/" + reminder.reminderid + "'>here</a>."
+        }
+
+
+        transporter.sendMail(mailOptions, async function (err) {
+            if (err) {
+                console.log(err);
+            } else {
+                await reminderQuery.setReminderSent(reminder.reminderid);
+                return job;
+            }
+        });
+    });
+
 }
