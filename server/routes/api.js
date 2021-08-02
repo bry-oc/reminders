@@ -418,8 +418,8 @@ module.exports = function (app) {
                 let reminderDescription = req.body.reminderDescription;
                 let reminderRepeat = req.body.reminderRepeat;
                 let reminderDate = req.body.reminderDate;
-                let reminderTime = req.body.reminderTime;   
-                
+                let reminderTime = req.body.reminderTime;  
+
                 //return error if required fields are missing
                 if(!userID || !reminderName || !reminderDate || !reminderTime) {
                     return res.status(400).send('Missing required field(s)!').end();
@@ -439,11 +439,21 @@ module.exports = function (app) {
                 reminderDate = new Date(reminderDate);
                 reminderDate.setUTCHours(reminderHours + timezone);
                 reminderDate.setUTCMinutes(reminderMinutes);
-                reminderDate = reminderDate.getTime();                
+                reminderDate = reminderDate.getTime();
+                
+                const reminder = {
+                    reminderid: reminderID,
+                    name: reminderName,
+                    date: reminderDate,
+                    userid: userID
+                }
                 
                 //create the reminder and return its id
                 let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
                 const reminderid = lookup.rows[0].reminderid;
+                //create job for the reminder email
+                await emailScheduler.createReminder(user, reminder);
+
                 return res.status(200).json({ reminderid: reminderid }).end();
             } catch(err) {
                 console.log(err);
@@ -515,7 +525,7 @@ module.exports = function (app) {
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
                 const reminderID = req.body.reminderid;
-
+                await emailScheduler.deleteReminder(reminderID);
                 await reminderQuery.deleteReminder(userID, reminderID);
                 return res.status(200).send('Reminder Deleted').end();
             } catch (err) {
