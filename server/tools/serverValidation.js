@@ -40,7 +40,7 @@ exports.isValidDate = function(date) {
 }
 
 exports.isValidTime = function(time) {
-    //HH:MM format
+    // HH:MM format
     const filter = /^(0?[1-9]|1[012])[:](0?[1-9]|[1-9][0-9])$/
     return filter.test(time);
 }
