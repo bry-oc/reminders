@@ -491,9 +491,9 @@ module.exports = function (app) {
                     date: reminderDate,
                     userid: userID
                 }
-                //update the reminder and return the values
-                await emailScheduler.updateReminder(reminder, user);
+                //update the reminder and return the values                
                 await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderDate);
+                await emailScheduler.updateReminder(reminder, user);
                 return res.status(200).json({ reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
             } catch(err) {
                 console.log(err);
@@ -524,9 +524,9 @@ module.exports = function (app) {
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
-                const reminderID = req.body.reminderid;
-                await emailScheduler.deleteReminder(reminderID);
+                const reminderID = req.body.reminderid;                
                 await reminderQuery.deleteReminder(userID, reminderID);
+                await emailScheduler.deleteReminder(reminderID);
                 return res.status(200).send('Reminder Deleted').end();
             } catch (err) {
                 console.log(err);

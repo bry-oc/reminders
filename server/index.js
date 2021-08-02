@@ -16,8 +16,6 @@ app.use(cookieParser());
 emailScheduler.initializeAllReminders();
 emailScheduler.checkMissedReminders();
 
-
-
 app.get('/', (req, res) => {
     res.send('Hello World!');
 })
