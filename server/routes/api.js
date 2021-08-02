@@ -11,6 +11,7 @@ const userQuery = require('../db/user');
 const authQuery = require('../db/auth');
 const reminderQuery = require('../db/reminder');
 const cookieHandler = require('../tools/cookieExtractor');
+const emailScheduler = require('../tools/emailScheduler');
 require('dotenv').config();
 
 //sign up
@@ -473,10 +474,17 @@ module.exports = function (app) {
                 reminderDate.setUTCHours = reminderHours + timezone;
                 reminderDate.setUTCMinutes = reminderMinutes;
                 reminderDate = reminderDate.getTime();
-
+                const reminder = {
+                    reminderid: reminderID,
+                    name: reminderName,
+                    date: reminderDate,
+                    userid: userID
+                }
                 //update the reminder and return the values
+                let newReminder = await emailScheduler.updateReminder(reminder, user);
+                console.log(newReminder);
                 await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderDate);
-                return res.status(200).json({ reminderid: reminderid, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
+                return res.status(200).json({ reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).send('Internal Server Error').end();

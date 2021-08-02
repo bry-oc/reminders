@@ -94,7 +94,7 @@ exports.initializeAllReminders = async function() {
         reminderID = reminders[i].reminderid;
         date = reminders[i].date;
         console.log(reminderID);
-        jobs[reminderID] = schedule.scheduleJob(date, function () {
+        jobs[reminderID] = schedule.scheduleJob(reminderID.toString(), date, function () {
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -134,7 +134,7 @@ exports.createReminder = async function(user, reminder) {
     const date = new Date(reminder.timestamp);
     let job = {};
     
-    job[reminder.reminderid] = schedule.scheduleJob(date, function(){
+    job[reminder.reminderid] = schedule.scheduleJob(reminderID.toString(), date, function(){
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -164,10 +164,13 @@ exports.createReminder = async function(user, reminder) {
 
 exports.updateReminder = async function(reminder, user) {
     //delete ongoing cron job and create new job with updated information
-    const currentJob = schedule.scheduleJob[job[reminder.reminderid]];
+    console.log(schedule.scheduledJobs[2]);
+    const currentJob = schedule.scheduledJobs[(reminder.reminderid).toString()];
     currentJob.cancel();
     let newJob = {};
-    newJob[reminder.reminderid] = schedule.scheduleJob(date, function () {
+    const date = new Date(reminder.date);
+    
+    newJob[reminder.reminderid] = schedule.scheduleJob((reminder.reminderid).toString(), date, function () {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
