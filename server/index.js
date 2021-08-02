@@ -1,15 +1,20 @@
 const express = require('express');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
+const schedule = require('node-schedule');
 
 const app = express();
 const port = process.env.PORT || 3001;
 const apiRoutes = require('./routes/api.js');
+const emailScheduler = require('./tools/emailScheduler');
+
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(passport.initialize());
 app.use(cookieParser());
+emailScheduler.initializeAllReminders();
+emailScheduler.checkMissedReminders();
 
 app.get('/', (req, res) => {
     res.send('Hello World!');

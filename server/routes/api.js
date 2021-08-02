@@ -11,6 +11,7 @@ const userQuery = require('../db/user');
 const authQuery = require('../db/auth');
 const reminderQuery = require('../db/reminder');
 const cookieHandler = require('../tools/cookieExtractor');
+const emailScheduler = require('../tools/emailScheduler');
 require('dotenv').config();
 
 //sign up
@@ -417,8 +418,8 @@ module.exports = function (app) {
                 let reminderDescription = req.body.reminderDescription;
                 let reminderRepeat = req.body.reminderRepeat;
                 let reminderDate = req.body.reminderDate;
-                let reminderTime = req.body.reminderTime;   
-                
+                let reminderTime = req.body.reminderTime;  
+
                 //return error if required fields are missing
                 if(!userID || !reminderName || !reminderDate || !reminderTime) {
                     return res.status(400).send('Missing required field(s)!').end();
@@ -436,13 +437,23 @@ module.exports = function (app) {
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
                 reminderDate = new Date(reminderDate);
-                reminderDate.setUTCHours = reminderHours + timezone;
-                reminderDate.setUTCMinutes = reminderMinutes;
-                reminderDate = reminderDate.getTime();                
+                reminderDate.setUTCHours(reminderHours + timezone);
+                reminderDate.setUTCMinutes(reminderMinutes);
+                reminderDate = reminderDate.getTime();
+                
+                const reminder = {
+                    reminderid: reminderID,
+                    name: reminderName,
+                    date: reminderDate,
+                    userid: userID
+                }
                 
                 //create the reminder and return its id
                 let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
                 const reminderid = lookup.rows[0].reminderid;
+                //create job for the reminder email
+                await emailScheduler.createReminder(user, reminder);
+
                 return res.status(200).json({ reminderid: reminderid }).end();
             } catch(err) {
                 console.log(err);
@@ -470,13 +481,20 @@ module.exports = function (app) {
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
                 reminderDate = new Date(reminderDate);
-                reminderDate.setUTCHours = reminderHours + timezone;
-                reminderDate.setUTCMinutes = reminderMinutes;
+                reminderDate.setUTCHours(reminderHours + timezone);
+                reminderDate.setUTCMinutes(reminderMinutes);
                 reminderDate = reminderDate.getTime();
-
-                //update the reminder and return the values
+                console.log(reminderDate);
+                const reminder = {
+                    reminderid: reminderID,
+                    name: reminderName,
+                    date: reminderDate,
+                    userid: userID
+                }
+                //update the reminder and return the values                
                 await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderDate);
-                return res.status(200).json({ reminderid: reminderid, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
+                await emailScheduler.updateReminder(reminder, user);
+                return res.status(200).json({ reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).send('Internal Server Error').end();
@@ -506,9 +524,9 @@ module.exports = function (app) {
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
-                const reminderID = req.body.reminderid;
-
+                const reminderID = req.body.reminderid;                
                 await reminderQuery.deleteReminder(userID, reminderID);
+                await emailScheduler.deleteReminder(reminderID);
                 return res.status(200).send('Reminder Deleted').end();
             } catch (err) {
                 console.log(err);
