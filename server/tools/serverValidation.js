@@ -34,9 +34,13 @@ exports.isValidPassword = function(password) {
 }
 
 exports.isValidDate = function(date) {
-
+    // MM/DD/YYYY format
+    const filter = /^(0?[1-9]|1[012])[\/](0?[1-9]|[12][0-9]|3[01])[\/]\d{4}$/;
+    return filter.test(date);
 }
 
 exports.isValidTime = function(time) {
-
+    //HH:MM format
+    const filter = /^(0?[1-9]|1[012])[:](0?[1-9]|[1-9][0-9])$/
+    return filter.test(time);
 }
