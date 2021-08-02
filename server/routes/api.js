@@ -437,8 +437,8 @@ module.exports = function (app) {
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
                 reminderDate = new Date(reminderDate);
-                reminderDate.setUTCHours = reminderHours + timezone;
-                reminderDate.setUTCMinutes = reminderMinutes;
+                reminderDate.setUTCHours(reminderHours + timezone);
+                reminderDate.setUTCMinutes(reminderMinutes);
                 reminderDate = reminderDate.getTime();                
                 
                 //create the reminder and return its id
@@ -471,9 +471,10 @@ module.exports = function (app) {
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
                 reminderDate = new Date(reminderDate);
-                reminderDate.setUTCHours = reminderHours + timezone;
-                reminderDate.setUTCMinutes = reminderMinutes;
+                reminderDate.setUTCHours(reminderHours + timezone);
+                reminderDate.setUTCMinutes(reminderMinutes);
                 reminderDate = reminderDate.getTime();
+                console.log(reminderDate);
                 const reminder = {
                     reminderid: reminderID,
                     name: reminderName,
@@ -481,8 +482,7 @@ module.exports = function (app) {
                     userid: userID
                 }
                 //update the reminder and return the values
-                let newReminder = await emailScheduler.updateReminder(reminder, user);
-                console.log(newReminder);
+                await emailScheduler.updateReminder(reminder, user);
                 await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderDate);
                 return res.status(200).json({ reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
             } catch(err) {
