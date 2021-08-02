@@ -81,7 +81,8 @@ exports.initializeAllReminders = async function() {
     let reminderName;
     let reminderID;
     let userID;
-    let jobs;
+    let jobs = {};
+    let date;
 
     //for each reminder, create a job
     for (let i = 0; i < count; i++) {
@@ -91,8 +92,9 @@ exports.initializeAllReminders = async function() {
         username = lookup.rows[0].username;
         reminderName = reminders[i].name;
         reminderID = reminders[i].reminderid;
-
-        const job = schedule.scheduleJob(date, function () {
+        date = reminders[i].date;
+        console.log(reminderID);
+        jobs[reminderID] = schedule.scheduleJob(date, function () {
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -112,21 +114,27 @@ exports.initializeAllReminders = async function() {
             transporter.sendMail(mailOptions, async function (err) {
                 if (err) {
                     console.log(err);
-                } else {
-                    jobs.push(job);
+                } else {                    
+                    await reminderQuery.setReminderSent(reminder.reminderid);
                 }
             });
+            
         });
+        
+        
     }
-
+    const list = schedule.scheduledJobs;
+    console.log(list);
+    console.log(Object.keys(jobs));
     return jobs;
 }
 
 exports.createReminder = async function(user, reminder) {
     //create cron job when reminder is created
     const date = new Date(reminder.timestamp);
-
-    const job = schedule.scheduleJob(date, function(){
+    let job = {};
+    
+    job[reminder.reminderid] = schedule.scheduleJob(date, function(){
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -148,18 +156,18 @@ exports.createReminder = async function(user, reminder) {
                 console.log(err);
             } else {
                 await reminderQuery.setReminderSent(reminder.reminderid);
-                return job;
             }
         });
     });
+    return job;
 }
 
-exports.updateReminder = async function(job, reminder, user) {
+exports.updateReminder = async function(reminder, user) {
     //delete ongoing cron job and create new job with updated information
-    const currentJob = schedule.scheduleJob[job];
+    const currentJob = schedule.scheduleJob[job[reminder.reminderid]];
     currentJob.cancel();
-
-    const job = schedule.scheduleJob(date, function () {
+    let newJob = {};
+    newJob[reminder.reminderid] = schedule.scheduleJob(date, function () {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -181,9 +189,8 @@ exports.updateReminder = async function(job, reminder, user) {
                 console.log(err);
             } else {
                 await reminderQuery.setReminderSent(reminder.reminderid);
-                return job;
             }
         });
     });
-
+    return newJob;
 }
