@@ -50,17 +50,17 @@ module.exports = function (app) {
                 const username = req.body.username;
                 const password = req.body.password;
                 if (!email || !username || !password) {
-                    return res.status(400).send('Missing required field(s)!').end();
+                    return res.status(400).json({error: 'Missing required field(s)!'}).end();
                 }
                 //validate user inputs
                 if(!serverValidation.isValidEmail(email)) {
-                    return res.status(400).send('Invalid email.').end();
+                    return res.status(400).json({error: 'Invalid email.'}).end();
                 }
                 if(!serverValidation.isValidUsername(username)) {
-                    return res.status(400).send('Invalid username.').end();
+                    return res.status(400).json({error: 'Invalid username.'}).end();
                 }
                 if (!serverValidation.isValidPassword(password)) {
-                    return res.status(400).send('Invalid password.').end();
+                    return res.status(400).json({error: 'Invalid password.'}).end();
                 }
                 //verify email is unique and username is unique
                 let lookup = await userQuery.getUserByEmail(email);
@@ -75,7 +75,7 @@ module.exports = function (app) {
                         //create user that is unverified; they must become verified to use the app
                         lookup = await userQuery.createUser(userID, username, email, passwordHash);
                         if (!lookup.rows[0].userid) {
-                            return res.status(500).send('User creation failed.').end();
+                            return res.status(500).json({error: 'User creation failed.'}).end();
                         }
                         //create hash
                         const hexString = crypto.randomBytes(16).toString('hex');
@@ -84,7 +84,7 @@ module.exports = function (app) {
                         //generate verfication token and store it
                         lookup = await authQuery.createEmailVerificationToken(userID, hexString, expirationDate);
                         if (!lookup.rows[0].token) {
-                            return res.status(500).send('Email token failed to generate.').end();
+                            return res.status(500).json({error: 'Email token failed to generate.'}).end();
                         }
                         const emailToken = lookup.rows[0].token;
                         //send verification email
@@ -105,22 +105,22 @@ module.exports = function (app) {
 
                         transporter.sendMail(mailOptions, function (err) {
                             if (err) {
-                                return res.status(500).send('Email failed to send.').end();
+                                return res.status(500).json({error: 'Email failed to send.'}).end();
                             } else {
-                                return res.status(200).send('A verification email has been sent to ' + email + '.').end();
+                                return res.status(200).json({message: 'A verification email has been sent to ' + email + '.'}).end();
                             }
                         });
                     } else {
                         //username is being used
-                        return res.status(403).send('That username is already being used.').end();
+                        return res.status(403).json({error: 'That username is already being used.'}).end();
                     }
                 } else {
                     //email is being used
-                    return res.status(403).send('That email is already being used.').end();
+                    return res.status(403).json({error: 'That email is already being used.'}).end();
                 }
             } catch (err) {
                 console.log(err);
-                return res.status(500).send('Interal Server Error').end();
+                return res.status(500).json({error: 'Interal Server Error'}).end();
             }
 
         })
@@ -136,25 +136,25 @@ module.exports = function (app) {
                 let lookup = await authQuery.getEmailVerificationToken(userID, token, timestamp);
                 if (lookup.rowCount <= 0) {
                     //userid and token failed to validate
-                    return res.status(404).send('Your verification link is invalid. Please request another link.').end();
+                    return res.status(404).json({error: 'Your verification link is invalid. Please request another link.'}).end();
                 } else {
                     //the token is valid
                     //check if the user is already verified
                     lookup = await userQuery.getUserByUserID(userID);
                     if (lookup.rowCount <= 0) {
                         //the user was not found
-                        return res.status(404).send('That user does not exist.').end();
+                        return res.status(404).json({error: 'That user does not exist.'}).end();
                     } else if (lookup.rows[0].verified === true) {
                         //the user is already verified
-                        return res.status(200).send('Your account is already verified.').end();
+                        return res.status(200).json({message: 'Your account is already verified.'}).end();
                     } else {
                         //update the user to verified
                         await authQuery.updateVerifiedUser(userID);
-                        return res.status(200).send('Your account is now verified.').end();
+                        return res.status(200).json({message: 'Your account is now verified.'}).end();
                     }
                 }
             } catch (err) {
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
 
@@ -164,14 +164,14 @@ module.exports = function (app) {
                 //lookup email
                 const email = req.body.email;
                 if(!email){
-                    return res.status(400).send('Missing required field!').end();
+                    return res.status(400).json({error: 'Missing required field!'}).end();
                 }
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
-                    return res.status(400).send('That email was not found.').end();
+                    return res.status(400).json({error: 'That email was not found.'}).end();
                 } else if (lookup.rows[0].verified === true){
                     //the email is already validated
-                    return res.status(200).send('Your account is already verified.').end();
+                    return res.status(200).json({message: 'Your account is already verified.'}).end();
                 } else {
                     //the email is not validated, send a verification email
                     //create email token
@@ -184,7 +184,7 @@ module.exports = function (app) {
                     //generate verfication token and store it
                     lookup = await authQuery.createEmailVerificationToken(userID, hexString, expirationDate);
                     if (!lookup.rows[0].token) {
-                        return res.status(500).send('Email token failed to generate.').end();
+                        return res.status(500).json({error: 'Email token failed to generate.'}).end();
                     }
                     const emailToken = lookup.rows[0].token;
                     //send verification email
@@ -205,14 +205,14 @@ module.exports = function (app) {
 
                     transporter.sendMail(mailOptions, function (err) {
                         if (err) {
-                            return res.status(500).send('Email failed to send.').end();
+                            return res.status(500).json({error: 'Email failed to send.'}).end();
                         } else {
-                            return res.status(200).send('A verification email has been sent to ' + email + '.').end();
+                            return res.status(200).json({message: 'A verification email has been sent to ' + email + '.'}).end();
                         }
                     });
                 }               
             } catch (err) {
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
 
@@ -223,13 +223,13 @@ module.exports = function (app) {
                 const username = req.body.username;
                 const password = req.body.password;
                 if(!username || !password){
-                    return res.status(400).send('Missing required field(s)!').end();
+                    return res.status(400).json({error: 'Missing required field(s)!'}).end();
                 }
                 //verify the username and password in the database
                 let lookup = await userQuery.getUserByUsername(username);
                 if(lookup.rowCount <= 0) {
                     //user does not exist
-                    return res.status(404).send('Login failed. Username or password did not match.').end();
+                    return res.status(404).json({error: 'Login failed. Username or password did not match.'}).end();
                 } else {
                     const passwordHash = lookup.rows[0].password;
                     if(await argon2.verify(passwordHash, password)) {                        
@@ -248,17 +248,17 @@ module.exports = function (app) {
                     } else {
                         //password failed
                         //invalid password
-                        return res.status(404).send('Login failed. Username or password did not match.').end();
+                        return res.status(404).json({error: 'Login failed. Username or password did not match.'}).end();
                     }
                 }
             } catch (err) {
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
     
     app.route('/api/profile')
         .get(passport.authenticate('jwt', {session: false}), (req, res) => {
-            res.send('access granted');
+            res.json({message: 'Access granted.'});
         });
     
     //renew access token by verifying refresh token
@@ -269,19 +269,19 @@ module.exports = function (app) {
             try {
                 const token = req.cookies['refresh'];
                 if(!token) {
-                    return res.status(401).send('Unauthorized').end();
+                    return res.status(401).json({error: 'Unauthorized'}).end();
                 }
                 const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
                 let lookup = await userQuery.getUserByUserID(decoded.userid);
                 if(lookup.rowCount <= 0) {
                     res.clearCookie('refresh');
-                    return res.status(401).send('Unauthorized').end();
+                    return res.status(401).json({error: 'Unauthorized'}).end();
                 }
                 lookup = await authQuery.checkRefreshBlacklist(decoded.jti);
                 const isBlacklisted = lookup.rows[0].exists;               
                 if(isBlacklisted) {
                     res.clearCookie('refresh');
-                    return res.status(401).send('Unauthorized').end();
+                    return res.status(401).json({error: 'Unauthorized'}).end();
                 } else {
                     const jti = crypto.randomBytes(16).toString('hex');
                     const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
@@ -291,9 +291,9 @@ module.exports = function (app) {
             } catch (err) {
                 if (err.name === "JsonWebTokenError") {
                     res.clearCookie('refresh');
-                    return res.status(401).send('Invalid Refresh Token').end();
+                    return res.status(401).json({error: 'Invalid Refresh Token'}).end();
                 }
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
     
@@ -307,7 +307,7 @@ module.exports = function (app) {
                 const token = req.cookies['jwt'];
                 const blacklistToken = req.body.blacklistToken;
                 if(!token || !blacklistToken) {
-                    return res.status(400).send('Missing required field(s)!').end();
+                    return res.status(400).json({error: 'Missing required field(s)!'}).end();
                 }
                 let decoded = jwt.verify(token, process.env.JWT_SECRET);
                 //verify user is an admin
@@ -322,16 +322,16 @@ module.exports = function (app) {
                     const blacklistJTI = decodedBlacklistToken.jti;
                     const blacklistExpirationDate = decodedBlacklistToken.exp;
                     await authQuery.blacklistRefreshToken(blacklistJTI, blacklistExpirationDate);
-                    return res.status(200).send('Refresh token was successfully blacklisted.').end();
+                    return res.status(200).json({message: 'Refresh token was successfully blacklisted.'}).end();
                 } else {
                     //user is not an admin
-                    return res.status(401).send('User is unauthorized').end();
+                    return res.status(401).json({error: 'User is unauthorized'}).end();
                 }
             } catch (err) {
                 if(err.name === "JsonWebTokenError") {
-                    return res.status(400).send('Invalid Refresh Token').end();
+                    return res.status(400).json({error: 'Invalid Refresh Token'}).end();
                 }
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }    
         });
 
@@ -341,13 +341,13 @@ module.exports = function (app) {
                 //receive user email
                 const email = req.body.email
                 if(!email) {
-                    return res.status(400).send('Missing Required field!').end();
+                    return res.status(400).json({error: 'Missing Required field!'}).end();
                 }
                 //lookup email in database
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
                     //email did not return a match
-                    return res.status(400).send('User does not exist');
+                    return res.status(400).json({error: 'User does not exist'});
                 } else {
                     //create & store id and reset token in password_reset table
                     const username = lookup.rows[0].username;
@@ -375,15 +375,15 @@ module.exports = function (app) {
 
                     transporter.sendMail(mailOptions, function (err) {
                         if (err) {
-                            return res.status(500).send('Email failed to send.').end();
+                            return res.status(500).json({error: 'Email failed to send.'}).end();
                         } else {
-                            return res.status(200).send('A reset password email has been sent to ' + email + '.').end();
+                            return res.status(200).json({message: 'A reset password email has been sent to ' + email + '.'}).end();
                         }
                     });
                 }                
             } catch (err) {
                 console.log(err);
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
     
@@ -396,12 +396,12 @@ module.exports = function (app) {
                 const token = req.params.token;
                 const timestamp = new Date().getTime();
                 if(!password) {
-                    return res.status(400).send('Missing required field!').end();
+                    return res.status(400).json({error: 'Missing required field!'}).end();
                 }
                 //lookup id and token in password_reset table
                 let lookup = await authQuery.getResetEmailToken(userID, token, timestamp);
                 if(lookup.rowCount <= 0) {
-                    return res.status(404).send('Your reset password link is invalid. Please request another link.').end();
+                    return res.status(404).json({error: 'Your reset password link is invalid. Please request another link.'}).end();
                 } else {
                     //id and token are valid
                     //update password and user id to prevent previous tokens having access
@@ -410,10 +410,10 @@ module.exports = function (app) {
                     const newUserID = crypto.randomBytes(16).toString('hex');
                     await authQuery.updatePasswordAndID(userID, newUserID, passwordHash);
                     await reminderQuery.updateUserID(newUserID, userID);
-                    return res.status(200).send('Password has been reset successfully.').end();
+                    return res.status(200).json({message: 'Password has been reset successfully.'}).end();
                 }
             } catch (err) {
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
     
@@ -433,15 +433,15 @@ module.exports = function (app) {
 
                 //return error if required fields are missing
                 if(!userID || !reminderName || !reminderDate || !reminderTime) {
-                    return res.status(400).send('Missing required field(s)!').end();
+                    return res.status(400).json({error: 'Missing required field(s)!'}).end();
                 }
 
                 //validate date and time
                 if(!serverValidation.isValidDate(reminderDate)) {
-                    return res.status(400).send('Invalid date.').end();
+                    return res.status(400).json({error: 'Invalid date.'}).end();
                 }
                 if(!serverValidation.isValidTime(reminderTime)) {
-                    return res.status(400).send('Invalid time.').end();
+                    return res.status(400).json({error: 'Invalid time.'}).end();
                 }
 
                 //set default values for optional parameters if not provided
@@ -476,7 +476,7 @@ module.exports = function (app) {
                 return res.status(200).json({ reminderid: reminderid }).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
     
@@ -498,10 +498,10 @@ module.exports = function (app) {
 
                 //validate date and time
                 if (!serverValidation.isValidDate(reminderDate)) {
-                    return res.status(400).send('Invalid date.').end();
+                    return res.status(400).json({error: 'Invalid date.'}).end();
                 }
                 if (!serverValidation.isValidTime(reminderTime)) {
-                    return res.status(400).send('Invalid time.').end();
+                    return res.status(400).json({error: 'Invalid time.'}).end();
                 }
 
                 //get timestamp from the given date and time
@@ -524,7 +524,7 @@ module.exports = function (app) {
                 return res.status(200).json({ reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
     
@@ -538,10 +538,10 @@ module.exports = function (app) {
 
                 //get all reminders and return them
                 let lookup = await reminderQuery.getAllReminders(userID);
-                return res.status(200).json(lookup.rows).end();
+                return res.status(200).json({reminders: lookup.rows}).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }            
         });    
 
@@ -554,14 +554,14 @@ module.exports = function (app) {
                 const reminderID = req.body.reminderid;
                 
                 if(!reminderID) {
-                    return res.send(400).send('Missing required field!').end();
+                    return res.status(400).json({error: 'Missing required field!'}).end();
                 }
                 await reminderQuery.deleteReminder(userID, reminderID);
                 await emailScheduler.deleteReminder(reminderID);
-                return res.status(200).send('Reminder Deleted').end();
+                return res.status(200).json({message: 'Reminder deleted.'}).end();
             } catch (err) {
                 console.log(err);
-                return res.status(500).send('Internal Server Error').end();
+                return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
 
