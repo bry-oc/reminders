@@ -18,10 +18,12 @@ emailScheduler.checkMissedReminders();
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
-})
+});
 
 apiRoutes(app);
 
 app.listen(port, () => {
     console.log(`Reminder app listening on port: ${port}`);
-})
+});
+
+module.exports = app
