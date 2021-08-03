@@ -473,7 +473,7 @@ module.exports = function (app) {
                 //create job for the reminder email
                 await emailScheduler.createReminder(user, reminder);
 
-                return res.status(200).json({ reminderid: reminderid }).end();
+                return res.status(200).json({ success: true, reminderid: reminderid }).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();
