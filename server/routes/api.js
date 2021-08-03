@@ -432,7 +432,7 @@ module.exports = function (app) {
                 let reminderTime = req.body.reminderTime;  
 
                 //return error if required fields are missing
-                if(!userID || !reminderName || !reminderDate || !reminderTime) {
+                if(!userID || !reminderName || !reminderDate || !reminderTime || !timezone) {
                     return res.status(400).json({error: 'Missing required field(s)!'}).end();
                 }
 

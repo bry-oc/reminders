@@ -1,13 +1,14 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const assert = chai.assert;
+const { expect } = chai;
 const server = require('../index.js');
+const cookieParser = require('cookie-parser');
 
 chai.use(chaiHttp);
 
-suite('Functional Tests', () => {
-    suite('User login tests', function() {
-        test('user login with invalid credentials', function (done) {
+suite('User login tests', function() {
+        test('user login with invalid credentials', function(done) {
             chai.request(server)
                 .post('/api/login')
                 .type('form')
@@ -21,7 +22,7 @@ suite('Functional Tests', () => {
                     done();
                 })
         });
-        test('user login with missing credentials', function (done) {
+        test('user login with missing credentials', function(done) {
             chai.request(server)
                 .post('/api/login')
                 .end(function (err, res) {
@@ -30,7 +31,7 @@ suite('Functional Tests', () => {
                     done();
                 })
         });
-        test('user login with valid credentials', function (done) {
+        test('user login with valid credentials', function(done) {
             chai.request(server)
                 .post('/api/login')
                 .type('form')
@@ -45,6 +46,23 @@ suite('Functional Tests', () => {
                     done();
                 })
         });
+});
+
+suite('Reminders tests', function () {    
+    test('create reminder with missing required fields', function (done) {      
+        const agent = chai.request.agent(server);
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .then(function(req, res) {
+                return agent.post('/api/reminder/create')
+                    .then(function(res){
+                        assert.equal(res.status, 400);
+                        done();
+                    })    
+            })        
     });
-    
 });
