@@ -29,7 +29,7 @@ exports.isValidPassword = function(password) {
     //one uppercase
     //one special character
     //one number
-    const filter = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+    const filter = /^(?=.*[0-9])(?=.*[!@#$%^&*-._])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*-._]{8,}$/;
     return filter.test(password);
 }
 

@@ -244,7 +244,7 @@ module.exports = function (app) {
                         const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
                         res.cookie('jwt', token, { httpOnly: true, sameSite: true});
                         res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: true });
-                        res.json({ success: true, token: token }).end();
+                        res.json({ success: true, message: 'Login was successful.'}).end();
                     } else {
                         //password failed
                         //invalid password
