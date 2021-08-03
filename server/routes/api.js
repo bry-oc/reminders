@@ -12,6 +12,7 @@ const authQuery = require('../db/auth');
 const reminderQuery = require('../db/reminder');
 const cookieHandler = require('../tools/cookieExtractor');
 const emailScheduler = require('../tools/emailScheduler');
+const serverValidation = require('../tools/serverValidation');
 require('dotenv').config();
 
 //sign up
@@ -50,6 +51,16 @@ module.exports = function (app) {
                 const password = req.body.password;
                 if (!email || !username || !password) {
                     return res.status(400).send('Missing required field(s)!').end();
+                }
+                //validate user inputs
+                if(!serverValidation.isValidEmail(email)) {
+                    return res.status(400).send('Invalid email.').end();
+                }
+                if(!serverValidation.isValidUsername(username)) {
+                    return res.status(400).send('Invalid username.').end();
+                }
+                if (!serverValidation.isValidPassword(password)) {
+                    return res.status(400).send('Invalid password.').end();
                 }
                 //verify email is unique and username is unique
                 let lookup = await userQuery.getUserByEmail(email);
@@ -425,6 +436,14 @@ module.exports = function (app) {
                     return res.status(400).send('Missing required field(s)!').end();
                 }
 
+                //validate date and time
+                if(!serverValidation.isValidDate(reminderDate)) {
+                    return res.status(400).send('Invalid date.').end();
+                }
+                if(!serverValidation.isValidTime(reminderTime)) {
+                    return res.status(400).send('Invalid time.').end();
+                }
+
                 //set default values for optional parameters if not provided
                 if(!reminderRepeat) {
                     reminderRepeat = 'never';
@@ -477,6 +496,14 @@ module.exports = function (app) {
                 let reminderDate = req.body.reminderDate;
                 let reminderTime = req.body.reminderTime;
 
+                //validate date and time
+                if (!serverValidation.isValidDate(reminderDate)) {
+                    return res.status(400).send('Invalid date.').end();
+                }
+                if (!serverValidation.isValidTime(reminderTime)) {
+                    return res.status(400).send('Invalid time.').end();
+                }
+
                 //get timestamp from the given date and time
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
@@ -524,7 +551,11 @@ module.exports = function (app) {
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
-                const reminderID = req.body.reminderid;                
+                const reminderID = req.body.reminderid;
+                
+                if(!reminderID) {
+                    return res.send(400).send('Missing required field!').end();
+                }
                 await reminderQuery.deleteReminder(userID, reminderID);
                 await emailScheduler.deleteReminder(reminderID);
                 return res.status(200).send('Reminder Deleted').end();
