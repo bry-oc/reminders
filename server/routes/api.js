@@ -474,7 +474,6 @@ module.exports = function (app) {
                 }
 
                 await emailScheduler.createReminder(user, reminder);
-                console.log('ready')
                 return res.status(200).json({ success: true, reminderid: reminderID }).end();
             } catch(err) {
                 console.log(err);
@@ -498,6 +497,11 @@ module.exports = function (app) {
                 let reminderDate = req.body.reminderDate;
                 let reminderTime = req.body.reminderTime;
 
+                //return error if any fields are missing
+                if (!userID || !reminderID || !reminderName || !reminderDate || !reminderTime || !timezone || !reminderDescription || !reminderRepeat) {
+                    return res.status(400).json({ error: 'Missing required field(s)!' }).end();
+                }
+
                 //validate date and time
                 if (!serverValidation.isValidDate(reminderDate)) {
                     return res.status(400).json({error: 'Invalid date.'}).end();
@@ -509,21 +513,21 @@ module.exports = function (app) {
                 //get timestamp from the given date and time
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
-                reminderDate = new Date(reminderDate);
-                reminderDate.setUTCHours(reminderHours + timezone);
-                reminderDate.setUTCMinutes(reminderMinutes);
-                reminderDate = reminderDate.getTime();
-                console.log(reminderDate);
+                let reminderTimestamp = new Date(reminderDate);
+                reminderTimestamp.setUTCHours(reminderHours + timezone);
+                reminderTimestamp.setUTCMinutes(reminderMinutes);
+                reminderTimestamp = reminderTimestamp.getTime();
+                
                 const reminder = {
                     reminderid: reminderID,
                     name: reminderName,
-                    date: reminderDate,
+                    date: reminderTimestamp,
                     userid: userID
                 }
                 //update the reminder and return the values                
-                await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderDate);
+                await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderTimestamp);
                 await emailScheduler.updateReminder(reminder, user);
-                return res.status(200).json({ reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
+                return res.status(200).json({ success: true, reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderTimestamp: reminderTimestamp, reminderDate: reminderDate, reminderTime: reminderTime }).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();

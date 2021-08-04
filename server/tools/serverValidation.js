@@ -41,6 +41,6 @@ exports.isValidDate = function(date) {
 
 exports.isValidTime = function(time) {
     // HH:MM format
-    const filter = /^(0?[1-9]|1[012])[:](0?[1-9]|[1-9][0-9])$/
+    const filter = /^(0?[1-9]|1[012])[:](0?[0-9]|[1-5][0-9])$/
     return filter.test(time);
 }
