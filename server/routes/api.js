@@ -559,10 +559,9 @@ module.exports = function (app) {
                 const userID = user.userid;
                 const reminderID = parseInt(req.params.reminderid);
                 
-                if(!reminderID) {
-                    return res.status(400).json({error: 'Missing required field!'}).end();
+                if(!reminderID || typeof(reminderID) != 'number') {
+                    return res.status(400).json({error: 'Invalid reminder id.'}).end();
                 }
-
                 await reminderQuery.deleteReminder(userID, reminderID);
                 await emailScheduler.deleteReminder(reminderID);
                 return res.status(200).json({success: true, message: 'Reminder deleted.'}).end();

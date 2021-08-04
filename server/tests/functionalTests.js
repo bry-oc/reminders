@@ -384,7 +384,7 @@ suite('delete reminder tests', function () {
             })
     });
 
-    test('delete reminder with invalid reminder id', function (done) {
+    test('delete reminder that is not found', function (done) {
         agent.post('/api/login')
             .type('form')
             .send({
@@ -392,10 +392,9 @@ suite('delete reminder tests', function () {
                 password: process.env.TEST_PASSWORD
             })
             .end(function (req, res) {                
-                    agent.delete('/api/reminder/delete/thisdoesnotexist')
+                    agent.delete('/api/reminder/delete/-999')
                     .end(function (err, res) {
-                        assert.equal(res.status, 400);
-                        assert.equal(res.body.error, 'Missing required field!');
+                        assert.equal(res.status, 500);
                         done();
                     })
             })
@@ -412,6 +411,23 @@ suite('delete reminder tests', function () {
                 agent.delete('/api/reminder/delete/')
                     .end(function (err, res) {
                         assert.equal(res.status, 404);
+                        done();
+                    })
+            })
+    });
+
+    test('delete reminder that does not exist', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.delete('/api/reminder/delete/thisdoesnotexist')
+                    .end(function (err, res) {
+                        assert.equal(res.status, 400);
+                        assert.equal(res.body.error, 'Invalid reminder id.');
                         done();
                     })
             })
@@ -438,7 +454,6 @@ suite('delete reminder tests', function () {
                         assert.equal(res.body.success, true);
                         assert.exists(res.body.reminderid);
                         const reminderid = res.body.reminderid;
-                        console.log(reminderid);
                         agent.delete('/api/reminder/delete/' + reminderid)
                             .end(function (err, res) {
                                 assert.equal(res.status, 200);
