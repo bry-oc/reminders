@@ -544,7 +544,7 @@ module.exports = function (app) {
 
                 //get all reminders and return them
                 let lookup = await reminderQuery.getAllReminders(userID);
-                return res.status(200).json({reminders: lookup.rows}).end();
+                return res.status(200).json({success: true, reminders: lookup.rows}).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();

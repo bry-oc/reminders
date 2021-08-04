@@ -464,4 +464,32 @@ suite('delete reminder tests', function () {
                     })
             })
     });
+});
+
+suite('list reminders test', function() {
+    test('list reminders without authorization', function (done) {
+        chai.request(server)
+            .get('/api/reminder/list')
+            .end(function (err, res) {
+                assert.equal(res.status, 401);
+                done();
+            })
+    });
+    test('list reminders successfully', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.get('/api/reminder/list')
+                    .end(function (err, res) {
+                        assert.equal(res.status, 200);
+                        assert.equal(res.body.success, true);
+                        assert.exists(res.body.reminders);
+                        done();
+                    })
+            })
+    });
 })
