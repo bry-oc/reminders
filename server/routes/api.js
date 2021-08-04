@@ -458,22 +458,24 @@ module.exports = function (app) {
                 reminderDate = new Date(reminderDate);
                 reminderDate.setUTCHours(reminderHours + timezone);
                 reminderDate.setUTCMinutes(reminderMinutes);
-                reminderDate = reminderDate.getTime();
-                
+                reminderDate = reminderDate.getTime();               
+                                
+                //create the reminder and return its id
+                let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
+                const reminderID = lookup.rows[0].reminderid;
+
+
+                //create job for the reminder email
                 const reminder = {
                     reminderid: reminderID,
                     name: reminderName,
                     date: reminderDate,
                     userid: userID
                 }
-                
-                //create the reminder and return its id
-                let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
-                const reminderid = lookup.rows[0].reminderid;
-                //create job for the reminder email
-                await emailScheduler.createReminder(user, reminder);
 
-                return res.status(200).json({ success: true, reminderid: reminderid }).end();
+                await emailScheduler.createReminder(user, reminder);
+                console.log('ready')
+                return res.status(200).json({ success: true, reminderid: reminderID }).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();

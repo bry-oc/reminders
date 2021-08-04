@@ -7,6 +7,8 @@ const cookieParser = require('cookie-parser');
 
 chai.use(chaiHttp);
 
+const agent = chai.request.agent(server);
+
 suite('User login tests', function() {
         test('user login with invalid credentials', function(done) {
             chai.request(server)
@@ -49,20 +51,44 @@ suite('User login tests', function() {
 });
 
 suite('Reminders tests', function () {    
-    test('create reminder with missing required fields', function (done) {      
-        const agent = chai.request.agent(server);
+    test('create reminder with missing required fields', function (done) {
         agent.post('/api/login')
             .type('form')
             .send({
                 username: process.env.TEST_ACCOUNT,
                 password: process.env.TEST_PASSWORD
             })
-            .then(function(req, res) {
-                return agent.post('/api/reminder/create')
-                    .then(function(res){
-                        assert.equal(res.status, 400);
+            .end(function(req, res) {
+                agent.post('/api/reminder/create')
+                    .end(function(err, res){
+                        assert.equal(res.status, 400);      
+                        assert.equal(res.body.error, 'Missing required field(s)!');          
                         done();
                     })    
             })        
+    });
+    test('create reminder with valid fields', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.post('/api/reminder/create')
+                    .type('form')
+                    .send({
+                        reminderName: "test_reminder",
+                        reminderDate: "01/02/2022",
+                        reminderTime: "02:30",
+                        timezone: 0
+                    })
+                    .end(function (err, res) {
+                        assert.equal(res.status, 200);
+                        assert.equal(res.body.success, true);
+                        assert.exists(res.body.reminderid);
+                        done();
+                    })
+            })
     });
 });
