@@ -155,7 +155,7 @@ suite('Create reminders tests', function () {
 });
 
 suite('Update reminder tests', function () {
-    test('Update reminder without authentication', function(done) {
+    test('Update reminder without authentication', function (done) {
         agent.post('/api/login')
             .type('form')
             .send({
@@ -352,4 +352,101 @@ suite('Update reminder tests', function () {
     });
 })
 
+suite('delete reminder tests', function () {
+    test('delete reminder without authorization', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.post('/api/reminder/create')
+                    .type('form')
+                    .send({
+                        reminderName: "test_reminder",
+                        reminderDate: "01/02/2022",
+                        reminderTime: "02:30",
+                        timezone: 0
+                    })
+                    .end(function (err, res) {
+                        assert.equal(res.status, 200);
+                        assert.equal(res.body.success, true);
+                        assert.exists(res.body.reminderid);
+                        const reminderid = res.body.reminderid;
+                        chai.request(server)
+                            .delete('/api/reminder/delete/' + reminderid)
+                            .end(function (err, res) {
+                                assert.equal(res.status, 401);
+                                done();
+                            })
+                    })
+            })
+    });
 
+    test('delete reminder with invalid reminder id', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {                
+                    agent.delete('/api/reminder/delete/thisdoesnotexist')
+                    .end(function (err, res) {
+                        assert.equal(res.status, 400);
+                        assert.equal(res.body.error, 'Missing required field!');
+                        done();
+                    })
+            })
+    });
+
+    test('delete reminder with missing reminder id', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.delete('/api/reminder/delete/')
+                    .end(function (err, res) {
+                        assert.equal(res.status, 404);
+                        done();
+                    })
+            })
+    });
+
+    test('delete reminder successfully', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.post('/api/reminder/create')
+                    .type('form')
+                    .send({
+                        reminderName: "test_reminder",
+                        reminderDate: "01/02/2022",
+                        reminderTime: "02:30",
+                        timezone: 0
+                    })
+                    .end(function (err, res) {
+                        assert.equal(res.status, 200);
+                        assert.equal(res.body.success, true);
+                        assert.exists(res.body.reminderid);
+                        const reminderid = res.body.reminderid;
+                        console.log(reminderid);
+                        agent.delete('/api/reminder/delete/' + reminderid)
+                            .end(function (err, res) {
+                                assert.equal(res.status, 200);
+                                assert.equal(res.body.success, true);
+                                assert.equal(res.body.message, 'Reminder deleted.');
+                                done();
+                            })
+                    })
+            })
+    });
+})

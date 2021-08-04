@@ -557,14 +557,15 @@ module.exports = function (app) {
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
-                const reminderID = req.params.reminderid;
+                const reminderID = parseInt(req.params.reminderid);
                 
                 if(!reminderID) {
                     return res.status(400).json({error: 'Missing required field!'}).end();
                 }
+
                 await reminderQuery.deleteReminder(userID, reminderID);
                 await emailScheduler.deleteReminder(reminderID);
-                return res.status(200).json({message: 'Reminder deleted.'}).end();
+                return res.status(200).json({success: true, message: 'Reminder deleted.'}).end();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();
