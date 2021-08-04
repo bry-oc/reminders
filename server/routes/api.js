@@ -551,13 +551,13 @@ module.exports = function (app) {
             }            
         });    
 
-    app.route('/api/reminder/delete')
+    app.route('/api/reminder/delete/:reminderid')
         .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
-                const reminderID = req.body.reminderid;
+                const reminderID = req.params.reminderid;
                 
                 if(!reminderID) {
                     return res.status(400).json({error: 'Missing required field!'}).end();

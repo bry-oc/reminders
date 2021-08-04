@@ -65,7 +65,7 @@ suite('Create reminders tests', function () {
                 assert.equal(res.status, 401);
                 done();
             })
-    })
+    });
     test('create reminder with missing required fields', function (done) {
         agent.post('/api/login')
             .type('form')
@@ -224,7 +224,87 @@ suite('Update reminder tests', function () {
                             })
                     })
             })
-    })
+    });
+    test('Update reminder with an invalid date', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.post('/api/reminder/create')
+                    .type('form')
+                    .send({
+                        reminderName: "test_reminder",
+                        reminderDate: "01/02/2022",
+                        reminderTime: "02:30",
+                        timezone: 0
+                    })
+                    .end(function (err, res) {
+                        assert.equal(res.status, 200);
+                        assert.equal(res.body.success, true);
+                        assert.exists(res.body.reminderid);
+                        const reminderid = res.body.reminderid;
+                        agent.post('/api/reminder/update')
+                            .type('form')
+                            .send({
+                                reminderid: reminderid,
+                                reminderName: "updated_test_reminder",
+                                reminderDate: "01/88/2022",
+                                reminderTime: "05:00",
+                                reminderDescription: "new_description",
+                                reminderRepeat: "never",
+                                timezone: 0
+                            })
+                            .end(function (err, res) {
+                                assert.equal(res.status, 400);
+                                assert.equal(res.body.error, 'Invalid date.');
+                                done();
+                            })
+                    })
+            })
+    });
+    test('Update reminder with an invalid time', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.post('/api/reminder/create')
+                    .type('form')
+                    .send({
+                        reminderName: "test_reminder",
+                        reminderDate: "01/02/2022",
+                        reminderTime: "02:30",
+                        timezone: 0
+                    })
+                    .end(function (err, res) {
+                        assert.equal(res.status, 200);
+                        assert.equal(res.body.success, true);
+                        assert.exists(res.body.reminderid);
+                        const reminderid = res.body.reminderid;
+                        agent.post('/api/reminder/update')
+                            .type('form')
+                            .send({
+                                reminderid: reminderid,
+                                reminderName: "updated_test_reminder",
+                                reminderDate: "01/03/2022",
+                                reminderTime: "88:00",
+                                reminderDescription: "new_description",
+                                reminderRepeat: "never",
+                                timezone: 0
+                            })
+                            .end(function (err, res) {
+                                assert.equal(res.status, 400);
+                                assert.equal(res.body.error, 'Invalid time.');
+                                done();
+                            })
+                    })
+            })
+    });
     test('Update reminder with valid fields', function (done) {
         agent.post('/api/login')
             .type('form')
@@ -269,5 +349,7 @@ suite('Update reminder tests', function () {
                             })
                     })
             })
-    })
+    });
 })
+
+
