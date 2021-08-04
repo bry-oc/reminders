@@ -91,4 +91,50 @@ suite('Reminders tests', function () {
                     })
             })
     });
+    test('create reminder with invalid date', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.post('/api/reminder/create')
+                    .type('form')
+                    .send({
+                        reminderName: "test_reminder",
+                        reminderDate: "01/40/2022",
+                        reminderTime: "02:30",
+                        timezone: 0
+                    })
+                    .end(function (err, res) {
+                        assert.equal(res.status, 400);
+                        assert.equal(res.body.error, 'Invalid date.');
+                        done();
+                    })
+            })
+    });
+    test('create reminder with invalid time', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (req, res) {
+                agent.post('/api/reminder/create')
+                    .type('form')
+                    .send({
+                        reminderName: "test_reminder",
+                        reminderDate: "01/02/2022",
+                        reminderTime: "32:30",
+                        timezone: 0
+                    })
+                    .end(function (err, res) {
+                        assert.equal(res.status, 400);
+                        assert.equal(res.body.error, 'Invalid time.');
+                        done();
+                    })
+            })
+    });
 });
