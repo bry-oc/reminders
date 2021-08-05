@@ -75,5 +75,28 @@ suite('Unit tests', function() {
             assert.equal(validator.isValidDate('111/11/2000'), false, '111/11/2000');
             assert.equal(validator.isValidDate('11/1221/2000'), false, '111/1221/2000');
         });
+        test('Validation test for valid times', function() {
+            assert.equal(validator.isValidTime('01:00'), true, '01:10');
+            assert.equal(validator.isValidTime('02:12'), true, '02:12');
+            assert.equal(validator.isValidTime('03:23'), true, '03:23');
+            assert.equal(validator.isValidTime('04:35'), true, '04:35');
+            assert.equal(validator.isValidTime('05:45'), true, '05:45');
+            assert.equal(validator.isValidTime('06:58'), true, '06:58');
+            assert.equal(validator.isValidTime('07:50'), true, '07:50');
+            assert.equal(validator.isValidTime('08:27'), true, '08:27');
+            assert.equal(validator.isValidTime('09:38'), true, '09:38');
+            assert.equal(validator.isValidTime('10:02'), true, '10:02');
+            assert.equal(validator.isValidTime('11:08'), true, '11:08');
+            assert.equal(validator.isValidTime('12:59'), true, '12:59');
+        });
+        test('Validation test for invalid times', function () {
+            assert.equal(validator.isValidTime('00:00'), false, '00:10');
+            assert.equal(validator.isValidTime(''), false, 'empty');
+            assert.equal(validator.isValidTime('101:10'), false, '101:10');
+            assert.equal(validator.isValidTime('01-45'), false, '01-45');
+            assert.equal(validator.isValidTime('10-30-00'), false, '10-30-00');
+            assert.equal(validator.isValidTime('13:30'), false, '13:30');
+            assert.equal(validator.isValidTime('10:60'), false, '10:60');
+        });
     })    
 })
