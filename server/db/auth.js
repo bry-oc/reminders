@@ -45,3 +45,15 @@ exports.getResetEmailToken = async function(userID, token, currentDate) {
 exports.updatePasswordAndID = async function(userID, newUserID, password) {
     return await pool.query('UPDATE "user" SET "password" = $1, "userid" = $2 WHERE "userid" = $3', [password, newUserID, userID]);
 }
+
+exports.deleteExpiredEmailTokens = async function(timestamp) {
+    return await pool.query('DELETE FROM "email_verfication" WHERE ("expires" - $1 < 0)', [timestamp]);
+}
+
+exports.deleteExpiredPasswordResetTokens = async function (timestamp) {
+    return await pool.query('DELETE FROM "password_reset" WHERE ("expires" - $1 < 0)', [timestamp]);
+}
+
+exports.deleteExpiredRefreshTokens = async function (timestamp) {
+    return await pool.query('DELETE FROM "refresh_blacklist" WHERE ("expires" - $1 < 0)', [timestamp]);
+}
