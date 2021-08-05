@@ -2,7 +2,7 @@
 
 exports.isValidEmail = function(email) {
     //email address followed by service provider
-    const filter = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9]+[a-zA-Z0-9.-]+[a-zA-Z0-9]+\.[a-z]{1,4}$/;
+    const filter = /^[a-zA-Z0-9!#$%&'*+-/=?^_`{|}~.]+@[a-zA-Z0-9]+[a-zA-Z0-9.-]+[a-zA-Z0-9]+\.[a-z]{1,4}$/;
     return filter.test(email);
 }
 
@@ -29,7 +29,7 @@ exports.isValidPassword = function(password) {
     //one uppercase
     //one special character
     //one number
-    const filter = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+    const filter = /^(?=.*[0-9])(?=.*[!#$%&'*+-/=?^_`{|}~@();:'"<>\\])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!#$%&'*+-/=?^_`{|}~@();:'"<>\\]{8,}$/;
     return filter.test(password);
 }
 
@@ -41,6 +41,6 @@ exports.isValidDate = function(date) {
 
 exports.isValidTime = function(time) {
     // HH:MM format
-    const filter = /^(0?[1-9]|1[012])[:](0?[1-9]|[1-9][0-9])$/
+    const filter = /^(0?[1-9]|1[012])[:](0?[0-9]|[1-5][0-9])$/
     return filter.test(time);
 }

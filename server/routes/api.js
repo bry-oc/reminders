@@ -244,7 +244,7 @@ module.exports = function (app) {
                         const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
                         res.cookie('jwt', token, { httpOnly: true, sameSite: true});
                         res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: true });
-                        res.json({ success: true, token: token }).end();
+                        res.json({ success: true, message: 'Login was successful.'}).end();
                     } else {
                         //password failed
                         //invalid password
@@ -432,7 +432,7 @@ module.exports = function (app) {
                 let reminderTime = req.body.reminderTime;  
 
                 //return error if required fields are missing
-                if(!userID || !reminderName || !reminderDate || !reminderTime) {
+                if(!userID || !reminderName || !reminderDate || !reminderTime || !timezone) {
                     return res.status(400).json({error: 'Missing required field(s)!'}).end();
                 }
 
@@ -458,22 +458,23 @@ module.exports = function (app) {
                 reminderDate = new Date(reminderDate);
                 reminderDate.setUTCHours(reminderHours + timezone);
                 reminderDate.setUTCMinutes(reminderMinutes);
-                reminderDate = reminderDate.getTime();
-                
+                reminderDate = reminderDate.getTime();               
+                                
+                //create the reminder and return its id
+                let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
+                const reminderID = lookup.rows[0].reminderid;
+
+
+                //create job for the reminder email
                 const reminder = {
                     reminderid: reminderID,
                     name: reminderName,
                     date: reminderDate,
                     userid: userID
                 }
-                
-                //create the reminder and return its id
-                let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
-                const reminderid = lookup.rows[0].reminderid;
-                //create job for the reminder email
-                await emailScheduler.createReminder(user, reminder);
 
-                return res.status(200).json({ reminderid: reminderid }).end();
+                await emailScheduler.createReminder(user, reminder);
+                return res.status(200).json({ success: true, reminderid: reminderID }).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();
@@ -496,6 +497,11 @@ module.exports = function (app) {
                 let reminderDate = req.body.reminderDate;
                 let reminderTime = req.body.reminderTime;
 
+                //return error if any fields are missing
+                if (!userID || !reminderID || !reminderName || !reminderDate || !reminderTime || !timezone || !reminderDescription || !reminderRepeat) {
+                    return res.status(400).json({ error: 'Missing required field(s)!' }).end();
+                }
+
                 //validate date and time
                 if (!serverValidation.isValidDate(reminderDate)) {
                     return res.status(400).json({error: 'Invalid date.'}).end();
@@ -507,21 +513,21 @@ module.exports = function (app) {
                 //get timestamp from the given date and time
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
-                reminderDate = new Date(reminderDate);
-                reminderDate.setUTCHours(reminderHours + timezone);
-                reminderDate.setUTCMinutes(reminderMinutes);
-                reminderDate = reminderDate.getTime();
-                console.log(reminderDate);
+                let reminderTimestamp = new Date(reminderDate);
+                reminderTimestamp.setUTCHours(reminderHours + timezone);
+                reminderTimestamp.setUTCMinutes(reminderMinutes);
+                reminderTimestamp = reminderTimestamp.getTime();
+                
                 const reminder = {
                     reminderid: reminderID,
                     name: reminderName,
-                    date: reminderDate,
+                    date: reminderTimestamp,
                     userid: userID
                 }
                 //update the reminder and return the values                
-                await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderDate);
+                await reminderQuery.updateReminder(userID, reminderID, reminderName, reminderDescription, reminderRepeat, reminderTimestamp);
                 await emailScheduler.updateReminder(reminder, user);
-                return res.status(200).json({ reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderDate: reminderDate }).end();
+                return res.status(200).json({ success: true, reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderTimestamp: reminderTimestamp, reminderDate: reminderDate, reminderTime: reminderTime }).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();
@@ -538,27 +544,27 @@ module.exports = function (app) {
 
                 //get all reminders and return them
                 let lookup = await reminderQuery.getAllReminders(userID);
-                return res.status(200).json({reminders: lookup.rows}).end();
+                return res.status(200).json({success: true, reminders: lookup.rows}).end();
             } catch(err) {
                 console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }            
         });    
 
-    app.route('/api/reminder/delete')
+    app.route('/api/reminder/delete/:reminderid')
         .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
-                const reminderID = req.body.reminderid;
+                const reminderID = parseInt(req.params.reminderid);
                 
-                if(!reminderID) {
-                    return res.status(400).json({error: 'Missing required field!'}).end();
+                if(!reminderID || typeof(reminderID) != 'number') {
+                    return res.status(400).json({error: 'Invalid reminder id.'}).end();
                 }
                 await reminderQuery.deleteReminder(userID, reminderID);
                 await emailScheduler.deleteReminder(reminderID);
-                return res.status(200).json({message: 'Reminder deleted.'}).end();
+                return res.status(200).json({success: true, message: 'Reminder deleted.'}).end();
             } catch (err) {
                 console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();

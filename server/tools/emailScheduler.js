@@ -129,8 +129,9 @@ exports.createReminder = async function(user, reminder) {
     //create cron job when reminder is created
     const date = new Date(reminder.timestamp);
     let job = {};
-    
-    job[reminder.reminderid] = schedule.scheduleJob(reminderID.toString(), date, function(){
+    const reminderID = reminder.reminderid;
+
+    job[reminderID] = schedule.scheduleJob(reminderID.toString(), date, function(){
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
