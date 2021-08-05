@@ -1,9 +1,9 @@
+'use strict';
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const assert = chai.assert;
-const { expect } = chai;
 const server = require('../index.js');
-const cookieParser = require('cookie-parser');
 
 chai.use(chaiHttp);
 
