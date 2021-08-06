@@ -54,6 +54,10 @@ exports.updateEmail = async function (userID, email) {
     return await pool.query('UPDATE "user" SET "email" = $1 WHERE "userid" = $2', [username, email]);
 }
 
+exports.updatePassword = async function (userID, password) {
+    return await pool.query('UPDATE "user" SET "password" = $1 WHERE "userid" = $2', [password, userID]);
+}
+
 exports.deleteUser = async function (userID) {
     return await pool.query('DELETE FROM "user" WHERE "userid" = $1', [userID]);
 }

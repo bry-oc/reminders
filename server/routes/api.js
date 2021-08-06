@@ -487,6 +487,30 @@ module.exports = function (app) {
                 return res.status(500).json({ error: 'Internal Server Error' }).end();
             }
         });
+    //update password
+    app.route('/api/user/email/update')
+        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //receive user and new password
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const password = req.body.password;
+
+                if (!password) {
+                    return res.status(400).json({ error: 'Missing required field!' }).end();
+                }
+
+                if (!serverValidation.isValidPassword(password)) {
+                    return res.status(400).json({ error: 'Invalid password.' }).end();
+                }
+                //update the user's password
+                await authQuery.updatePassword(userID, password);
+                return res.status(200).json({ message: 'Your password has been successfuly updated.' });
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error' }).end();
+            }
+        });
     //user account deletion
     app.route('/api/user/account/delete')
         .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -504,7 +528,7 @@ module.exports = function (app) {
                 return res.status(500).json({ error: 'Internal Server Error' }).end();
             }
         });
-        
+
     //reminder routes
     //create reminders
     app.route('/api/reminder/create')
