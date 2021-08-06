@@ -50,10 +50,14 @@ exports.deleteExpiredEmailTokens = async function(timestamp) {
     return await pool.query('DELETE FROM "email_verfication" WHERE ("expires" - $1 < 0)', [timestamp]);
 }
 
-exports.deleteExpiredPasswordResetTokens = async function (timestamp) {
+exports.deleteExpiredPasswordResetTokens = async function(timestamp) {
     return await pool.query('DELETE FROM "password_reset" WHERE ("expires" - $1 < 0)', [timestamp]);
 }
 
-exports.deleteExpiredRefreshTokens = async function (timestamp) {
+exports.deleteExpiredRefreshTokens = async function(timestamp) {
     return await pool.query('DELETE FROM "refresh_blacklist" WHERE ("expires" - $1 < 0)', [timestamp]);
+}
+
+exports.deleteUnverifiedAccounts = async function() {
+    return await pool.query('DELETE FROM "user" WHERE "verified" = false AND "userid" NOT IN (SELECT email_verification.userid FROM "email_verification"');
 }

@@ -7,14 +7,14 @@ const app = express();
 const port = process.env.PORT || 3001;
 const apiRoutes = require('./routes/api.js');
 const emailScheduler = require('./tools/emailScheduler');
-const dbScheduler = require('./db/dbScheduler');
+const db = require('./db/dbScheduler');
 
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(passport.initialize());
 app.use(cookieParser());
-db.dbScheduler();
+db.deleteExpiredRows();
 emailScheduler.initializeAllReminders();
 emailScheduler.checkMissedReminders();
 
