@@ -46,6 +46,14 @@ exports.updatePasswordAndID = async function(userID, newUserID, password) {
     return await pool.query('UPDATE "user" SET "password" = $1, "userid" = $2 WHERE "userid" = $3', [password, newUserID, userID]);
 }
 
+exports.updateUsername = async function(userID, username) {
+    return await pool.query('UPDATE "user" SET "username" = $1 WHERE "userid" = $2', [username, userID]);
+}
+
+exports.updateEmail = async function (userID, email) {
+    return await pool.query('UPDATE "user" SET "email" = $1 WHERE "userid" = $2', [username, email]);
+}
+
 exports.deleteExpiredEmailTokens = async function(timestamp) {
     return await pool.query('DELETE FROM "email_verfication" WHERE ("expires" - $1 < 0)', [timestamp]);
 }
@@ -59,5 +67,5 @@ exports.deleteExpiredRefreshTokens = async function(timestamp) {
 }
 
 exports.deleteUnverifiedAccounts = async function() {
-    return await pool.query('DELETE FROM "user" WHERE "verified" = false AND "userid" NOT IN (SELECT email_verification.userid FROM "email_verification"');
+    return await pool.query('DELETE FROM "user" WHERE "verified" = false AND "userid" NOT IN (SELECT email_verification.userid FROM "email_verification")');
 }
