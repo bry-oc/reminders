@@ -19,6 +19,7 @@ require('dotenv').config();
 //sign in
 //crud reminders
 module.exports = function (app) {
+    //jwt tokens stored in cookies
     const upload = multer();
     let ExtractJWT = passportJWT.ExtractJwt;
     let JwtStrategy = passportJWT.Strategy;
@@ -42,7 +43,8 @@ module.exports = function (app) {
 
     passport.use(strategy);
     
-
+    //sign up and login routes
+    //account creation
     app.route('/api/signup')
         .post(upload.none(), async (req, res) => {
             try {
@@ -124,7 +126,8 @@ module.exports = function (app) {
             }
 
         })
-
+    
+    //account creation and email verification 
     app.route('/api/emailconfirmation/:userid/:token')
         .get(async (req, res) => {
             try {
@@ -157,7 +160,8 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-
+    
+    //resend email verification
     app.route('/api/resendemailconfirmation')
         .post(upload.none(), async (req, res) => {
             try {
@@ -215,7 +219,8 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-
+    
+    //login
     app.route('/api/login')
         .post(upload.none(), async (req, res) => {
             try {
@@ -334,7 +339,7 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }    
         });
-
+    //reset password request
     app.route('/api/password/reset')
         .post(upload.none(), async (req, res) => {
             try {
@@ -386,7 +391,7 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-    
+    //reset password
     app.route('/api/password/reset/:userid/:token')
         .post(upload.none(), async (req, res) => {
             try {
@@ -416,7 +421,8 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-    
+    //reminder routes
+    //create reminders
     app.route('/api/reminder/create')
         .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
@@ -480,7 +486,7 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-    
+    //update reminder
     app.route('/api/reminder/update')
         .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
@@ -533,7 +539,7 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-    
+    //list reminders
     app.route('/api/reminder/list')
         .get(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
@@ -550,18 +556,20 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }            
         });    
-
+    //delete reminders
     app.route('/api/reminder/delete/:reminderid')
         .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
+                //get user and reminder id
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
                 const reminderID = parseInt(req.params.reminderid);
-                
+                //return error if reminder id is invalid
                 if(!reminderID || typeof(reminderID) != 'number') {
                     return res.status(400).json({error: 'Invalid reminder id.'}).end();
                 }
+                //delete reminder and the scheduled email
                 await reminderQuery.deleteReminder(userID, reminderID);
                 await emailScheduler.deleteReminder(reminderID);
                 return res.status(200).json({success: true, message: 'Reminder deleted.'}).end();
