@@ -79,8 +79,8 @@ module.exports = function (app) {
                         }
                         //create hash
                         const hexString = crypto.randomBytes(16).toString('hex');
-                        //set two week expiration
-                        const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 14;
+                        //set two day expiration
+                        const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 2;
                         //generate verfication token and store it
                         lookup = await authQuery.createEmailVerificationToken(userID, hexString, expirationDate);
                         if (!lookup.rows[0].token) {
@@ -179,8 +179,8 @@ module.exports = function (app) {
                     const username = lookup.rows[0].username;
                     //create hash
                     const hexString = crypto.randomBytes(16).toString('hex');
-                    //set two week expiration
-                    const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 14;
+                    //set two day expiration
+                    const expirationDate = new Date().getTime() + 1000 * 60 * 60 * 24 * 2;
                     //generate verfication token and store it
                     lookup = await authQuery.createEmailVerificationToken(userID, hexString, expirationDate);
                     if (!lookup.rows[0].token) {
