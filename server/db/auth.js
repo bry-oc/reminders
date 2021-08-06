@@ -54,6 +54,10 @@ exports.updateEmail = async function (userID, email) {
     return await pool.query('UPDATE "user" SET "email" = $1 WHERE "userid" = $2', [username, email]);
 }
 
+exports.deleteUser = async function (userID) {
+    return await pool.query('DELETE FROM "user" WHERE "userid" = $1', [userID]);
+}
+
 exports.deleteExpiredEmailTokens = async function(timestamp) {
     return await pool.query('DELETE FROM "email_verfication" WHERE ("expires" - $1 < 0)', [timestamp]);
 }

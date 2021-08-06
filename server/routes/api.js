@@ -487,7 +487,24 @@ module.exports = function (app) {
                 return res.status(500).json({ error: 'Internal Server Error' }).end();
             }
         });
-    
+    //user account deletion
+    app.route('/api/user/account/delete')
+        .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //get user
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                //delete all reminders
+                await reminderQuery.deleteAllReminders(userID);
+                //delete account
+                await authQuery.deleteUser(userID);
+                return res.status(200).json({ message: 'Account deleted.' }).end();
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error' }).end();
+            }
+        });
+        
     //reminder routes
     //create reminders
     app.route('/api/reminder/create')
