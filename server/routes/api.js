@@ -19,6 +19,7 @@ require('dotenv').config();
 //sign in
 //crud reminders
 module.exports = function (app) {
+    //jwt tokens stored in cookies
     const upload = multer();
     let ExtractJWT = passportJWT.ExtractJwt;
     let JwtStrategy = passportJWT.Strategy;
@@ -42,7 +43,8 @@ module.exports = function (app) {
 
     passport.use(strategy);
     
-
+    //sign up and login routes
+    //account creation
     app.route('/api/signup')
         .post(upload.none(), async (req, res) => {
             try {
@@ -124,7 +126,8 @@ module.exports = function (app) {
             }
 
         })
-
+    
+    //account creation and email verification 
     app.route('/api/emailconfirmation/:userid/:token')
         .get(async (req, res) => {
             try {
@@ -157,7 +160,8 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-
+    
+    //resend email verification
     app.route('/api/resendemailconfirmation')
         .post(upload.none(), async (req, res) => {
             try {
@@ -215,7 +219,8 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-
+    
+    //login
     app.route('/api/login')
         .post(upload.none(), async (req, res) => {
             try {
@@ -334,8 +339,8 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }    
         });
-
-    app.route('/api/password/reset')
+    //reset password request
+    app.route('/api/user/password/reset')
         .post(upload.none(), async (req, res) => {
             try {
                 //receive user email
@@ -386,7 +391,7 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-    
+    //reset password
     app.route('/api/password/reset/:userid/:token')
         .post(upload.none(), async (req, res) => {
             try {
@@ -397,6 +402,9 @@ module.exports = function (app) {
                 const timestamp = new Date().getTime();
                 if(!password) {
                     return res.status(400).json({error: 'Missing required field!'}).end();
+                }
+                if (!serverValidation.isValidPassword(password)) {
+                    return res.status(400).json({ error: 'Invalid password.' }).end();
                 }
                 //lookup id and token in password_reset table
                 let lookup = await authQuery.getResetEmailToken(userID, token, timestamp);
@@ -416,7 +424,113 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-    
+    //update username
+    app.route('/api/user/username/update')
+        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //receive user and new username
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const username = req.body.username;
+                
+                if (!username) {
+                    return res.status(400).json({ error: 'Missing required field!' }).end();
+                }
+
+                if (!serverValidation.isValidUsername(username)) {
+                    return res.status(400).json({ error: 'Invalid username.' }).end();
+                }
+                //lookup username in user table
+                let lookup = await userQuery.getUserByUsername(username);
+                if (lookup.rowCount > 0) {
+                    //username is already being used
+                    return res.status(404).json({ error: 'That username is already being used.' }).end();
+                } else {
+                    //update the user's username
+                    await authQuery.updateUsername(userID, username);
+                    return res.status(200).json({message: 'Your username has been changed to ' + username + "."});
+                }
+                
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error' }).end();
+            }
+        });
+    //update email
+    app.route('/api/user/email/update')
+        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //receive user and new email
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const email = req.body.email;
+
+                if (!email) {
+                    return res.status(400).json({ error: 'Missing required field!' }).end();
+                }
+
+                if (!serverValidation.isValidEmail(email)) {
+                    return res.status(400).json({ error: 'Invalid email.' }).end();
+                }
+                //lookup email in user table
+                let lookup = await userQuery.getUserByEmail(email);
+                if (lookup.rowCount > 0) {
+                    //email is already being used
+                    return res.status(404).json({ error: 'That email is already being used.' }).end();
+                } else {
+                    //update the user's email
+                    await authQuery.updateEmail(userID, email);
+                    return res.status(200).json({ message: 'Your email has been changed to ' + email + "." });
+                }
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error' }).end();
+            }
+        });
+    //update password
+    app.route('/api/user/email/update')
+        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //receive user and new password
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const password = req.body.password;
+
+                if (!password) {
+                    return res.status(400).json({ error: 'Missing required field!' }).end();
+                }
+
+                if (!serverValidation.isValidPassword(password)) {
+                    return res.status(400).json({ error: 'Invalid password.' }).end();
+                }
+                //update the user's password
+                await authQuery.updatePassword(userID, password);
+                return res.status(200).json({ message: 'Your password has been successfuly updated.' });
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error' }).end();
+            }
+        });
+    //user account deletion
+    app.route('/api/user/account/delete')
+        .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                //get user
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                //delete all reminders
+                await reminderQuery.deleteAllReminders(userID);
+                //delete account
+                await authQuery.deleteUser(userID);
+                return res.status(200).json({ message: 'Account deleted.' }).end();
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error' }).end();
+            }
+        });
+
+    //reminder routes
+    //create reminders
     app.route('/api/reminder/create')
         .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
@@ -480,7 +594,7 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-    
+    //update reminder
     app.route('/api/reminder/update')
         .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
@@ -533,7 +647,7 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-    
+    //list reminders
     app.route('/api/reminder/list')
         .get(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
@@ -550,18 +664,20 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }            
         });    
-
+    //delete reminders
     app.route('/api/reminder/delete/:reminderid')
         .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
+                //get user and reminder id
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
                 const reminderID = parseInt(req.params.reminderid);
-                
+                //return error if reminder id is invalid
                 if(!reminderID || typeof(reminderID) != 'number') {
                     return res.status(400).json({error: 'Invalid reminder id.'}).end();
                 }
+                //delete reminder and the scheduled email
                 await reminderQuery.deleteReminder(userID, reminderID);
                 await emailScheduler.deleteReminder(reminderID);
                 return res.status(200).json({success: true, message: 'Reminder deleted.'}).end();
