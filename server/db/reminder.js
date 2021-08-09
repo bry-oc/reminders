@@ -26,7 +26,7 @@ exports.deleteReminder = async function(userID, reminderID) {
 }
 
 exports.deleteAllReminders = async function(userID) {
-    return await pool.query('DELETE FROM "reminder" WHERE "userid" = $1', userID);
+    return await pool.query('DELETE FROM "reminder" WHERE "userid" = $1', [userID]);
 }
 
 exports.updateUserID = async function(newUserID, userID) {

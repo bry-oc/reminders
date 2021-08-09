@@ -484,7 +484,7 @@ module.exports = function (app) {
                     return res.status(200).json({ success: true, message: 'Your email has been changed to ' + email + "." });
                 }
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' + err}).end();
+                return res.status(500).json({ error: 'Internal Server Error' }).end();
             }
         });
     //update password
