@@ -683,7 +683,6 @@ module.exports = function (app) {
                 await emailScheduler.deleteReminder(reminderID);
                 return res.status(200).json({success: true, message: 'Reminder deleted.'}).end();
             } catch (err) {
-                console.log(err);
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });

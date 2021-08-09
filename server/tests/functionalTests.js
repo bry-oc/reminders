@@ -567,7 +567,6 @@ suite('account testing', function() {
                         email: process.env.TEST_EMAIL2
                     })
                     .end(function (err, res) {
-                        console.log(res.body);
                         assert.equal(res.status, 200, 'update email');
                         assert.equal(res.body.success, true, 'update email');
                         agent.post('/api/user/email/update')
