@@ -51,7 +51,7 @@ exports.updateUsername = async function(userID, username) {
 }
 
 exports.updateEmail = async function (userID, email) {
-    return await pool.query('UPDATE "user" SET "email" = $1 WHERE "userid" = $2', [username, email]);
+    return await pool.query('UPDATE "user" SET "email" = $1 WHERE "userid" = $2', [email, userID]);
 }
 
 exports.updatePassword = async function (userID, password) {
