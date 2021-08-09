@@ -449,7 +449,7 @@ module.exports = function (app) {
                 } else {
                     //update the user's username
                     await authQuery.updateUsername(userID, username);
-                    return res.status(200).json({message: 'Your username has been changed to ' + username + "."});
+                    return res.status(200).json({ success: true, message: 'Your username has been changed to ' + username + "."});
                 }
                 
             } catch (err) {
@@ -481,14 +481,14 @@ module.exports = function (app) {
                 } else {
                     //update the user's email
                     await authQuery.updateEmail(userID, email);
-                    return res.status(200).json({ message: 'Your email has been changed to ' + email + "." });
+                    return res.status(200).json({ success: true, message: 'Your email has been changed to ' + email + "." });
                 }
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error' + err}).end();
             }
         });
     //update password
-    app.route('/api/user/email/update')
+    app.route('/api/user/password/update')
         .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
                 //receive user and new password
@@ -505,8 +505,9 @@ module.exports = function (app) {
                     return res.status(400).json({ error: 'Invalid password.' }).end();
                 }
                 //update the user's password
-                await authQuery.updatePassword(userID, password);
-                return res.status(200).json({ message: 'Your password has been successfuly updated.' });
+                const passwordHash = await argon2.hash(password);
+                await authQuery.updatePassword(userID, passwordHash);
+                return res.status(200).json({ success: true, message: 'Your password has been successfuly updated.' });
             } catch (err) {
                 return res.status(500).json({ error: 'Internal Server Error' }).end();
             }

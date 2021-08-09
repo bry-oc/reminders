@@ -492,4 +492,95 @@ suite('list reminders test', function() {
                     })
             })
     });
+});
+
+suite('account testing', function() {
+    test('update username', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (err, res) {
+                agent.post('/api/user/username/update')
+                    .type('form')
+                    .send({
+                        username: process.env.TEST_ACCOUNT2
+                    })
+                    .end(function (err, res) {
+                        assert.equal(res.status, 200, 'update username');
+                        assert.equal(res.body.success, true);
+                        agent.post('/api/user/username/update')
+                            .type('form')
+                            .send({
+                                username: process.env.TEST_ACCOUNT
+                            })
+                            .end(function (err, res) {
+                                assert.equal(res.status, 200, 'return username');
+                                assert.equal(res.body.success, true, 'return username');
+                                done();
+                            })
+                    })                
+            })
+    });
+    test('update password', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (err, res) {
+                agent.post('/api/user/password/update')
+                    .type('form')
+                    .send({
+                        password: process.env.TEST_PASSWORD2
+                    })
+                    .end(function (err, res) {
+                        assert.equal(res.status, 200, 'update password');
+                        assert.equal(res.body.success, true, 'update password');
+                        agent.post('/api/user/password/update')
+                            .type('form')
+                            .send({
+                                password: process.env.TEST_PASSWORD
+                            })
+                            .end(function (err, res) {
+                                assert.equal(res.status, 200, 'return password');
+                                assert.equal(res.body.success, true, 'return password');
+                                done();
+                            })
+                    })
+            })
+    });
+    test('update email', function (done) {
+        agent.post('/api/login')
+            .type('form')
+            .send({
+                username: process.env.TEST_ACCOUNT,
+                password: process.env.TEST_PASSWORD
+            })
+            .end(function (err, res) {
+                agent.post('/api/user/email/update')
+                    .type('form')
+                    .send({
+                        email: process.env.TEST_EMAIL2
+                    })
+                    .end(function (err, res) {
+                        console.log(res.body);
+                        assert.equal(res.status, 200, 'update email');
+                        assert.equal(res.body.success, true, 'update email');
+                        agent.post('/api/user/email/update')
+                            .type('form')
+                            .send({
+                                email: process.env.TEST_EMAIL
+                            })
+                            .end(function (err, res) {
+                                assert.equal(res.status, 200, 'return email');
+                                assert.equal(res.body.success, true, 'return email');
+                                done();
+                            })
+                    })
+            })
+    });
 })
