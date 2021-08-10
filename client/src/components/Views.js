@@ -1,5 +1,6 @@
 import { Route, Switch } from 'react-router-dom';
 import Home from './Home';
+import Login from './Login';
 
 function Views(){
     return (
@@ -12,7 +13,7 @@ function Views(){
 
                 </Route>
                 <Route path="/login">
-
+                    <Login/>
                 </Route>
                 <Route path="/account">
 
