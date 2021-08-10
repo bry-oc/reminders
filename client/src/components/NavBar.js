@@ -7,31 +7,25 @@ function NavBar() {
             <nav className="navbar">
                 <ul>
                     <li>
-                        <p>Reminders</p>
+                        <Link className="navlink" to="/">Home</Link>
                     </li>
                     <li>
-                        <Link to="/">Home</Link>
+                        <Link className="navlink" to="/login">Login</Link>
                     </li>
                     <li>
-                        <Link to="/signup">Signup</Link>
+                        <Link className="navlink" to="/account">Account</Link>
                     </li>
                     <li>
-                        <Link to="/login">Login</Link>
+                        <Link className="navlink" to="/reminder/list">Reminders</Link>
                     </li>
                     <li>
-                        <Link to="/account">Account</Link>
+                        <Link className="navlink" to="/reminder/create">Create</Link>
                     </li>
                     <li>
-                        <Link to="/reminder/list">List</Link>
+                        <Link className="navlink" to="/reminder/update">Update</Link>
                     </li>
                     <li>
-                        <Link to="/reminder/create">Create</Link>
-                    </li>
-                    <li>
-                        <Link to="/reminder/update">Update</Link>
-                    </li>
-                    <li>
-                        <Link to="/reminder/delete">Delete</Link>
+                        <Link className="navlink" to="/reminder/delete">Delete</Link>
                     </li>
                 </ul>
 
@@ -39,3 +33,5 @@ function NavBar() {
         </div>
     )
 }
+
+export default NavBar;
