@@ -1,11 +1,12 @@
 import { Route, Switch } from 'react-router-dom';
+import Home from './Home';
 
 function Views(){
     return (
         <div>
             <Switch>
                 <Route exact path="/">
-
+                    <Home/>
                 </Route>
                 <Route path="/signup">
 
