@@ -1,7 +1,7 @@
 import { Route, Switch } from 'react-router-dom';
 import Home from './Home';
 import Login from './Login';
-
+import CreateReminder from './CreateReminder'
 function Views(){
     return (
         <div>
@@ -22,7 +22,7 @@ function Views(){
 
                 </Route>
                 <Route path="/reminder/create">
-
+                    <CreateReminder/>
                 </Route>
                 <Route path="/reminder/update">
 

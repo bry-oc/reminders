@@ -2,14 +2,14 @@ function Login(){
     return (
         <div className="wrapper">
             <form>
-                <label>Username:
+                <label>Username:<br/>
                     <input type="text" placeholder="Enter your username" required>
                     </input>
-                </label>
-                <label>Password:
+                </label><br />
+                <label>Password:<br />
                     <input type="text" placeholder="Enter your password" required>
                     </input>
-                </label>
+                </label><br />
                 <button id="submit" type="submit">Submit</button>
             </form>
         </div>
