@@ -4,6 +4,8 @@ import Login from './Login';
 import Signup from './Signup';
 import CreateReminder from './CreateReminder';
 import UpdateReminder from './UpdateReminder';
+import DeleteReminder from './DeleteReminder';
+import ForgotPassword  from './ForgotPassword';
 import Account from './Account';
 function Views(){
     return (
@@ -31,7 +33,10 @@ function Views(){
                     <UpdateReminder/>
                 </Route>
                 <Route path="/reminder/delete">
-
+                    <DeleteReminder/>
+                </Route>
+                <Route path="/password/reset">
+                    <ForgotPassword />
                 </Route>
             </Switch>
         </div>
