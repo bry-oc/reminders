@@ -1,10 +1,18 @@
 function Account(){
     return(
         <div>
-            <button>Change Username</button>
-            <button>Change Email</button>
-            <button>Change Password</button>
-            <button>Delete Account</button>
+            <form action="/username/edit">
+                <input type="submit" value="Change Username" />
+            </form>
+            <form action="/email/edit">
+                <input type="submit" value="Change Email" />
+            </form>
+            <form action="/password/edit">
+                <input type="submit" value="Change Password" />
+            </form>
+            <form action="/account/delete">
+                <input type="submit" value="Delete Account" />
+            </form>
         </div>
     )
 }
