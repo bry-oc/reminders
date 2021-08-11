@@ -10,7 +10,8 @@ function Login(){
                     <input type="text" placeholder="Enter your password" required>
                     </input>
                 </label><br />
-                <button id="submit" type="submit">Submit</button>
+                <a>Forgot password?</a><br/>
+                <button type="submit">Login</button>
             </form>
         </div>
     )    

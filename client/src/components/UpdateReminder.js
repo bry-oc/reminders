@@ -1,4 +1,4 @@
-function CreateReminder(){
+function UpdateReminder() {
     return (
         <div className="wrapper">
             <form>
@@ -27,10 +27,10 @@ function CreateReminder(){
                         <option value="monthly">Monthly</option>
                     </select>
                 </label><br />
-                <button type="submit">Create Reminder</button>
+                <button type="submit">Update Reminder</button>
             </form>
         </div>
     )
 }
 
-export default CreateReminder;
+export default UpdateReminder;

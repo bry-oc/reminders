@@ -14,7 +14,7 @@ function Signup() {
                     <input type="text" placeholder="Enter your password" required>
                     </input>
                 </label><br />
-                <button id="submit" type="submit">Submit</button>
+                <button id="submit" type="submit">Create Account</button>
             </form>
         </div>
     )

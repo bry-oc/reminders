@@ -1,7 +1,10 @@
 import { Route, Switch } from 'react-router-dom';
 import Home from './Home';
 import Login from './Login';
-import CreateReminder from './CreateReminder'
+import Signup from './Signup';
+import CreateReminder from './CreateReminder';
+import UpdateReminder from './UpdateReminder';
+import Account from './Account';
 function Views(){
     return (
         <div>
@@ -10,13 +13,13 @@ function Views(){
                     <Home/>
                 </Route>
                 <Route path="/signup">
-
+                    <Signup/>
                 </Route>
                 <Route path="/login">
                     <Login/>
                 </Route>
                 <Route path="/account">
-
+                    <Account/>
                 </Route>
                 <Route path="/reminder/list">
 
@@ -25,7 +28,7 @@ function Views(){
                     <CreateReminder/>
                 </Route>
                 <Route path="/reminder/update">
-
+                    <UpdateReminder/>
                 </Route>
                 <Route path="/reminder/delete">
 
