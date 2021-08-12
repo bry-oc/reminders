@@ -1,3 +1,4 @@
+const cors = require("cors");
 const express = require('express');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
@@ -12,6 +13,7 @@ const db = require('./db/dbScheduler');
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(cors({ optionsSuccessStatus: 200 }));
 app.use(passport.initialize());
 app.use(cookieParser());
 db.deleteExpiredRows();
