@@ -1,4 +1,7 @@
+import React from 'react';
+
 function Login(){
+    const [warning, setWarning] = React.useState("");
 
     let login = (e) => {
         e.preventDefault();
@@ -19,9 +22,11 @@ function Login(){
         .then((res) => res.json())
         .then((data) => {
             if(data.error) {
-                console.log(data.error)
+                setWarning(data.error);
+                console.log(data.error);
             } else {
-                console.log(data)
+                console.log(data);
+                window.location.href = "/account";
             }
         })
     }
@@ -39,6 +44,7 @@ function Login(){
                 <a href={'/password/reset'}>Forgot password?</a><br/>
                 <button type="submit">Login</button>
             </form>
+            {warning !== "" ? <p className="warning">{warning}</p> : null}
         </div>
     )    
 }
