@@ -35,7 +35,7 @@ exports.isValidPassword = function(password) {
 
 exports.isValidDate = function(date) {
     // YYYY/MM/DD format
-    const filter = /^\d{4}[\/|\-](0?[1-9]|[12][0-9]|3[01])[\/|\-](0?[1-9]|1[012])$/;
+    const filter = /^\d{4}[\/|\-](0?[1-9]|1[012])[\/|\-](0?[1-9]|[12][0-9]|3[01])$/;
     return filter.test(date);
 }
 

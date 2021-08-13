@@ -1,4 +1,5 @@
 function CreateReminder(){
+
     let createReminder = (e) => {
         e.preventDefault();
         const reminderName = e.target.name.value;
@@ -13,7 +14,6 @@ function CreateReminder(){
         formData.append('reminderTime', reminderTime);
         formData.append('reminderRepeat', reminderRepeat);
         formData.append('reminderDescription', reminderDescription);
-        console.log(formData);
 
         const url = '/api/reminder/create'
 
@@ -22,16 +22,35 @@ function CreateReminder(){
             body: formData,
             credentials: 'include'
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.error) {
-                    console.log(data.error);
-                } else {
-                    console.log(data);
-                    window.location.href = "/account";
-                }
+            .then((res) => {
+                console.log(res);
+                if(res.status === 401) {
+                    const refreshURL = '/api/token/refresh'
+                    fetch(refreshURL, {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                    .then((res) => {
+                        console.log(res.status);
+                        console.log(res.statusText);
+                        if(res.status === 401) {
+                            window.location.href = "/login";
+                        } else {
+                            fetch(url, {
+                                method: 'POST',
+                                body: formData,
+                                credentials: 'include'
+                            })
+                            .then((res) => res.json())
+                            .then((data) => {
+                                console.log(data);
+                                console.log(data.reminderid);
+                            })                            
+                        }
+                    })
+                }            
             })
-        
+            
     }
     return (
         <div className="wrapper">
@@ -50,7 +69,7 @@ function CreateReminder(){
                 </label><br />
                 <label htmlFor="repeat">Repeat:<br />
                     <select id="repeat">
-                        <option value="none" id="none" selected>None</option>
+                        <option defaultValue="none" id="none">None</option>
                         <option value="daily" id="daily">Daily</option>
                         <option value="weekly" id="weekly">Weekly</option>
                         <option value="biweekly" id="biweekly">Biweekly</option>
