@@ -540,14 +540,13 @@ module.exports = function (app) {
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
                 const reminderName = req.body.reminderName;
-                const timezone = req.body.timezone;
                 let reminderDescription = req.body.reminderDescription;
                 let reminderRepeat = req.body.reminderRepeat;
                 let reminderDate = req.body.reminderDate;
                 let reminderTime = req.body.reminderTime;  
 
                 //return error if required fields are missing
-                if(!userID || !reminderName || !reminderDate || !reminderTime || !timezone) {
+                if(!userID || !reminderName || !reminderDate || !reminderTime ) {
                     return res.status(400).json({error: 'Missing required field(s)!'}).end();
                 }
 
@@ -571,8 +570,8 @@ module.exports = function (app) {
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
                 reminderDate = new Date(reminderDate);
-                reminderDate.setUTCHours(reminderHours + timezone);
-                reminderDate.setUTCMinutes(reminderMinutes);
+                reminderDate.setHours(reminderHours);
+                reminderDate.setMinutes(reminderMinutes);
                 reminderDate = reminderDate.getTime();               
                                 
                 //create the reminder and return its id
@@ -606,14 +605,13 @@ module.exports = function (app) {
                 const userID = user.userid;
                 const reminderID = req.body.reminderid;
                 const reminderName = req.body.reminderName;
-                const timezone = req.body.timezone;
                 let reminderDescription = req.body.reminderDescription;
                 let reminderRepeat = req.body.reminderRepeat;
                 let reminderDate = req.body.reminderDate;
                 let reminderTime = req.body.reminderTime;
 
                 //return error if any fields are missing
-                if (!userID || !reminderID || !reminderName || !reminderDate || !reminderTime || !timezone || !reminderDescription || !reminderRepeat) {
+                if (!userID || !reminderID || !reminderName || !reminderDate || !reminderTime || !reminderDescription || !reminderRepeat) {
                     return res.status(400).json({ error: 'Missing required field(s)!' }).end();
                 }
 
@@ -629,8 +627,8 @@ module.exports = function (app) {
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
                 let reminderTimestamp = new Date(reminderDate);
-                reminderTimestamp.setUTCHours(reminderHours + timezone);
-                reminderTimestamp.setUTCMinutes(reminderMinutes);
+                reminderTimestamp.setHours(reminderHours);
+                reminderTimestamp.setMinutes(reminderMinutes);
                 reminderTimestamp = reminderTimestamp.getTime();
                 
                 const reminder = {
