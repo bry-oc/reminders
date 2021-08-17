@@ -685,5 +685,14 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-
+    
+    //verify the user is logged in
+    app.route('/api/user/authentication')
+        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                return res.status(200).json({ success: true, loggedIn: true }).end();
+            } catch (err) {
+                return res.status(500).json({error: 'Internal Server Error'}).end();
+            }
+        });
 }
