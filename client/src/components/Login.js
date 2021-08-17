@@ -1,7 +1,9 @@
-import React from 'react';
+import authContext from './AuthContext';
+import React, { useContext } from "react";
 
 function Login(){
     const [warning, setWarning] = React.useState("");
+    const { auth, setAuth } = useContext(authContext);
 
     let login = (e) => {
         e.preventDefault();
@@ -25,6 +27,8 @@ function Login(){
                 setWarning(data.error);
                 console.log(data.error);
             } else {
+                setAuth(true);
+                console.log(auth);
                 console.log(data);
                 window.location.href = "/account";
             }

@@ -1,4 +1,9 @@
+import React, { useContext } from "react";
+import authContext from './AuthContext';
+
 function Account(){
+    const { auth } = useContext(authContext);
+    console.log(auth);
     return(
         <div>
             <form action="/username/edit">

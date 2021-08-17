@@ -11,6 +11,8 @@ import UpdateUsername from './UpdateUsername';
 import UpdateEmail from './UpdateEmail';
 import UpdatePassword from './UpdatePassword';
 import DeleteAccount from './DeleteAccount';
+
+
 function Views(){
     return (
         <div>
