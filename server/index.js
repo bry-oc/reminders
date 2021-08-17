@@ -13,7 +13,7 @@ const db = require('./db/dbScheduler');
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(cors({ optionsSuccessStatus: 200 }));
+app.use(cors({ optionsSuccessStatus: 200, credentials: true, origin: 'http://localhost:3000' }));
 app.use(passport.initialize());
 app.use(cookieParser());
 db.deleteExpiredRows();
