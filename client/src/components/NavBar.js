@@ -36,6 +36,9 @@ function NavBar() {
                     <li>
                         <Link className="navlink" to="/reminder/delete">Delete</Link>
                     </li>
+                    <li>
+                        <Link className="navlink" to="/logout">Logout</Link>
+                    </li>
                 </ul>
 
             </nav>

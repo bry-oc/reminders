@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 function App() {
   const [auth, setAuth] = useState(null);
-  const url = 'http://localhost:3001/api/user/authentication';
+  const url = '/api/user/authentication';
   useEffect(() => {
     fetch(url, {
       method: 'GET',
@@ -18,8 +18,19 @@ function App() {
           setAuth(true);
           console.log(auth);
         } else {
-          console.log(res.status);
-          setAuth(false);
+          const refresh = '/api/token/refresh';
+          fetch(refresh, {
+            method: 'GET',
+            credentials: 'include'
+          })
+            .then((res) => {
+              if(res.status === 200){
+                setAuth(true);
+              } else {
+                console.log(res.status);
+                setAuth(false);
+              }
+            })          
         }
       })
   }, [auth]);
