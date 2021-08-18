@@ -17,39 +17,21 @@ function CreateReminder(){
 
         const url = '/api/reminder/create'
 
-        fetch(url, { 
+        fetch(url, {
             method: 'POST',
             body: formData,
-            credentials: 'include'
+            credentials: 'included'
         })
-            .then((res) => {
-                console.log(res);
-                if(res.status === 401) {
-                    const refreshURL = '/api/token/refresh'
-                    fetch(refreshURL, {
-                        method: 'GET',
-                        credentials: 'include'
-                    })
-                    .then((res) => {
-                        console.log(res.status);
-                        console.log(res.statusText);
-                        if(res.status === 401) {
-                            window.location.href = "/login";
-                        } else {
-                            fetch(url, {
-                                method: 'POST',
-                                body: formData,
-                                credentials: 'include'
-                            })
-                            .then((res) => res.json())
-                            .then((data) => {
-                                console.log(data);
-                                console.log(data.reminderid);
-                            })                            
-                        }
-                    })
-                }            
+            .then((res) => res.json())
+            .then((data) => {
+                if(data.error){
+                    console.log(data.error);
+                } else {
+                    console.log(data.reminderid);
+                }
             })
+
+        
             
     }
     return (

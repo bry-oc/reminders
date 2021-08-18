@@ -32,7 +32,6 @@ function NavBar() {
                     <li>
                         <Link className="navlink" to="/">Home</Link>
                     </li>
-                    
                     {
                         !auth ? <li>
                             <Link className="navlink" to="/signup">Signup</Link>
