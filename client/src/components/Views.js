@@ -1,7 +1,6 @@
 import { Route, Switch } from 'react-router-dom';
 import Home from './Home';
 import Login from './Login';
-import Logout from './Logout';
 import Signup from './Signup';
 import CreateReminder from './CreateReminder';
 import UpdateReminder from './UpdateReminder';
@@ -41,7 +40,6 @@ function Views(){
                     <DeleteAccount />
                 </Route>
                 <PrivateRoute path="/account" component={Account}/>
-                <PrivateRoute path="/logout" component={Logout} />
                 <PrivateRoute path="/reminder/list" component={ListReminders}/>
                 <PrivateRoute path="/reminder/create" component={CreateReminder}/>
                 <PrivateRoute path="/reminder/update" component={UpdateReminder}/>

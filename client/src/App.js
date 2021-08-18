@@ -33,7 +33,7 @@ function App() {
             })          
         }
       })
-  }, [auth]);
+  });
 
   return (
     <div className="App">
