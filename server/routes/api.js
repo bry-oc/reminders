@@ -695,4 +695,23 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
+    
+    app.route('/api/logout')
+        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                const refreshToken = req.cookies['refresh'];
+                //blacklist their refresh token
+                //store jti and expiration timestamp of the token
+                const decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+                const refreshJTI = decodedRefreshToken.jti;
+                const refreshExpirationDate = decodedRefreshToken.exp;
+                await authQuery.blacklistRefreshToken(refreshJTI, refreshExpirationDate);
+                //clear the user's cookies
+                res.clearCookie('refresh');
+                res.clearCookes('jwt');
+                return res.status(200).json({ success: true, message: 'User successfully logged out.' }).end();
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error' }).end();
+            }
+        });
 }
