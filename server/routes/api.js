@@ -243,7 +243,7 @@ module.exports = function (app) {
                         const user = lookup.rows[0];
                         let jti = crypto.randomBytes(16).toString('hex');
                         const payload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
-                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "300s" });
+                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "10s" });
                         jti = crypto.randomBytes(16).toString('hex');
                         const refreshPayload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
                         const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
@@ -290,8 +290,9 @@ module.exports = function (app) {
                 } else {
                     const jti = crypto.randomBytes(16).toString('hex');
                     const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
-                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "300s" });
-                    res.cookie('jwt', token, { httpOnly: true, sameSite: true }).json({ success: true, token: token }).end();;
+                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "30s" });
+                    res.cookie('jwt', token, { httpOnly: true, sameSite: true });
+                    res.json({ success: true, token: token }).end();;
                 }
             } catch (err) {
                 if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
@@ -649,7 +650,7 @@ module.exports = function (app) {
         });
     //list reminders
     app.route('/api/reminder/list')
-        .get(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
                 //get user id
                 const token = req.cookies['jwt'];

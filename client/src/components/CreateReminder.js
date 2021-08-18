@@ -20,7 +20,7 @@ function CreateReminder(){
         fetch(url, {
             method: 'POST',
             body: formData,
-            credentials: 'included'
+            credentials: 'include'
         })
             .then((res) => res.json())
             .then((data) => {
@@ -30,8 +30,6 @@ function CreateReminder(){
                     console.log(data.reminderid);
                 }
             })
-
-        
             
     }
     return (
