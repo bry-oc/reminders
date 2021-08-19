@@ -270,7 +270,7 @@ module.exports = function (app) {
     //check the refresh token blacklist to ensure refresh token is still valid
     //issue a renewed access token
     app.route('/api/token/refresh')
-        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .get(async (req, res) => {
             try {
                 const token = req.cookies['refresh'];
                 if(!token) {

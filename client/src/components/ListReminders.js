@@ -10,10 +10,9 @@ function ListReminders() {
             method: 'GET',
             credentials: 'include'
         })
-            .then((res) => {
-                res.json()
-            })
+            .then((res) => res.json())
             .then((data) => {
+                console.log(data);
                 if (data.error) {
                     console.log(data.error);
                 } else {

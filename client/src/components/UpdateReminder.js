@@ -2,29 +2,29 @@ function UpdateReminder() {
     return (
         <div className="wrapper">
             <form>
-                <label for="name">Name:<br />
+                <label htmlFor="name">Name:<br />
                     <input type="text" placeholder="Enter reminder name" required>
                     </input>
                 </label><br />
-                <label for="description">Description (Optional):<br />
+                <label htmlFor="description">Description (Optional):<br />
                     <textarea name="description" placeholder="Enter your description here...">
                     </textarea>
                 </label><br />
-                <label for="date">Date:<br />
+                <label htmlFor="date">Date:<br />
                     <input type="date">
                     </input>
                 </label><br />
-                <label for="time">Time:<br />
+                <label htmlFor="time">Time:<br />
                     <input type="time">
                     </input>
                 </label><br />
-                <label for="repeat">Repeat:<br />
+                <label htmlFor="repeat">Repeat:<br />
                     <select form="repeat">
-                        <option value="none" selected>None</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="biweekly">Biweekly</option>
-                        <option value="monthly">Monthly</option>
+                        <option defaultValue="none" id="none">None</option>
+                        <option value="daily" id="daily">Daily</option>
+                        <option value="weekly" id="weekly">Weekly</option>
+                        <option value="biweekly" id="biweekly">Biweekly</option>
+                        <option value="monthly" id="monthly">Monthly</option>
                     </select>
                 </label><br />
                 <button type="submit">Update Reminder</button>
