@@ -1,5 +1,6 @@
 function Signup() {
     let signup = (e) => {
+        e.preventDefault();
         const url = '/api/signup';
 
         const email = e.target.email.value;

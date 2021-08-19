@@ -1,5 +1,6 @@
 function ForgotPassword() {
     let forgotPassword = (e) => {
+        e.preventDefault();
         const url = '/api/user/password/reset';
 
         const email = e.target.email.value;
