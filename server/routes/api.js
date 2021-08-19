@@ -243,7 +243,7 @@ module.exports = function (app) {
                         const user = lookup.rows[0];
                         let jti = crypto.randomBytes(16).toString('hex');
                         const payload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
-                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "10s" });
+                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "300s" });
                         jti = crypto.randomBytes(16).toString('hex');
                         const refreshPayload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
                         const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
@@ -290,7 +290,7 @@ module.exports = function (app) {
                 } else {
                     const jti = crypto.randomBytes(16).toString('hex');
                     const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
-                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "30s" });
+                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "300s" });
                     res.cookie('jwt', token, { httpOnly: true, sameSite: true });
                     res.json({ success: true, token: token }).end();;
                 }
