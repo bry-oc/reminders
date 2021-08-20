@@ -31,6 +31,8 @@ function ListReminders() {
                     <td>{date}</td>                    
                     <td>{repeat}</td>
                     <td>{description}</td>
+                    <td><button>edit</button></td>
+                    <td><button>delete</button></td>
                 </tr>
             )
         })
