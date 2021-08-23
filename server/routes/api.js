@@ -243,7 +243,7 @@ module.exports = function (app) {
                         const user = lookup.rows[0];
                         let jti = crypto.randomBytes(16).toString('hex');
                         const payload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
-                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
+                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "300s" });
                         jti = crypto.randomBytes(16).toString('hex');
                         const refreshPayload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
                         const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
@@ -270,7 +270,7 @@ module.exports = function (app) {
     //check the refresh token blacklist to ensure refresh token is still valid
     //issue a renewed access token
     app.route('/api/token/refresh')
-        .post(async (req, res) => {
+        .get(async (req, res) => {
             try {
                 const token = req.cookies['refresh'];
                 if(!token) {
@@ -290,11 +290,12 @@ module.exports = function (app) {
                 } else {
                     const jti = crypto.randomBytes(16).toString('hex');
                     const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
-                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: 60 * 5 });
-                    res.cookie('jwt', token, { httpOnly: true, sameSite: true }).json({ success: true, token: token }).end();;
+                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "300s" });
+                    res.cookie('jwt', token, { httpOnly: true, sameSite: true });
+                    res.json({ success: true, token: token }).end();;
                 }
             } catch (err) {
-                if (err.name === "JsonWebTokenError") {
+                if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
                     res.clearCookie('refresh');
                     return res.status(401).json({error: 'Invalid Refresh Token'}).end();
                 }
@@ -552,6 +553,7 @@ module.exports = function (app) {
 
                 //validate date and time
                 if(!serverValidation.isValidDate(reminderDate)) {
+                    console.log(reminderDate);
                     return res.status(400).json({error: 'Invalid date.'}).end();
                 }
                 if(!serverValidation.isValidTime(reminderTime)) {
@@ -648,7 +650,7 @@ module.exports = function (app) {
         });
     //list reminders
     app.route('/api/reminder/list')
-        .get(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
             try {
                 //get user id
                 const token = req.cookies['jwt'];
@@ -684,5 +686,33 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }
         });
-
+    
+    //verify the user is logged in
+    app.route('/api/user/authentication')
+        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                return res.status(200).json({ success: true, loggedIn: true }).end();
+            } catch (err) {
+                return res.status(500).json({error: 'Internal Server Error'}).end();
+            }
+        });
+    
+    app.route('/api/logout')
+        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+            try {
+                const refreshToken = req.cookies['refresh'];
+                //blacklist their refresh token
+                //store jti and expiration timestamp of the token
+                const decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+                const refreshJTI = decodedRefreshToken.jti;
+                const refreshExpirationDate = decodedRefreshToken.exp;
+                await authQuery.blacklistRefreshToken(refreshJTI, refreshExpirationDate);
+                //clear the user's cookies
+                res.clearCookie('refresh');
+                res.clearCookie('jwt');
+                return res.status(200).json({ success: true, message: 'User successfully logged out.' }).end();
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error: ' + err }).end();
+            }
+        });
 }
