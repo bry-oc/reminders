@@ -1,6 +1,12 @@
-function UpdateReminder() {
+import React, {useEffect, useState} from "react";
+function UpdateReminder(props) {
+    const [reminderID, setReminderID] = useState();
+    useEffect(() => {
+        setReminderID(props.reminderid);
+    }, [props.reminderid]);    
     return (
         <div className="wrapper">
+            <p>{props.reminderid}</p>
             <form>
                 <label htmlFor="name">Name:<br />
                     <input type="text" placeholder="Enter reminder name" required>

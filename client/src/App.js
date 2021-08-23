@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 function App() {
   const [auth, setAuth] = useState(null);
+
   const url = '/api/user/authentication';
 
   useEffect(() => {
@@ -35,7 +36,7 @@ function App() {
             })
         }
       })
-  });
+  },[]);
 
   return (
     <div className="App">

@@ -1,26 +1,84 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import UpdateReminder from "./UpdateReminder";
+import DeleteReminder from "./DeleteReminder";
+import authContext from './AuthContext';
 
 function ListReminders() {
     const [reminders, setReminders] = useState([]);
+    const [currentID, setCurrentID] = useState();
+    const { auth, setAuth } = useContext(authContext);
 
     useEffect(() => {
-        const url = '/api/reminder/list';
-
+        let url = '/api/user/authentication';
         fetch(url, {
             method: 'GET',
             credentials: 'include'
         })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data);
-                if (data.error) {
-                    console.log(data.error);
+            .then((res) => {
+                if (res.status === 200) {
+                    setAuth(true);
+                    console.log(auth);
+                    url = '/api/reminder/list';
+
+                    fetch(url, {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            console.log(data);
+                            if (data.error) {
+                                console.log(data.error);
+                            } else {
+                                console.log(data.reminders);
+                                setReminders(data.reminders);
+                            }
+                        })
                 } else {
-                    console.log(data.reminders);
-                    setReminders(data.reminders);
+                    console.log('refresh!');
+                    const refresh = '/api/token/refresh';
+                    fetch(refresh, {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                        .then((res) => {
+                            if (res.status === 200) {
+                                setAuth(true);
+                                url = '/api/reminder/list';
+
+                                fetch(url, {
+                                    method: 'GET',
+                                    credentials: 'include'
+                                })
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        console.log(data);
+                                        if (data.error) {
+                                            console.log(data.error);
+                                        } else {
+                                            console.log(data.reminders);
+                                            setReminders(data.reminders);
+                                        }
+                                    })
+                            } else {
+                                console.log(res.status);
+                                setAuth(false);
+                            }
+                        })
                 }
             })
-    }, []);
+        
+    },[]);
+
+    let showUpdate = (e) => {
+        console.log(e.target.name);
+        setCurrentID(e.target.name);
+    }
+
+    let showDelete = (e) => {
+        setCurrentID(e.target.name);
+        console.log(currentID)
+    }
 
     function TableData() {
         return reminders.map((reminder, index) => {
@@ -31,8 +89,8 @@ function ListReminders() {
                     <td>{date}</td>                    
                     <td>{repeat}</td>
                     <td>{description}</td>
-                    <td><button>edit</button></td>
-                    <td><button>delete</button></td>
+                    <td><button onClick={showUpdate} name={reminderid}>edit</button></td>
+                    <td><button onClick={showDelete} name={reminderid}>delete</button></td>
                 </tr>
             )
         })
@@ -51,6 +109,8 @@ function ListReminders() {
                     {TableData()}
                 </tbody>
             </table>
+            <UpdateReminder reminderid={currentID}/>
+            <DeleteReminder reminderid={currentID}/>
         </div>
     )
     

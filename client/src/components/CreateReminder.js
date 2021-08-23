@@ -29,6 +29,21 @@ function CreateReminder(){
                 if (res.status === 200) {
                     setAuth(true);
                     console.log(auth);
+                    url = '/api/reminder/create';
+
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include'
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.error) {
+                                console.log(data.error);
+                            } else {
+                                console.log(data.reminderid);
+                            }
+                        })
                 } else {
                     console.log('refresh!');
                     const refresh = '/api/token/refresh';
