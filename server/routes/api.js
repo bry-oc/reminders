@@ -315,7 +315,7 @@ module.exports = function (app) {
                 } else {
                     const jti = crypto.randomBytes(16).toString('hex');
                     const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
-                    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "300s" });
+                    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "10s" });
                     res.cookie('jwt', token, { httpOnly: true, sameSite: true });
                     res.json({ success: true, token: token }).end();;
                 }
