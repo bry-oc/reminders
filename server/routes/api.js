@@ -13,6 +13,7 @@ const reminderQuery = require('../db/reminder');
 const cookieHandler = require('../tools/cookieExtractor');
 const emailScheduler = require('../tools/emailScheduler');
 const serverValidation = require('../tools/serverValidation');
+const { authenticate } = require('passport');
 require('dotenv').config();
 
 //sign up
@@ -21,6 +22,7 @@ require('dotenv').config();
 module.exports = function (app) {
     //jwt tokens stored in cookies
     const upload = multer();
+    /*
     let ExtractJWT = passportJWT.ExtractJwt;
     let JwtStrategy = passportJWT.Strategy;
     let jwtOptions = {};
@@ -42,6 +44,29 @@ module.exports = function (app) {
     });
 
     passport.use(strategy);
+    */
+    //authorization
+    const authorization = async (req, res, next) => {
+        try {
+            let token;
+            let user;
+            if (req && req.cookies) {
+                token = req.cookies['jwt'];
+            }
+            if (!token) {
+                return res.status(401).json({ error: 'Unauthorized' }).end();
+            }
+            const data = jwt.verify(token, process.env.JWT_SECRET);
+            if (!data.userid) {
+                return res.status(401).json({ error: 'Unauthorized' }).end();
+            }
+            user = data;
+            return next();
+        } catch (err) {
+            return res.status(401).json({ error: 'Unauthorized' }).end();
+        }
+        
+    }
     
     //sign up and login routes
     //account creation
@@ -243,10 +268,10 @@ module.exports = function (app) {
                         const user = lookup.rows[0];
                         let jti = crypto.randomBytes(16).toString('hex');
                         const payload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
-                        const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "300s" });
+                        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "10s" });
                         jti = crypto.randomBytes(16).toString('hex');
                         const refreshPayload = { jti: jti, userid: user.userid, username: user.username, email: user.email }
-                        const refreshToken = jwt.sign(refreshPayload, jwtOptions.refreshSecretOrKey, { expiresIn: "14d"} );
+                        const refreshToken = jwt.sign(refreshPayload, process.env.JWT_REFRESH_SECRET, { expiresIn: "14d"} );
                         res.cookie('jwt', token, { httpOnly: true, sameSite: true});
                         res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: true });
                         res.json({ success: true, message: 'Login was successful.'}).end();
@@ -262,7 +287,7 @@ module.exports = function (app) {
         });
     
     app.route('/api/profile')
-        .get(passport.authenticate('jwt', {session: false}), (req, res) => {
+        .get(authorization, (req, res) => {
             res.json({message: 'Access granted.'});
         });
     
@@ -290,7 +315,7 @@ module.exports = function (app) {
                 } else {
                     const jti = crypto.randomBytes(16).toString('hex');
                     const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
-                    const token = jwt.sign(payload, jwtOptions.secretOrKey, { expiresIn: "300s" });
+                    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "300s" });
                     res.cookie('jwt', token, { httpOnly: true, sameSite: true });
                     res.json({ success: true, token: token }).end();;
                 }
@@ -306,7 +331,7 @@ module.exports = function (app) {
     //admins can revoke refresh tokens by blacklisting them
     //the user will need to login again to generate a new refresh token
     app.route('/api/token/revoke')
-        .post(passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .post(authorization, async (req, res) => {
             try {
                 //receive admin cookies and given refresh token                
                 //decode access token jwt from cookie
@@ -427,7 +452,7 @@ module.exports = function (app) {
         });
     //update username
     app.route('/api/user/username/update')
-        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .post(upload.none(), authorization, async (req, res) => {
             try {
                 //receive user and new username
                 const token = req.cookies['jwt'];
@@ -459,7 +484,7 @@ module.exports = function (app) {
         });
     //update email
     app.route('/api/user/email/update')
-        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .post(upload.none(), authorization, async (req, res) => {
             try {
                 //receive user and new email
                 const token = req.cookies['jwt'];
@@ -490,7 +515,7 @@ module.exports = function (app) {
         });
     //update password
     app.route('/api/user/password/update')
-        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .post(upload.none(), authorization, async (req, res) => {
             try {
                 //receive user and new password
                 const token = req.cookies['jwt'];
@@ -515,7 +540,7 @@ module.exports = function (app) {
         });
     //user account deletion
     app.route('/api/user/account/delete')
-        .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .delete(upload.none(), authorization, async (req, res) => {
             try {
                 //get user
                 const token = req.cookies['jwt'];
@@ -534,7 +559,7 @@ module.exports = function (app) {
     //reminder routes
     //create reminders
     app.route('/api/reminder/create')
-        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .post(upload.none(), authorization, async (req, res) => {
             try {
                 //receieve user info and reminder data
                 const token = req.cookies['jwt'];
@@ -548,6 +573,10 @@ module.exports = function (app) {
 
                 //return error if required fields are missing
                 if(!userID || !reminderName || !reminderDate || !reminderTime ) {
+                    console.log(userID);
+                    console.log(reminderName);
+                    console.log(reminderDate);
+                    console.log(reminderTime);
                     return res.status(400).json({error: 'Missing required field(s)!'}).end();
                 }
 
@@ -598,7 +627,7 @@ module.exports = function (app) {
         });
     //update reminder
     app.route('/api/reminder/update')
-        .post(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .post(upload.none(), authorization, async (req, res) => {
             try {
                 //recieve user info and reminder data
                 //frontend will provide all fields
@@ -650,7 +679,7 @@ module.exports = function (app) {
         });
     //list reminders
     app.route('/api/reminder/list')
-        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .get(authorization, async (req, res) => {
             try {
                 //get user id
                 const token = req.cookies['jwt'];
@@ -667,7 +696,7 @@ module.exports = function (app) {
         });    
     //delete reminders
     app.route('/api/reminder/delete/:reminderid')
-        .delete(upload.none(), passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .delete(upload.none(), authorization, async (req, res) => {
             try {
                 //get user and reminder id
                 const token = req.cookies['jwt'];
@@ -689,7 +718,7 @@ module.exports = function (app) {
     
     //verify the user is logged in
     app.route('/api/user/authentication')
-        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .get(authorization, async (req, res) => {
             try {
                 return res.status(200).json({ success: true, loggedIn: true }).end();
             } catch (err) {
@@ -698,7 +727,7 @@ module.exports = function (app) {
         });
     
     app.route('/api/logout')
-        .get(passport.authenticate('jwt', { session: false }), async (req, res) => {
+        .get(authorization, async (req, res) => {
             try {
                 const refreshToken = req.cookies['refresh'];
                 //blacklist their refresh token
