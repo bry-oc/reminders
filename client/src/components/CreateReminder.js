@@ -76,7 +76,7 @@ function CreateReminder(){
                         })
                 }
             })
-            
+        
     }
     return (
         <div className="wrapper">

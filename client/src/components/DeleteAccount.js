@@ -1,3 +1,6 @@
+import React, { useContext } from "react";
+import authContext from './AuthContext';
+
 function DeleteAccount() {
     return (
         <div className="wrapper">
