@@ -3,12 +3,12 @@ import authContext from './AuthContext';
 
 function UpdateReminder(props) {
     const { auth, setAuth } = useContext(authContext);
-    const [reminderID, setReminderID] = useState();
-    const [reminderName, setReminderName] = useState();
-    const [reminderDescription, setReminderDescription] = useState();
-    const [reminderDate, setReminderDate] = useState();
-    const [reminderTime, setReminderTime] = useState();
-    const [reminderRepeat, setReminderRepeat] = useState();
+    const [reminderID, setReminderID] = useState(0);
+    const [reminderName, setReminderName] = useState('');
+    const [reminderDescription, setReminderDescription] = useState('');
+    const [reminderDate, setReminderDate] = useState('');
+    const [reminderTime, setReminderTime] = useState('');
+    const [reminderRepeat, setReminderRepeat] = useState('');
 
 
     useEffect(() => {
