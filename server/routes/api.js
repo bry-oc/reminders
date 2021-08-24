@@ -694,6 +694,16 @@ module.exports = function (app) {
                 return res.status(500).json({error: 'Internal Server Error'}).end();
             }            
         });    
+    //view reminder
+    app.route('/api/reminder/view/:reminderid')
+        .get(authorization, async (req, res) => {
+            try {
+                
+            } catch(err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Internal Server Error' }).end();
+            }
+        })
     //delete reminders
     app.route('/api/reminder/delete/:reminderid')
         .delete(upload.none(), authorization, async (req, res) => {
