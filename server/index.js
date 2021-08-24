@@ -10,7 +10,6 @@ const apiRoutes = require('./routes/api.js');
 const emailScheduler = require('./tools/emailScheduler');
 const db = require('./db/dbScheduler');
 
-
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors({ optionsSuccessStatus: 200, credentials: true, origin: 'http://localhost:3000' }));

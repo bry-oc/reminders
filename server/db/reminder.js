@@ -18,6 +18,10 @@ exports.getAllReminders = async function(userID) {
     return await pool.query('SELECT * FROM "reminder" WHERE "userid" = $1', [userID]);
 }
 
+exports.getReminder = async function(reminderID, userID) {
+    return await pool.query('SELECT * FROM "reminder" WHERE "reminderid"=$1 AND "userid" = $2', [reminderID, userID]);
+}
+
 exports.updateReminder = async function(userID, reminderID, name, description, repeat, date) {
     return await pool.query('UPDATE "reminder" SET "name" = $1, "description" = $2, "repeat" = $3, "date" = $4 WHERE "userid" = $5 AND "reminderid" = $6', [name, description, repeat, date, userID, reminderID]);
 }

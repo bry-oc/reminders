@@ -182,7 +182,7 @@ module.exports = function (app) {
                     }
                 }
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({error: 'Internal Server Error: ' +err}).end();
             }
         });
     
@@ -241,7 +241,7 @@ module.exports = function (app) {
                     });
                 }               
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
@@ -282,7 +282,7 @@ module.exports = function (app) {
                     }
                 }
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
@@ -324,7 +324,7 @@ module.exports = function (app) {
                     res.clearCookie('refresh');
                     return res.status(401).json({error: 'Invalid Refresh Token'}).end();
                 }
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
@@ -362,7 +362,7 @@ module.exports = function (app) {
                 if(err.name === "JsonWebTokenError") {
                     return res.status(400).json({error: 'Invalid Refresh Token'}).end();
                 }
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }    
         });
     //reset password request
@@ -414,7 +414,7 @@ module.exports = function (app) {
                 }                
             } catch (err) {
                 console.log(err);
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //reset password
@@ -447,7 +447,7 @@ module.exports = function (app) {
                     return res.status(200).json({message: 'Password has been reset successfully.'}).end();
                 }
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //update username
@@ -479,7 +479,7 @@ module.exports = function (app) {
                 }
                 
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //update email
@@ -510,7 +510,7 @@ module.exports = function (app) {
                     return res.status(200).json({ success: true, message: 'Your email has been changed to ' + email + "." });
                 }
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //update password
@@ -535,7 +535,7 @@ module.exports = function (app) {
                 await authQuery.updatePassword(userID, passwordHash);
                 return res.status(200).json({ success: true, message: 'Your password has been successfuly updated.' });
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //user account deletion
@@ -552,7 +552,7 @@ module.exports = function (app) {
                 await authQuery.deleteUser(userID);
                 return res.status(200).json({ message: 'Account deleted.' }).end();
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
 
@@ -622,7 +622,7 @@ module.exports = function (app) {
                 return res.status(200).json({ success: true, reminderid: reminderID }).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //update reminder
@@ -674,7 +674,7 @@ module.exports = function (app) {
                 return res.status(200).json({ success: true, reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderTimestamp: reminderTimestamp, reminderDate: reminderDate, reminderTime: reminderTime }).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //list reminders
@@ -691,17 +691,26 @@ module.exports = function (app) {
                 return res.status(200).json({success: true, reminders: lookup.rows}).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }            
         });    
     //view reminder
     app.route('/api/reminder/view/:reminderid')
         .get(authorization, async (req, res) => {
             try {
-                
+                //get userid
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const reminderID = req.params.reminderid;
+                //get reminder and return
+                const lookup = await reminderQuery.getReminder(reminderID, userID);
+                const reminder = lookup.rows[0];
+
+                return res.status(200).json({ success: true, reminderid: reminder.reminderid, reminderName: reminder.name, reminderDescription: reminder.description, reminderRepeat: reminder.repeat, reminderTimestamp: reminder.date }).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         })
     //delete reminders
@@ -722,7 +731,7 @@ module.exports = function (app) {
                 await emailScheduler.deleteReminder(reminderID);
                 return res.status(200).json({success: true, message: 'Reminder deleted.'}).end();
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
@@ -732,7 +741,7 @@ module.exports = function (app) {
             try {
                 return res.status(200).json({ success: true, loggedIn: true }).end();
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
