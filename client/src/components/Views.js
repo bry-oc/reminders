@@ -25,7 +25,7 @@ const PrivateRoute = ({ component, ...options }) => {
 
 function Views(){
     return (
-        <div>
+        <div id="views">
             <Switch>
                 <Route exact path="/">
                     <Home/>
