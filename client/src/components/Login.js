@@ -45,9 +45,9 @@ function Login(){
                 <label htmlFor="password">Password:<br />
                     <input type="password" placeholder="Enter your password" id="password" name="password" required>
                     </input>
-                </label><br />
-                <a href={'/password/reset'}>Forgot password?</a><br/>
-                <button type="submit">Login</button>
+                </label><br />                
+                <button type="submit">Login</button><br />
+                <a href={'/password/reset'}>Forgot password?</a><br />
             </form>
             {warning !== "" ? <p className="warning">{warning}</p> : null}
         </div>
