@@ -36,17 +36,17 @@ function Login(){
     }
     return (
         <div className="wrapper">
-            <p>Please Login.</p>
+            <h1>Reminder App Login</h1>
             <form onSubmit={login}>
                 <label htmlFor="username">Username:<br/>
                     <input type="text" placeholder="Enter your username" id="username" name="username" required>
                     </input>
-                </label><br />
+                </label><br /><br />
                 <label htmlFor="password">Password:<br />
                     <input type="password" placeholder="Enter your password" id="password" name="password" required>
                     </input>
-                </label><br />                
-                <button type="submit">Login</button><br />
+                </label><br /><br />
+                <button type="submit">Login</button><br /><br />
                 <a href={'/password/reset'}>Forgot password?</a><br />
             </form>
             {warning !== "" ? <p className="warning">{warning}</p> : null}

@@ -1,0 +1,28 @@
+h1 {
+    text-align: center;
+}
+form {
+    width: 300px;    
+    margin: auto;
+}
+input {
+    width: 300px;
+    height: 40px;
+    font-size: large;
+}
+label {
+    font-weight: bold;
+}
+button {
+    width: 310px;
+    height: 40px;
+    font-size: large;
+}
+@media screen and (max-width: 350px) {
+    h1 {
+        word-wrap: break-word;
+    }
+    .wrapper, form, input, label, button {
+        max-width: 100%;
+    }
+}
