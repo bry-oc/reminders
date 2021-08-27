@@ -35,7 +35,7 @@ function Login(){
         })
     }
     return (
-        <div className="wrapper">
+        <div className="wrapper" id="login">
             <h1>Reminder App Login</h1>
             <form onSubmit={login}>
                 <label htmlFor="username">Username:<br/>

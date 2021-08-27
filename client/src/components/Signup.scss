@@ -1,4 +1,4 @@
-#login {
+#signup {
     h1 {
     text-align: center;
     }
@@ -19,12 +19,12 @@
         height: 40px;
         font-size: large;
         border-radius: 12px; 
-        cursor: pointer;    
+        cursor: pointer;       
     }
 }
 
 @media screen and (max-width: 350px) {
-    #login {
+    #signup {
         h1 {
         word-wrap: break-word;
         }

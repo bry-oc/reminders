@@ -1,6 +1,6 @@
 function Home(){
     return(
-        <div className="wrapper">
+        <div className="home">
             <div className="title">
                 <h1>Reminder App: Never Forget</h1>
             </div>

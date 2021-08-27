@@ -27,20 +27,21 @@ function Signup() {
             })
     }
     return (
-        <div className="wrapper">
+        <div className="wrapper" id="signup">
+            <h1>Create Your Account</h1>
             <form onSubmit={signup}>
-                <label>Email:<br />
-                    <input type="text" placeholder="Enter your email" required>
+                <label htmlFor="email">Email:<br />
+                    <input type="text" placeholder="Enter your email" id="email" name="email" required>
                     </input>
-                </label><br />
-                <label>Username:<br />
-                    <input type="text" placeholder="Enter your username" required>
+                </label><br /><br />
+                <label htmlFor="username">Username:<br />
+                    <input type="text" placeholder="Enter your username" id="username" name="username" required>
                     </input>
-                </label><br />
-                <label>Password:<br />
-                    <input type="text" placeholder="Enter your password" required>
+                </label><br /><br />
+                <label htmlFor="password">Password:<br />
+                    <input type="password" placeholder="Enter your password" id="password" name="password" required>
                     </input>
-                </label><br />
+                </label><br /><br />
                 <button id="submit" type="submit">Create Account</button>
             </form>
         </div>
