@@ -72,8 +72,8 @@ function UpdatePassword() {
     return (
         <div className="wrapper">
             <form onSubmit={updatePassword}>
-                <label for="password">New Password:<br />
-                    <input type="text" placeholder="Enter your password" required>
+                <label htmlFor="password">New Password:<br />
+                    <input type="text" name="password" placeholder="Enter your password" required>
                     </input>
                 </label><br />
                 <button type="submit">Change Password</button>

@@ -72,8 +72,8 @@ function UpdateEmail() {
     return (
         <div className="wrapper">
             <form onSubmit={updateEmail}>
-                <label for="email">New Email:<br />
-                    <input type="text" placeholder="Enter your email" required>
+                <label htmlFor="email">New Email:<br />
+                    <input type="text" name="email" placeholder="Enter your email" required>
                     </input>
                 </label><br />
                 <button type="submit">Change Email</button>

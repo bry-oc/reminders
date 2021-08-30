@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import authContext from './AuthContext';
 
 function UpdateUsername(){
     const { auth, setAuth } = useContext(authContext);
+    const [warning, setWarning] = useState('');
 
     let updateUsername = (e) => {
         e.preventDefault();
@@ -30,9 +31,12 @@ function UpdateUsername(){
                         .then((res) => res.json())
                         .then((data) => {
                             if (data.error) {
+                                setWarning(data.error);
                                 console.log(data.error);
                             } else {
                                 console.log(data.message);
+                                setWarning('');
+                                window.location.href = "/account";
                             }
                         })
                 } else {
@@ -55,9 +59,12 @@ function UpdateUsername(){
                                     .then((res) => res.json())
                                     .then((data) => {
                                         if (data.error) {
+                                            setWarning(data.error);
                                             console.log(data.error);
                                         } else {
                                             console.log(data.message);
+                                            setWarning('');
+                                            window.location.href = "/account";
                                         }
                                     })
                             } else {
@@ -71,12 +78,13 @@ function UpdateUsername(){
     return (
         <div className="wrapper">
             <form onSubmit={updateUsername}>
-                <label for="username">New Username:<br />
-                    <input type="text" placeholder="Enter your username" required>
+                <label htmlFor="username">New Username:<br />
+                    <input type="text" name="username" placeholder="Enter your username" required>
                     </input>
                 </label><br />
                 <button type="submit">Change Username</button>
             </form>
+            <p>{warning}</p>
         </div>
     )    
 }

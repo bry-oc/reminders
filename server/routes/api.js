@@ -763,4 +763,15 @@ module.exports = function (app) {
                 return res.status(500).json({ error: 'Internal Server Error: ' + err }).end();
             }
         });
+    
+    app.route('/api/user/account')
+        .get(authorization, async (req, res) => {
+            try {
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                return res.status(200).json({success: true, username: user.username, email: user.email});
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error: ' + err }).end();
+            }
+        })
 }
