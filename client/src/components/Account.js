@@ -49,6 +49,7 @@ function Account(){
                 if (data.error) {
                     console.log(data.error);
                 } else {
+                    console.log(data.username);
                     setUsername(data.username);
                     setEmail(data.email);
                 }

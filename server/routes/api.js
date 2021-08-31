@@ -475,6 +475,11 @@ module.exports = function (app) {
                 } else {
                     //update the user's username
                     await authQuery.updateUsername(userID, username);
+                    const jti = crypto.randomBytes(16).toString('hex');
+                    const payload = { jti: jti, userid: user.userid, username: username, email: user.email }
+                    const updateToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "10s" });
+                    res.clearCookie('jwt');
+                    res.cookie('jwt', updateToken, { httpOnly: true, sameSite: true });
                     return res.status(200).json({ success: true, message: 'Your username has been changed to ' + username + "."});
                 }
                 
@@ -507,6 +512,11 @@ module.exports = function (app) {
                 } else {
                     //update the user's email
                     await authQuery.updateEmail(userID, email);
+                    const jti = crypto.randomBytes(16).toString('hex');
+                    const payload = { jti: jti, userid: user.userid, username: user.username, email: email }
+                    const updateToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "10s" });
+                    res.clearCookie('jwt');
+                    res.cookie('jwt', updateToken, { httpOnly: true, sameSite: true });
                     return res.status(200).json({ success: true, message: 'Your email has been changed to ' + email + "." });
                 }
             } catch (err) {
