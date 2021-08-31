@@ -1,7 +1,5 @@
 @import './components/NavBar.scss';
 @import './components/Home.scss';
-@import './components/Login.scss';
-@import './components/Signup.scss';
 @import './components/Account.scss';
 body {
   margin: 0;  
@@ -14,6 +12,43 @@ body {
 #views {    
   margin:auto;
   max-width: 1080px;
+}
+.wrapper {
+    h1 {
+    text-align: center;
+    }
+    form {
+        width: 300px;    
+        margin: auto;
+    }
+    input {
+        width: 300px;
+        height: 40px;
+        font-size: large;
+    }
+    label {
+        font-weight: bold;
+    }
+    button {
+        width: 310px;
+        height: 40px;
+        font-size: large;
+        border-radius: 12px; 
+        cursor: pointer;    
+    }
+}
+
+
+@media screen and (max-width: 350px) {
+    .wrapper {
+        h1 {
+        word-wrap: break-word;
+        }
+        .wrapper, form, input, label, button {
+            max-width: 100%;
+            overflow: hidden;
+        }
+    }    
 }
 
 
