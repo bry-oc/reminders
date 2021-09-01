@@ -5,6 +5,7 @@ nav {
     padding: 0;
     overflow: hidden;
     background-color: #333;
+    max-height: 48px;
   }    
   .navlink {
     float: left;
@@ -37,7 +38,12 @@ nav {
     right: 0;
     top: 0;
   }
-  .navbar.responsive {position: relative;}
+  .navbar.responsive {
+    position: relative;    
+  }
+  .navbar.responsive ul {
+    max-height: none;
+  }
   .navbar.responsive i {    
     visibility: visible;
     position: absolute;
