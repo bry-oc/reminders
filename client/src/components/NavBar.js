@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import authContext from './AuthContext';
+import 'font-awesome/css/font-awesome.min.css';
 
 function NavBar() {
     const { auth, setAuth } = useContext(authContext);
@@ -24,11 +25,25 @@ function NavBar() {
                 }
             })
     }
+    /* Toggle between adding and removing the "responsive" class to topnav when the user clicks on the icon */
+    function myFunction() {
+        var x = document.getElementById("navbar");
+        if (x.className === "navbar") {
+            x.className += " responsive";
+            console.log(x.className);
+        } else {
+            x.className = "navbar";
+            console.log(x.className);
+        }
+    }
 
     return (
         <div>
-            <nav className="navbar">
+            <nav className="navbar" id="navbar">
                 <ul>
+                    <li>
+                        <i className="fa fa-bars fa-2x" onClick={myFunction}></i>
+                    </li>                    
                     <li>
                         <Link className="navlink" to="/">Home</Link>
                     </li>
@@ -73,7 +88,7 @@ function NavBar() {
                             <li>
                                 <Link className="navlink" to="/" onClick={logout}>Logout</Link>
                             </li> : null
-                    }                    
+                    }               
                 </ul>
 
             </nav>
