@@ -58,8 +58,10 @@ function Account(){
 
     return(
         <div className="wrapper" id="account">            
-            <p>Email: {email}</p>
-            <p>Username: {username}</p><br />
+            <p>Email:</p><br />
+            <p>{email}</p>
+            <p>Username:</p><br />
+            <p>{username}</p><br />
             <form action="/username/edit">
                 <input type="submit" value="Change Username" />
             </form><br/>
