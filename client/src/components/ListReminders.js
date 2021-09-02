@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import UpdateReminder from "./UpdateReminder";
 import DeleteReminder from "./DeleteReminder";
+import ViewReminder from "./ViewReminder";
 import authContext from './AuthContext';
 
 function ListReminders() {
@@ -66,17 +67,14 @@ function ListReminders() {
                         })
                 }
             })
-        
-    },[]);
 
-    let showUpdate = (e) => {
+    }, []);
+
+
+
+    let updateID = (e) => {
         console.log(e.target.name);
         setCurrentID(e.target.name);
-    }
-
-    let showDelete = (e) => {
-        setCurrentID(e.target.name);
-        console.log(currentID)
     }
 
     function TableData() {
@@ -85,36 +83,37 @@ function ListReminders() {
             return (
                 <tr key={reminderid}>
                     <td>{name}</td>
-                    <td>{date}</td>                    
-                    <td>{repeat}</td>
-                    <td>{description}</td>
-                    <td><button onClick={showUpdate} name={reminderid}>edit</button></td>
-                    <td><button onClick={showDelete} name={reminderid}>delete</button></td>
+                    <td>{date}</td>
+                    <td><button onClick={updateID} name={reminderid}>view</button></td>
+                    <td><button onClick={updateID} name={reminderid}>edit</button></td>
+                    <td><button onClick={updateID} name={reminderid}>delete</button></td>
                 </tr>
             )
         })
     }
 
-    return(
+    return (
         <div className="wrapper">
-            <table>
+            <table className="table">
                 <tbody>
                     <tr>
                         <th>Name</th>
-                        <th>Date</th>                        
-                        <th>Repeat</th>
-                        <th>Description</th>
+                        <th>Date</th>
+                        <th>View</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
                     </tr>
                     {TableData()}
                 </tbody>
             </table>
-            <UpdateReminder reminderid={currentID}/>
-            <DeleteReminder reminderid={currentID}/>
+            <ViewReminder reminderid={currentID} />
+            <UpdateReminder reminderid={currentID} />
+            <DeleteReminder reminderid={currentID} />
         </div>
     )
-    
-    
-    
+
+
+
 }
 
 export default ListReminders;
