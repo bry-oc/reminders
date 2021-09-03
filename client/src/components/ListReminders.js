@@ -93,7 +93,7 @@ function ListReminders() {
     }
 
     return (
-        <div className="wrapper">
+        <div className="table-wrapper">
             <table className="table">
                 <tbody>
                     <tr>

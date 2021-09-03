@@ -1,3 +1,10 @@
+.table-wrapper {
+    padding-top: 40px;    
+    table {        
+        width: 720px;
+        margin:auto;        
+    }    
+}
 .table {
     border: 1px solid black;
     border-collapse: collapse;
@@ -9,5 +16,11 @@
     th, td {
         border: 1px solid black;
     }
+    button {        
+        height: 100%;
+        width: 100%;
+        border-radius: 0;
+    }
 }
+    
     
