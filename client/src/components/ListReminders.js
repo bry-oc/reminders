@@ -79,11 +79,18 @@ function ListReminders() {
 
     function TableData() {
         return reminders.map((reminder, index) => {
-            const { reminderid, name, description, date, repeat } = reminder;
+            const { reminderid, name, repeat, description, date } = reminder;
+            let reminderDate = new Date(parseInt(date));
+            const day = reminderDate.getDate() < 10 ? "0" + reminderDate.getDate() : reminderDate.getDate();
+            const month = (reminderDate.getMonth() + 1) < 10 ? "0" + (reminderDate.getMonth() + 1) : (reminderDate.getMonth() + 1);
+            const year = reminderDate.getFullYear();
+            const hour = reminderDate.getHours() < 10 ? "0" + reminderDate.getHours() : reminderDate.getHours();
+            const minutes = reminderDate.getMinutes() < 10 ? "0" + reminderDate.getMinutes() : reminderDate.getMinutes();
+            reminderDate = year + '-' + month + '-' + day;
             return (
                 <tr key={reminderid}>
                     <td>{name}</td>
-                    <td>{date}</td>
+                    <td>{reminderDate}</td>
                     <td><button onClick={updateID} name={reminderid}>view</button></td>
                     <td><button onClick={updateID} name={reminderid}>edit</button></td>
                     <td><button onClick={updateID} name={reminderid}>delete</button></td>
