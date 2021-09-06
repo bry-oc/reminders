@@ -3,9 +3,11 @@ import React, { useContext } from "react";
 
 function Login(){
     const [warning, setWarning] = React.useState("");
+    const [isLoading, setLoading] = React.useState(false);
     const { auth, setAuth } = useContext(authContext);
 
     let login = (e) => {
+        setLoading(true);
         e.preventDefault();
         const username = e.target.username.value;
         const password = e.target.password.value;
@@ -24,10 +26,12 @@ function Login(){
         .then((res) => res.json())
         .then((data) => {
             if(data.error) {
+                setLoading(false);
                 setWarning(data.error);
                 console.log(data.error);
             } else {
                 setAuth(true);
+                setLoading(false);
                 console.log(auth);
                 console.log(data);
                 window.location.href = "/account";
