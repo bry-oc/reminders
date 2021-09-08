@@ -70,7 +70,11 @@ function ListReminders() {
 
     }, []);
 
-
+    let openEdit = (e) => {
+        let modalEdit = document.getElementById("modal-update");
+        modalEdit.style.display = "block";
+        setCurrentID(e.target.name);
+    }
 
     let updateID = (e) => {
         console.log(e.target.name);
@@ -92,7 +96,7 @@ function ListReminders() {
                     <td>{name}</td>
                     <td>{reminderDate}</td>
                     <td><button onClick={updateID} name={reminderid}>view</button></td>
-                    <td><button onClick={updateID} name={reminderid}>edit</button></td>
+                    <td><button onClick={openEdit} name={reminderid}>edit</button></td>
                     <td><button onClick={updateID} name={reminderid}>delete</button></td>
                 </tr>
             )
@@ -100,23 +104,32 @@ function ListReminders() {
     }
 
     return (
-        <div className="table-wrapper">
-            <table className="table">
-                <tbody>
-                    <tr>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>View</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
-                    </tr>
-                    {TableData()}
-                </tbody>
-            </table>
-            <ViewReminder reminderid={currentID} />
-            <UpdateReminder reminderid={currentID} />
-            <DeleteReminder reminderid={currentID} />
+        <div className="list-wrapper">
+            <div className="table-wrapper">
+                <table className="table">
+                    <tbody>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>View</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                        {TableData()}
+                    </tbody>
+                </table>
+            </div>
+            <div className="modal" id="modal-view">
+                <ViewReminder reminderid={currentID} />
+            </div>
+            <div className="modal" id="modal-update">
+                <UpdateReminder reminderid={currentID} />
+            </div>
+            <div className="modal" id="modal-delete">
+                <DeleteReminder reminderid={currentID} />
+            </div>
         </div>
+        
     )
 
 

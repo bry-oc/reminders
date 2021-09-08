@@ -27,11 +27,11 @@ function NavBar() {
     }
 
     function myFunction() {
-        var x = document.getElementById("navbar");
-        if (x.className === "navbar") {
-            x.className += " responsive";
+        let nav = document.getElementById("navbar");
+        if (nav.className === "navbar") {
+            nav.className += " responsive";
         } else {
-            x.className = "navbar";
+            nav.className = "navbar";
         }
     }
 
