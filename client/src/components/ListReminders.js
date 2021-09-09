@@ -70,6 +70,12 @@ function ListReminders() {
 
     }, []);
 
+    let openView = (e) => {
+        let modalView = document.getElementById("modal-view");
+        modalView.style.display = "block";
+        setCurrentID(e.target.name);
+    }
+
     let openEdit = (e) => {
         let modalEdit = document.getElementById("modal-update");
         modalEdit.style.display = "block";
@@ -78,12 +84,7 @@ function ListReminders() {
 
     let openDelete = (e) => {
         let modalDelete = document.getElementById("modal-delete");
-        modalEdit.style.display = "block";
-        setCurrentID(e.target.name);
-    }
-
-    let updateID = (e) => {
-        console.log(e.target.name);
+        modalDelete.style.display = "block";
         setCurrentID(e.target.name);
     }
 
@@ -101,7 +102,7 @@ function ListReminders() {
                 <tr key={reminderid}>
                     <td>{name}</td>
                     <td>{reminderDate}</td>
-                    <td><button onClick={updateID} name={reminderid}>view</button></td>
+                    <td><button onClick={openView} name={reminderid}>view</button></td>
                     <td><button onClick={openEdit} name={reminderid}>edit</button></td>
                     <td><button onClick={openDelete} name={reminderid}>delete</button></td>
                 </tr>
