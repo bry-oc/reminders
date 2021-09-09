@@ -1,6 +1,7 @@
-.table-wrapper {
+.table-wrapper {    
     padding-top: 40px;    
-    table {        
+    table {     
+        z-index: 0;   
         width: 720px;
         margin:auto;        
     }    
@@ -22,9 +23,39 @@
         width: 100%;
         align-self: stretch;
     }
+}
+#modal-view {
+    display: none;
+    position: fixed;
+    z-index: 2;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
 #modal-update {
     display: none;
-    } 
+    position: fixed;
+    z-index: 2;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+#modal-delete {
+    display: none;
+    position: fixed;
+    z-index: 2;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
 }
     
     

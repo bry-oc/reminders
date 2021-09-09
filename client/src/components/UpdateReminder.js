@@ -96,7 +96,7 @@ function UpdateReminder(props) {
     }
 
     return (
-        <div className="wrapper">
+        <div className="wrapper modal">
             <p>{props.reminderid}</p>
             <form>
                 <label htmlFor="name">Name:<br />

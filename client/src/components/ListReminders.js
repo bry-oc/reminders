@@ -126,13 +126,13 @@ function ListReminders() {
                     </tbody>
                 </table>
             </div>
-            <div className="modal" id="modal-view">
+            <div className="modal-wrapper" id="modal-view">
                 <ViewReminder reminderid={currentID} />
             </div>
-            <div className="modal" id="modal-update">
+            <div className="modal-wrapper" id="modal-update">
                 <UpdateReminder reminderid={currentID} />
             </div>
-            <div className="modal" id="modal-delete">
+            <div className="modal-wrapper" id="modal-delete">
                 <DeleteReminder reminderid={currentID} />
             </div>
         </div>
