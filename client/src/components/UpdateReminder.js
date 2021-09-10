@@ -97,24 +97,20 @@ function UpdateReminder(props) {
 
     return (
         <div className="wrapper modal">
-            <p>{props.reminderid}</p>
+            <h2>Edit Reminder</h2>
             <form>
-                <label htmlFor="name">Name:<br />
+                <label htmlFor="name" id="name">Name:<br />
                     <input type="text" value={reminderName} onChange={(e => setReminderName(e.target.value))} required>
                     </input>
-                </label><br />
-                <label htmlFor="description">Description (Optional):<br />
-                    <textarea name="description" value={reminderDescription} onChange={(e => setReminderDescription(e.target.value))}>
-                    </textarea>
-                </label><br />
+                </label><br /><br />                
                 <label htmlFor="date">Date:<br />
                     <input type="date" value={reminderDate} onChange={(e => setReminderDate(e.target.value))}>
                     </input>
-                </label><br />
+                </label><br /><br />
                 <label htmlFor="time">Time:<br />
                     <input type="time" value={reminderTime} onChange={(e => setReminderTime(e.target.value))}>
                     </input>
-                </label><br />
+                </label><br /><br />
                 <label htmlFor="repeat">Repeat:<br />
                     <select form="repeat" value={reminderRepeat} onChange={(e => setReminderRepeat(e.target.value))}>
                         <option defaultValue="none" id="none">None</option>
@@ -123,7 +119,11 @@ function UpdateReminder(props) {
                         <option value="biweekly" id="biweekly">Biweekly</option>
                         <option value="monthly" id="monthly">Monthly</option>
                     </select>
-                </label><br />
+                </label><br /><br />
+                <label htmlFor="description">Description (Optional):<br />
+                    <textarea name="description" value={reminderDescription} onChange={(e => setReminderDescription(e.target.value))}>
+                    </textarea>
+                </label><br /><br />
                 <button type="submit" onClick={fetchUpdateReminder}>Update Reminder</button>
             </form>
         </div>

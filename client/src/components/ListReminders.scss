@@ -8,7 +8,7 @@
 }
 .table {
     border: 1px solid black;
-    border-radius: 13px; 
+    border-radius: 12px; 
     border-spacing: 0;
     padding: 5px;
     td, th {
@@ -26,16 +26,37 @@
 }
 .modal-wrapper {    
     box-sizing: border-box;
-    border: 12px solid black;
     display: none;
     z-index: 2;
-    position: fixed;    
-    left: 0;
+    position: fixed;
+    justify-content: center;
+    align-items: center;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;    
     overflow: auto;
     background-color: rgba(0,0,0,0.4);
+}
+.modal {
+    padding: 40px;
+    background-color: white;
+    border-radius: 12px; 
+    padding-top: 0;
+    h2 {
+    text-align: center;
+    }
+    textarea {
+        font-size: 14px;
+        width: 300px;
+        height: 75px;
+        resize: none;
+        overflow: auto;
+    }    
+    select {
+        width: 304px;
+        font-size: medium;
+    }
 }
 
     

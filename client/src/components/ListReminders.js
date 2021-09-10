@@ -79,7 +79,7 @@ function ListReminders() {
 
     let openEdit = (e) => {
         let modalEdit = document.getElementById("modal-update");
-        modalEdit.style.display = "block";
+        modalEdit.style.display = "flex";
         document.body.style.overflow = "hidden";
         setCurrentID(e.target.name);
     }
