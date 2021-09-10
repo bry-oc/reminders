@@ -40,11 +40,11 @@
 }
 .modal {
     border: 1px solid black;
-    margin: 0;
     padding: 40px;
     background-color: white;
     border-radius: 12px; 
     padding-top: 0;
+    margin: auto;
     h2 {
         text-align: center;
     }
@@ -67,5 +67,16 @@
     }
 }
 
+@media screen and (max-width: 400px) {
+    .modal-wrapper {
+        .modal, form, input, label, select, button, textarea {
+            max-width: 100%;            
+        }
+        button {
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }  
+}
     
     
