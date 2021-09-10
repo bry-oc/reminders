@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import authContext from './AuthContext';
-import 'font-awesome/css/font-awesome.min.css';
 
 function NavBar() {
     const { auth, setAuth } = useContext(authContext);
@@ -26,7 +25,7 @@ function NavBar() {
             })
     }
 
-    function myFunction() {
+    function toggleResponsiveNav() {
         let nav = document.getElementById("navbar");
         if (nav.className === "navbar") {
             nav.className += " responsive";
@@ -40,7 +39,7 @@ function NavBar() {
             <nav className="navbar" id="navbar">
                 <ul>
                     <li>
-                        <i className="fa fa-bars fa-2x" onClick={myFunction}></i>
+                        <i className="fa fa-bars fa-2x" onClick={toggleResponsiveNav}></i>
                     </li>                    
                     <li>
                         <Link className="navlink" to="/">Home</Link>

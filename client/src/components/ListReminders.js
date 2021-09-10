@@ -82,7 +82,7 @@ function ListReminders() {
         modalEdit.style.display = "flex";
         document.body.style.overflow = "hidden";
         setCurrentID(e.target.name);
-    }
+    }    
 
     let openDelete = (e) => {
         let modalDelete = document.getElementById("modal-delete");

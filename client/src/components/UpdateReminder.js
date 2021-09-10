@@ -95,8 +95,15 @@ function UpdateReminder(props) {
             })
     }
 
+    let closeEdit = (e) => {
+        let modalEditClose = document.getElementById("modal-update");
+        modalEditClose.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
     return (
         <div className="wrapper modal">
+            <i className="fa fa-times-circle fa-2x" onClick={closeEdit}></i><br />
             <h2>Edit Reminder</h2>
             <form>
                 <label htmlFor="name" id="name">Name:<br />
