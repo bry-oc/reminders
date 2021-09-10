@@ -73,18 +73,21 @@ function ListReminders() {
     let openView = (e) => {
         let modalView = document.getElementById("modal-view");
         modalView.style.display = "block";
+        document.body.style.overflow = "hidden";
         setCurrentID(e.target.name);
     }
 
     let openEdit = (e) => {
         let modalEdit = document.getElementById("modal-update");
         modalEdit.style.display = "block";
+        document.body.style.overflow = "hidden";
         setCurrentID(e.target.name);
     }
 
     let openDelete = (e) => {
         let modalDelete = document.getElementById("modal-delete");
         modalDelete.style.display = "block";
+        document.body.style.overflow = "hidden";
         setCurrentID(e.target.name);
     }
 
