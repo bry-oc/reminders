@@ -95,14 +95,19 @@ function DeleteReminder(props){
     }
 
     return (
-        <div className="wrapper modal">
+        <div className="wrapper modal">            
             <i className="fa fa-times-circle fa-2x" onClick={closeDelete}></i><br />
-            <p>Reminder Name: {reminderName}</p><br/>            
-            <p>Reminder Date: {reminderDate}</p><br/>
-            <p>Reminder Time: {reminderTime}</p><br/>
-            <p>Reminder Repeat: {reminderRepeat}</p><br />
-            <p>Reminder Description: {reminderDescription}</p><br />
-            <p>Are you sure you want to delete?</p><br/>
+            <h2>Delete Reminder</h2>
+            <h3>Reminder Name: </h3>
+            <p>{reminderName}</p>
+            <h3>Reminder Date: </h3>
+            <p>{reminderDate}</p>
+            <h3>Reminder Time: </h3>
+            <p>{reminderTime}</p>
+            <h3>Reminder Repeat: </h3>
+            <p>{reminderRepeat}</p>
+            <h3>Reminder Description: </h3>
+            <p>{reminderDescription}</p>
             <button type="submit" onClick={fetchDeleteReminder}>Delete Reminder</button>
         </div>
     )
