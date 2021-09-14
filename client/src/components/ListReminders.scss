@@ -46,6 +46,7 @@
     padding-top: 0;
     margin: auto;
     width: 320px;
+    min-height: 500px;
     p {
         font-size: 18px;
     }
@@ -68,6 +69,13 @@
         padding-top: 10px;
         margin-right: -30px;
         float: right;        
+    }
+    #spinner {
+        float: none;
+        position: fixed;
+        top: 50%;
+        left: 49%;
+        
     }
 }
 

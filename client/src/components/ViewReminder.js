@@ -9,15 +9,12 @@ function ViewReminder(props) {
     const [reminderDate, setReminderDate] = useState('');
     const [reminderTime, setReminderTime] = useState('');
     const [reminderRepeat, setReminderRepeat] = useState('');
+    const [loading, setLoading] = useState(true);
 
 
     useEffect(() => {
-        setReminderID(props.reminderid);
-        setReminderDescription('');
-        setReminderName('');
-        setReminderDate('');
-        setReminderTime('');
-        setReminderRepeat('');
+        setLoading(true);
+        setReminderID(props.reminderid);        
         const url = '/api/user/authentication';
 
         fetch(url, {
@@ -39,10 +36,11 @@ function ViewReminder(props) {
                         .then((res) => {
                             if (res.status === 200) {
                                 setAuth(true);
-                                fetchGetReminder();
+                                fetchGetReminder(); 
                             } else {
                                 console.log(res.status);
                                 setAuth(false);
+                                setLoading(false);
                             }
                         })
                 }
@@ -74,18 +72,31 @@ function ViewReminder(props) {
                     const reminderDate = year + '-' + month + '-' + day;
                     const reminderTime = hour + ':' + minutes;
                     setReminderDate(reminderDate);
-                    setReminderTime(reminderTime);
+                    setReminderTime(reminderTime);                    
                 }
+                setLoading(false);
             })
     }
 
     let closeView = (e) => {
+        setReminderDescription('');
+        setReminderName('');
+        setReminderDate('');
+        setReminderTime('');
+        setReminderRepeat('');       
+        setLoading(true);
         let modalViewClose = document.getElementById("modal-view");
         modalViewClose.style.display = "none";
         document.body.style.overflow = "auto";
     }
 
-    return (
+    return loading ? (
+        <div className="wrapper modal">
+            <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />            
+            <h2>View Reminder</h2>
+            <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
+        </div> ):
+        (
         <div className="wrapper modal">
             <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
             <h2>View Reminder</h2>            
@@ -100,7 +111,8 @@ function ViewReminder(props) {
             <h3>Description: </h3>
             <p>{reminderDescription}</p>
         </div>
-    )
+        )
+    
 }
 
 export default ViewReminder;
