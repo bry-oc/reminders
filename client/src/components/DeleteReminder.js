@@ -88,9 +88,15 @@ function DeleteReminder(props){
             })
     }
 
+    let closeDelete = (e) => {
+        let modalDeleteClose = document.getElementById("modal-delete");
+        modalDeleteClose.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
     return (
-        <div className="wrapper">
-            <p>{props.reminderid}</p>
+        <div className="wrapper modal">
+            <i className="fa fa-times-circle fa-2x" onClick={closeDelete}></i><br />
             <p>Reminder Name: {reminderName}</p><br/>            
             <p>Reminder Date: {reminderDate}</p><br/>
             <p>Reminder Time: {reminderTime}</p><br/>

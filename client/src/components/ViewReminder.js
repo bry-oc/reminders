@@ -74,13 +74,20 @@ function ViewReminder(props) {
             })
     }
 
+    let closeView = (e) => {
+        let modalViewClose = document.getElementById("modal-view");
+        modalViewClose.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
     return (
-        <div className="wrapper">
-            <p>{props.reminderid}</p>
-            <p>Title: {reminderName}</p>
-            <p>Date: {reminderDate}</p>
-            <p>Repeat: {reminderRepeat}</p>
-            <p>Description: {reminderDescription}</p>
+        <div className="wrapper modal">
+            <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
+            <h2>Name: </h2><p>{reminderName}</p>
+            <h2>Date: {reminderDate}</h2>
+            <h2>Time: {reminderTime}</h2>
+            <h2>Repeat: {reminderRepeat}</h2>
+            <h2>Description: {reminderDescription}</h2>
         </div>
     )
 }

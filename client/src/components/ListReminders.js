@@ -72,7 +72,7 @@ function ListReminders() {
 
     let openView = (e) => {
         let modalView = document.getElementById("modal-view");
-        modalView.style.display = "block";
+        modalView.style.display = "flex";
         document.body.style.overflow = "hidden";
         setCurrentID(e.target.name);
     }
@@ -86,7 +86,7 @@ function ListReminders() {
 
     let openDelete = (e) => {
         let modalDelete = document.getElementById("modal-delete");
-        modalDelete.style.display = "block";
+        modalDelete.style.display = "flex";
         document.body.style.overflow = "hidden";
         setCurrentID(e.target.name);
     }
