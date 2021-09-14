@@ -11,7 +11,7 @@ function ViewReminder(props) {
     const [reminderRepeat, setReminderRepeat] = useState('');
     const [loading, setLoading] = useState(true);
 
-
+    //gets stuck loading if reopening same reminder
     useEffect(() => {
         setLoading(true);
         setReminderID(props.reminderid);        
