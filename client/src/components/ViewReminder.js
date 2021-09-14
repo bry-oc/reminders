@@ -13,6 +13,11 @@ function ViewReminder(props) {
 
     useEffect(() => {
         setReminderID(props.reminderid);
+        setReminderDescription('');
+        setReminderName('');
+        setReminderDate('');
+        setReminderTime('');
+        setReminderRepeat('');
         const url = '/api/user/authentication';
 
         fetch(url, {
