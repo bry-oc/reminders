@@ -273,8 +273,8 @@ function ListReminders() {
             })
     }
 
-    function fetchDeleteReminder(reminderid) {
-        const deleteReminderURL = '/api/reminder/delete' + reminderid;
+    function fetchDeleteReminder() {
+        const deleteReminderURL = '/api/reminder/delete/' + reminderID;
         fetch(deleteReminderURL, {
             method: 'DELETE',
             credentials: 'include'
@@ -368,7 +368,7 @@ function ListReminders() {
             <div className="modal-wrapper" id="modal-update">
                 {loading ? (
                     <div className="wrapper modal">
-                        <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
+                        <i className="fa fa-times-circle fa-2x" onClick={closeEdit}></i><br />
                         <h2>Edit Reminder</h2>
                         <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
                     </div>
@@ -412,7 +412,7 @@ function ListReminders() {
             <div className="modal-wrapper" id="modal-delete">
                 {loading ? (
                     <div className="wrapper modal">
-                        <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
+                        <i className="fa fa-times-circle fa-2x" onClick={closeDelete}></i><br />
                         <h2>Delete Reminder</h2>
                         <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
                     </div>
@@ -432,7 +432,7 @@ function ListReminders() {
                         <p>{reminderRepeat}</p>
                         <h3>Reminder Description: </h3>
                         <p>{reminderDescription}</p>
-                        <button type="submit" onClick={fetchDeleteReminder(currentID)}>Delete Reminder</button>
+                        <button onClick={fetchDeleteReminder}>Delete Reminder</button>
                     </div>
                 )}
             </div>
