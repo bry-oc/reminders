@@ -197,11 +197,21 @@ function ListReminders() {
             })
     }
 
-    //todo: create form
+    //todo: add form
     function fetchUpdateReminder() {
         const updateReminderURL = '/api/reminder/update';
+        const formData = new FormData();
+
+        formData.append('reminderid', reminderID);
+        formData.append('reminderName', reminderName);        
+        formData.append('reminderDate', reminderDate);
+        formData.append('reminderTime', reminderTime);
+        formData.append('reminderRepeat', reminderRepeat);
+        formData.append('reminderDescription', reminderDescription);
+
         fetch(updateReminderURL, {
             method: 'POST',
+            body: formData,
             credentials: 'include'
         })
             .then((res) => res.json())
@@ -375,21 +385,21 @@ function ListReminders() {
                     <div className="wrapper modal">
                         <i className="fa fa-times-circle fa-2x" onClick={closeEdit}></i><br />
                         <h2>Edit Reminder</h2>
-                        <form>
-                            <label htmlFor="name" id="name">Name:<br />
-                                <input type="text" value={reminderName} onChange={(e => setReminderName(e.target.value))} required>
+                        <form onSubmit={fetchUpdateReminder}>
+                                <label htmlFor="reminderName" id="name">Name:<br />
+                                    <input type="text" value={reminderName} name="reminderName" onChange={(e => setReminderName(e.target.value))} required>
                                 </input>
                             </label><br /><br />
                             <label htmlFor="date">Date:<br />
-                                <input type="date" value={reminderDate} onChange={(e => setReminderDate(e.target.value))}>
+                                    <input type="date" value={reminderDate} name="reminderDate" onChange={(e => setReminderDate(e.target.value))}>
                                 </input>
                             </label><br /><br />
                             <label htmlFor="time">Time:<br />
-                                <input type="time" value={reminderTime} onChange={(e => setReminderTime(e.target.value))}>
+                                    <input type="time" value={reminderTime} name="reminderTime" onChange={(e => setReminderTime(e.target.value))}>
                                 </input>
                             </label><br /><br />
                             <label htmlFor="repeat">Repeat:<br />
-                                <select form="repeat" value={reminderRepeat} onChange={(e => setReminderRepeat(e.target.value))}>
+                                    <select value={reminderRepeat} name="reminderRepeat" onChange={(e => setReminderRepeat(e.target.value))}>
                                     <option defaultValue="none" id="none">None</option>
                                     <option value="daily" id="daily">Daily</option>
                                     <option value="weekly" id="weekly">Weekly</option>
@@ -398,10 +408,10 @@ function ListReminders() {
                                 </select>
                             </label><br /><br />
                             <label htmlFor="description">Description (Optional):<br />
-                                <textarea name="description" value={reminderDescription} onChange={(e => setReminderDescription(e.target.value))}>
+                                    <textarea value={reminderDescription} name="reminderDescription" onChange={(e => setReminderDescription(e.target.value))}>
                                 </textarea>
                             </label><br /><br />
-                            <button type="submit" onClick={fetchUpdateReminder}>Update Reminder</button>
+                            <button type="submit" >Update Reminder</button>
                         </form>
                     </div>
                 )}

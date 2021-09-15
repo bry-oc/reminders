@@ -652,7 +652,7 @@ module.exports = function (app) {
                 let reminderTime = req.body.reminderTime;
 
                 //return error if any fields are missing
-                if (!userID || !reminderID || !reminderName || !reminderDate || !reminderTime || !reminderDescription || !reminderRepeat) {
+                if (!userID || !reminderID || !reminderName || !reminderDate || !reminderTime || reminderDescription === null || reminderDescription === undefined || !reminderRepeat) {
                     console.log(reminderID);
                     console.log(reminderName);
                     console.log(reminderDate);
