@@ -653,6 +653,12 @@ module.exports = function (app) {
 
                 //return error if any fields are missing
                 if (!userID || !reminderID || !reminderName || !reminderDate || !reminderTime || !reminderDescription || !reminderRepeat) {
+                    console.log(reminderID);
+                    console.log(reminderName);
+                    console.log(reminderDate);
+                    console.log(reminderTime);
+                    console.log(reminderRepeat);
+                    console.log(reminderDescription);
                     return res.status(400).json({ error: 'Missing required field(s)!' }).end();
                 }
 

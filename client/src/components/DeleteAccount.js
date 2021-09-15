@@ -1,5 +1,4 @@
-import React, { useContext } from "react";
-import authContext from './AuthContext';
+import React from "react";
 
 function DeleteAccount() {
     return (

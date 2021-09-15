@@ -1,7 +1,4 @@
 import React, { useEffect, useState, useContext } from "react";
-import UpdateReminder from "./UpdateReminder";
-import DeleteReminder from "./DeleteReminder";
-import ViewReminder from "./ViewReminder";
 import authContext from './AuthContext';
 
 function ListReminders() {
@@ -200,7 +197,7 @@ function ListReminders() {
             })
     }
 
-    //todo: close edit and reload table
+    //todo: create form
     function fetchUpdateReminder() {
         const updateReminderURL = '/api/reminder/update';
         fetch(updateReminderURL, {
@@ -303,7 +300,7 @@ function ListReminders() {
 
     function TableData() {
         return reminders.map((reminder, index) => {
-            const { reminderid, name, repeat, description, date } = reminder;
+            const { reminderid, name, date } = reminder;
             let reminderDate = new Date(parseInt(date));
             const day = reminderDate.getDate() < 10 ? "0" + reminderDate.getDate() : reminderDate.getDate();
             const month = (reminderDate.getMonth() + 1) < 10 ? "0" + (reminderDate.getMonth() + 1) : (reminderDate.getMonth() + 1);
@@ -432,7 +429,7 @@ function ListReminders() {
                         <p>{reminderRepeat}</p>
                         <h3>Reminder Description: </h3>
                         <p>{reminderDescription}</p>
-                        <button onClick={fetchDeleteReminder}>Delete Reminder</button>
+                        <button type="submit" onClick={fetchDeleteReminder}>Delete Reminder</button>
                     </div>
                 )}
             </div>
