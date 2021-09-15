@@ -200,7 +200,7 @@ function ListReminders() {
             })
     }
 
-
+    //todo: close edit and reload table
     function fetchUpdateReminder() {
         const updateReminderURL = '/api/reminder/update';
         fetch(updateReminderURL, {
@@ -239,6 +239,66 @@ function ListReminders() {
         modalDelete.style.display = "flex";
         document.body.style.overflow = "hidden";
         setCurrentID(e.target.name);
+
+        let fetchID = e.target.name;
+        setReminderID(e.target.name);
+        const url = '/api/user/authentication';
+
+        fetch(url, {
+            method: 'GET',
+            credentials: 'include'
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    setAuth(true);
+                    fetchGetReminder(fetchID);
+                    console.log(auth);
+                } else {
+                    console.log('refresh!');
+                    const refresh = '/api/token/refresh';
+                    fetch(refresh, {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                        .then((res) => {
+                            if (res.status === 200) {
+                                setAuth(true);
+                                fetchGetReminder(fetchID);
+                            } else {
+                                console.log(res.status);
+                                setAuth(false);
+                            }
+                        })
+                }
+            })
+    }
+
+    function fetchDeleteReminder(reminderid) {
+        const deleteReminderURL = '/api/reminder/delete' + reminderid;
+        fetch(deleteReminderURL, {
+            method: 'DELETE',
+            credentials: 'include'
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.error) {
+                    console.log(data.error)
+                } else {
+                    window.location.href = "/reminder/list";
+                }
+            })
+    }
+
+    let closeDelete = (e) => {
+        let modalDeleteClose = document.getElementById("modal-delete");
+        modalDeleteClose.style.display = "none";
+        document.body.style.overflow = "auto";
+        setReminderDescription('');
+        setReminderName('');
+        setReminderDate('');
+        setReminderTime('');
+        setReminderRepeat('');
+        setLoading(true);
     }
 
     function TableData() {
@@ -309,7 +369,7 @@ function ListReminders() {
                 {loading ? (
                     <div className="wrapper modal">
                         <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
-                        <h2>View Reminder</h2>
+                        <h2>Edit Reminder</h2>
                         <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
                     </div>
                 )
@@ -350,7 +410,31 @@ function ListReminders() {
                 )}
             </div >
             <div className="modal-wrapper" id="modal-delete">
-                <DeleteReminder reminderid={currentID} />
+                {loading ? (
+                    <div className="wrapper modal">
+                        <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
+                        <h2>Delete Reminder</h2>
+                        <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
+                    </div>
+                )
+                    :
+                (
+                    <div className="wrapper modal">
+                        <i className="fa fa-times-circle fa-2x" onClick={closeDelete}></i><br />
+                        <h2>Delete Reminder</h2>
+                        <h3>Reminder Name: </h3>
+                        <p>{reminderName}</p>
+                        <h3>Reminder Date: </h3>
+                        <p>{reminderDate}</p>
+                        <h3>Reminder Time: </h3>
+                        <p>{reminderTime}</p>
+                        <h3>Reminder Repeat: </h3>
+                        <p>{reminderRepeat}</p>
+                        <h3>Reminder Description: </h3>
+                        <p>{reminderDescription}</p>
+                        <button type="submit" onClick={fetchDeleteReminder(currentID)}>Delete Reminder</button>
+                    </div>
+                )}
             </div>
         </div >
 
