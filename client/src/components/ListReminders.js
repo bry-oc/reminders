@@ -197,7 +197,6 @@ function ListReminders() {
             })
     }
 
-    //todo: add form
     function fetchUpdateReminder() {
         const updateReminderURL = '/api/reminder/update';
         const formData = new FormData();
@@ -308,6 +307,7 @@ function ListReminders() {
         setLoading(true);
     }
 
+    //sort by date/time
     function TableData() {
         return reminders.map((reminder, index) => {
             const { reminderid, name, date } = reminder;
