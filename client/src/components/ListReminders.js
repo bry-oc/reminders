@@ -317,11 +317,13 @@ function ListReminders() {
             const year = reminderDate.getFullYear();
             const hour = reminderDate.getHours() < 10 ? "0" + reminderDate.getHours() : reminderDate.getHours();
             const minutes = reminderDate.getMinutes() < 10 ? "0" + reminderDate.getMinutes() : reminderDate.getMinutes();
+            const reminderTime = hour + ':' + minutes;
             reminderDate = year + '-' + month + '-' + day;
             return (
                 <tr key={reminderid}>
                     <td>{name}</td>
                     <td>{reminderDate}</td>
+                    <td>{reminderTime}</td>
                     <td><button onClick={openView} name={reminderid}>view</button></td>
                     <td><button onClick={openEdit} name={reminderid}>edit</button></td>
                     <td><button onClick={openDelete} name={reminderid}>delete</button></td>
