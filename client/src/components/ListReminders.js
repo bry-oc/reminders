@@ -336,6 +336,12 @@ function ListReminders() {
         })
     }
 
+    const currentDate = new Date();
+    const day = currentDate.getDate() < 10 ? "0" + currentDate.getDate() : currentDate.getDate();
+    const month = (currentDate.getMonth() + 1) < 10 ? "0" + (currentDate.getMonth() + 1) : (currentDate.getMonth() + 1);
+    const year = currentDate.getFullYear();
+    const today = year + '-' + month + '-' + day;
+
     return (
         <div className="list-wrapper">
             <div className="table-wrapper">
@@ -344,6 +350,7 @@ function ListReminders() {
                         <tr>
                             <th>Name</th>
                             <th>Date</th>
+                            <th>Time</th>
                             <th>View</th>
                             <th>Edit</th>
                             <th>Delete</th>
@@ -397,7 +404,7 @@ function ListReminders() {
                                 </input>
                             </label><br /><br />
                             <label htmlFor="date">Date:<br />
-                                    <input type="date" value={reminderDate} name="reminderDate" onChange={(e => setReminderDate(e.target.value))}>
+                                    <input type="date" value={reminderDate} min={today} name="reminderDate" onChange={(e => setReminderDate(e.target.value))}>
                                 </input>
                             </label><br /><br />
                             <label htmlFor="time">Time:<br />
