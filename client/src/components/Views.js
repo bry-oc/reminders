@@ -13,13 +13,13 @@ import UpdateEmail from './UpdateEmail';
 import UpdatePassword from './UpdatePassword';
 import DeleteAccount from './DeleteAccount';
 import authContext from './AuthContext';
+import Loading from './Loading';
 import React, { useContext } from 'react';
 
-
+//todo: fix login showing briefly on refresh
 const PrivateRoute = ({ component, ...options }) => {
     const { auth } = useContext(authContext);
     const finalComponent = auth ? component : Login;
-
     return <Route {...options} component={finalComponent} />;
 };
 
