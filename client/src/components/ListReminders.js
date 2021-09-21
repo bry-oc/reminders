@@ -12,6 +12,7 @@ function ListReminders() {
     const [reminderTime, setReminderTime] = useState('');
     const [reminderRepeat, setReminderRepeat] = useState('');
     const [loading, setLoading] = useState(true);
+    const [tableLoading, setTableLoading] = useState(true);
 
     useEffect(() => {
         let url = '/api/user/authentication';
@@ -39,6 +40,7 @@ function ListReminders() {
                                 setReminders(data.reminders);
                             }
                         })
+                    setTableLoading(false);
                 } else {
                     console.log('refresh!');
                     const refresh = '/api/token/refresh';
@@ -68,6 +70,7 @@ function ListReminders() {
                                 console.log(res.status);
                                 setAuth(false);
                             }
+                            setTableLoading(false);
                         })
                 }
             })
@@ -142,7 +145,7 @@ function ListReminders() {
                     setReminderDate(reminderDate);
                     setReminderTime(reminderTime);
                 }
-                setLoading(false);
+                setLoading(false);                
             })
     }
 
@@ -343,21 +346,22 @@ function ListReminders() {
     const today = year + '-' + month + '-' + day;
 
     return (
-        <div className="list-wrapper">
+        <div className="list-wrapper">            
             <div className="table-wrapper">
-                <table className="table">
-                    <tbody>
-                        <tr>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>View</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
-                        {TableData()}
-                    </tbody>
-                </table>
+                {tableLoading ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) :
+                    (<table className="table">
+                        <tbody>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>View</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                            {TableData()}
+                        </tbody>
+                    </table> )}
             </div>
             <div className="modal-wrapper" id="modal-view">
                 {loading ? (

@@ -5,15 +5,22 @@
         width: 720px;
         margin:auto;        
     }    
+    #spinner {
+        float: none;
+        position: fixed;
+        top: 50%;
+        left: 49%;        
+    }
 }
 .table {
     border: 1px solid black;
     border-radius: 12px; 
     border-spacing: 0;
-    padding: 5px;
+    padding: 5px;  
     td, th {
         border-bottom: 1px solid black;
-        padding: 10px; 
+        padding: 10px;   
+        min-height: 100vh;       
     }
     tr:last-child > td {
         border-bottom: none;
@@ -22,7 +29,7 @@
         height: 100%;
         width: 100%;
         align-self: stretch;
-    }
+    }    
 }
 .modal-wrapper {    
     box-sizing: border-box;
@@ -74,8 +81,7 @@
         float: none;
         position: fixed;
         top: 50%;
-        left: 49%;
-        
+        left: 49%;        
     }
 }
 
