@@ -35,14 +35,15 @@ function NavBar() {
     }
     
     function openCreate() {
-        let modalEdit = document.getElementById("modal-create");
-        modalEdit.style.display = "flex";
+        let modalCreate = document.getElementById("modal-create");
+        modalCreate.style.display = "flex";
         document.body.style.overflow = "hidden";
     }
 
     function closeCreate() {
-        modalEdit.style.display = "flex";
-        document.body.style.overflow = "hidden";
+        let modalCreateClose = document.getElementById("modal-create");
+        modalCreateClose.style.display = "none";
+        document.body.style.overflow = "auto";
     }
 
     function fetchCreateReminder() {
@@ -87,7 +88,7 @@ function NavBar() {
                     {
                         auth ?
                             <li>
-                                <Link className="navlink" to="/reminder/list" onClick={openCreate}>Create</Link>
+                                <Link className="navlink" to="#" onClick={openCreate}>Create</Link>
                             </li> : null
                     }
                     {
@@ -99,10 +100,10 @@ function NavBar() {
                 </ul>
             </nav>
             </div>
-            <div className="modal-wrapper">
-                <div className="wrapper modal modal-create">
+            <div className="modal-wrapper" id="modal-create">
+                <div className="wrapper modal">
                     <i className="fa fa-times-circle fa-2x" onClick={closeCreate}></i><br />
-                    <h2>Edit Reminder</h2>
+                    <h2>Create Reminder</h2>
                     <form onSubmit={fetchCreateReminder}>
                         <label htmlFor="reminderName" id="name">Name:<br />
                             <input type="text" name="reminderName" onChange={(e =>e.target.value)} required>

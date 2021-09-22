@@ -28,6 +28,60 @@ nav {
   }
 }
 
+.modal-wrapper {    
+    box-sizing: border-box;
+    display: none;
+    z-index: 2;
+    position: fixed;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;    
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+.modal {
+    border: 1px solid black;
+    padding: 40px;
+    background-color: white;
+    border-radius: 12px; 
+    padding-top: 0;
+    margin: auto;
+    width: 320px;
+    min-height: 500px;
+    p {
+        font-size: 18px;
+    }
+    h2 {
+        text-align: center;
+    }
+    textarea {
+        font-size: 14px;
+        width: 300px;
+        height: 75px;
+        resize: none;
+        overflow: auto;
+    }    
+    select {
+        width: 304px;
+        font-size: medium;
+        height: 40px;
+    }
+    i {
+        padding-top: 10px;
+        margin-right: -30px;
+        float: right;        
+    }
+    #spinner {
+        float: none;
+        position: fixed;
+        top: 50%;
+        left: 49%;        
+    }
+}
+
 @media screen and (max-width: 600px) {
   .navbar a {
     height: 20px;
