@@ -4,11 +4,6 @@ import authContext from './AuthContext';
 
 function NavBar() {
     const { auth, setAuth } = useContext(authContext);
-    const [reminderName, setReminderName] = useState('');
-    const [reminderDescription, setReminderDescription] = useState('');
-    const [reminderDate, setReminderDate] = useState('');
-    const [reminderTime, setReminderTime] = useState('');
-    const [reminderRepeat, setReminderRepeat] = useState('');
 
     let logout = () => {
         const url = "/api/logout";
@@ -46,7 +41,8 @@ function NavBar() {
     }
 
     function closeCreate() {
-
+        modalEdit.style.display = "flex";
+        document.body.style.overflow = "hidden";
     }
 
     function fetchCreateReminder() {
@@ -104,24 +100,24 @@ function NavBar() {
             </nav>
             </div>
             <div className="modal-wrapper">
-                <div className="wrapper modal">
+                <div className="wrapper modal modal-create">
                     <i className="fa fa-times-circle fa-2x" onClick={closeCreate}></i><br />
                     <h2>Edit Reminder</h2>
                     <form onSubmit={fetchCreateReminder}>
                         <label htmlFor="reminderName" id="name">Name:<br />
-                            <input type="text" value={reminderName} name="reminderName" onChange={(e => setReminderName(e.target.value))} required>
+                            <input type="text" name="reminderName" onChange={(e =>e.target.value)} required>
                             </input>
                         </label><br /><br />
                         <label htmlFor="date">Date:<br />
-                            <input type="date" value={reminderDate} min={today} name="reminderDate" onChange={(e => setReminderDate(e.target.value))}>
+                            <input type="date" min={today} name="reminderDate" onChange={(e => e.target.value)}>
                             </input>
                         </label><br /><br />
                         <label htmlFor="time">Time:<br />
-                            <input type="time" value={reminderTime} name="reminderTime" onChange={(e => setReminderTime(e.target.value))}>
+                            <input type="time" name="reminderTime" onChange={(e => e.target.value)}>
                             </input>
                         </label><br /><br />
                         <label htmlFor="repeat">Repeat:<br />
-                            <select value={reminderRepeat} name="reminderRepeat" onChange={(e => setReminderRepeat(e.target.value))}>
+                            <select name="reminderRepeat" onChange={(e => e.target.value)}>
                                 <option defaultValue="none" id="none">None</option>
                                 <option value="daily" id="daily">Daily</option>
                                 <option value="weekly" id="weekly">Weekly</option>
@@ -130,7 +126,7 @@ function NavBar() {
                             </select>
                         </label><br /><br />
                         <label htmlFor="description">Description (Optional):<br />
-                            <textarea value={reminderDescription} name="reminderDescription" onChange={(e => setReminderDescription(e.target.value))}>
+                            <textarea name="reminderDescription" onChange={(e => e.target.value)}>
                             </textarea>
                         </label><br /><br />
                         <button type="submit" >Update Reminder</button>
