@@ -348,6 +348,7 @@ function ListReminders() {
     return (
         <div className="list-wrapper">            
             <div className="table-wrapper">
+                <h1>Reminders</h1>
                 {tableLoading ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) :
                     (<table className="table">
                         <tbody>
