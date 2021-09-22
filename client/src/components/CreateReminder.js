@@ -79,7 +79,8 @@ function CreateReminder(){
         
     }
     return (
-        <div className="wrapper">
+        <div className="wrapper create">
+            <h1>Create Reminder</h1>
             <form onSubmit={createReminder}>
                 <label htmlFor="name">Name:<br />
                     <input type="text" placeholder="Enter reminder name" id="name" required>
