@@ -47,7 +47,28 @@ function NavBar() {
     }
 
     function fetchCreateReminder() {
-        
+        const createReminderURL = '/api/reminder/create';
+        const formData = new FormData();
+
+        formData.append('reminderName', reminderName);
+        formData.append('reminderDate', reminderDate);
+        formData.append('reminderTime', reminderTime);
+        formData.append('reminderRepeat', reminderRepeat);
+        formData.append('reminderDescription', reminderDescription);
+
+        fetch(createReminderURL, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.error) {
+                    console.log(data.error);
+                } else {
+                    window.location.href = "/reminder/list";
+                }
+            })
     }
 
     const currentDate = new Date();
