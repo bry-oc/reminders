@@ -41,9 +41,6 @@ function Views(){
                 </Route>
                 <PrivateRoute path="/account" component={Account}/>
                 <PrivateRoute path="/reminder/list" component={ListReminders}/>
-                <PrivateRoute path="/reminder/create" component={CreateReminder}/>
-                <PrivateRoute path="/reminder/update" component={UpdateReminder}/>
-                <PrivateRoute path="/reminder/delete" component={DeleteReminder}/>
                 <PrivateRoute path="/password/reset" component={ForgotPassword}/>
                 <PrivateRoute path="/username/edit" component={UpdateUsername}/>
                 <PrivateRoute path="/email/edit" component={UpdateEmail}/>
