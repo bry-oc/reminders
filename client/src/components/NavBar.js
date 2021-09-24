@@ -156,7 +156,7 @@ function NavBar() {
                             <textarea name="reminderDescription" value={reminderDescription} onChange={(e => e.target.value)}>
                             </textarea>
                         </label><br /><br />
-                        <button type="submit" >Update Reminder</button>
+                        <button type="submit" >Create Reminder</button>
                     </form>
                 </div>
             </div>
