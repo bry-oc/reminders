@@ -7,7 +7,6 @@ function Login(){
     const { auth, setAuth } = useContext(authContext);
 
     let login = (e) => {
-        setLoading(true);
         e.preventDefault();
         const username = e.target.username.value;
         const password = e.target.password.value;
@@ -40,20 +39,32 @@ function Login(){
     }
     return (
         <div className="wrapper" id="login">
-            <h1>Reminder App Login</h1>
-            <form onSubmit={login}>
-                <label htmlFor="username">Username:<br/>
-                    <input type="text" placeholder="Enter your username" id="username" name="username" required>
-                    </input>
-                </label><br /><br />
-                <label htmlFor="password">Password:<br />
-                    <input type="password" placeholder="Enter your password" id="password" name="password" required>
-                    </input>
-                </label><br /><br />
-                <button type="submit">Login</button><br /><br />
-                <a href={'/password/reset'}>Forgot password?</a><br />
-            </form>
-            {warning !== "" ? <p className="warning">{warning}</p> : null}
+            {isLoading ? (
+                <div>
+                    <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
+                </div>
+            )
+            :
+            (
+                <div>
+                    <h1>Reminder App Login</h1>
+                    <form onSubmit={login}>
+                        <label htmlFor="username">Username:<br />
+                            <input type="text" placeholder="Enter your username" id="username" name="username" required>
+                            </input>
+                        </label><br /><br />
+                        <label htmlFor="password">Password:<br />
+                            <input type="password" placeholder="Enter your password" id="password" name="password" required>
+                            </input>
+                        </label><br /><br />
+                        <button type="submit">Login</button><br /><br />
+                        <a href={'/password/reset'}>Forgot password?</a><br />
+                    </form>
+                    { warning !== "" ? <p className="warning">{warning}</p> : null }
+                </div >
+            )}
+            
+            
         </div>
     )    
 }

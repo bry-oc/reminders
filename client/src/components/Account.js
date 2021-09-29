@@ -5,6 +5,7 @@ function Account(){
     const { auth, setAuth } = useContext(authContext);
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const url = '/api/user/authentication';
@@ -54,28 +55,40 @@ function Account(){
                     setEmail(data.email);
                 }
             })
+        setLoading(false);
     }
 
     return(
-        <div className="wrapper" id="account">            
-            <p><b>Email:</b></p>
-            <p>{email}</p>
-            <p><b>Username:</b></p>
-            <p>{username}</p><br />
-            <form action="/username/edit">
-                <input type="submit" value="Change Username" />
-            </form><br/>
-            <form action="/email/edit">
-                <input type="submit" value="Change Email" />
-            </form><br />
-            <form action="/password/edit">
-                <input type="submit" value="Change Password" />
-            </form><br />
-            <form action="/account/delete">
-                <input type="submit" value="Delete Account" />
-            </form>
+        <div className="wrapper" id="account">   
+            {loading ? (
+                <div>
+                    <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
+                </div>
+            )
+            : 
+            (
+                <div>
+                    <p><b>Email:</b></p >
+                    <p>{email}</p>
+                    <p><b>Username:</b></p>
+                    <p>{username}</p><br />
+                    <form action="/username/edit">
+                        <input type="submit" value="Change Username" />
+                    </form><br />
+                    <form action="/email/edit">
+                        <input type="submit" value="Change Email" />
+                    </form><br />
+                    <form action="/password/edit">
+                        <input type="submit" value="Change Password" />
+                    </form><br />
+                    <form action="/account/delete">
+                        <input type="submit" value="Delete Account" />
+                    </form>
+                </div>
+            )}
         </div>
     )
 }
+
 
 export default Account;
