@@ -150,7 +150,7 @@ function ListReminders() {
     }
 
     function sortByDate(a, b){
-        return new Date(b.date) - new Date(a.date)
+        return new Date(parseInt(b.date)) > new Date(parseInt(a.date)) ? -1 : 1;
     }
 
     let closeView = (e) => {
@@ -316,7 +316,7 @@ function ListReminders() {
 
     //sort by date/time
     function TableData() {
-        return reminders.map((reminder, index) => {
+        return reminders.sort(sortByDate).map((reminder) => {
             const { reminderid, name, date } = reminder;
             let reminderDate = new Date(parseInt(date));
             const day = reminderDate.getDate() < 10 ? "0" + reminderDate.getDate() : reminderDate.getDate();
