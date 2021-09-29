@@ -77,11 +77,12 @@ function UpdateUsername(){
     }
     return (
         <div className="wrapper" id="username">
+            <h1>Change Username</h1>
             <form onSubmit={updateUsername}>
                 <label htmlFor="username">New Username:<br />
                     <input type="text" name="username" placeholder="Enter your username" required>
                     </input>
-                </label><br />
+                </label><br /><br />
                 <button type="submit">Change Username</button>
             </form>
             <p>{warning}</p>

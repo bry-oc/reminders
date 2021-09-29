@@ -19,7 +19,7 @@ body {
 }
 .wrapper {
     h1 {
-    text-align: center;
+        text-align: center;
     }
     form {
         width: 300px;    
@@ -33,7 +33,12 @@ body {
     label {
         font-weight: bold;
     }
+    p {
+        text-align: center;
+    }
     button {
+        display: block;
+        margin: auto;
         width: 310px;
         height: 40px;
         font-size: large;

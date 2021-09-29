@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import authContext from './AuthContext';
 
 function UpdateEmail() {
     const { auth, setAuth } = useContext(authContext);
+    const [warning, setWarning] = useState('');
     
     let updateEmail = (e) => {
         e.preventDefault();
@@ -30,9 +31,12 @@ function UpdateEmail() {
                         .then((res) => res.json())
                         .then((data) => {
                             if (data.error) {
+                                setWarning(data.error);
                                 console.log(data.error);
                             } else {
                                 console.log(data.message);
+                                setWarning('');
+                                window.location.href = "/account";
                             }
                         })
                 } else {
@@ -55,9 +59,12 @@ function UpdateEmail() {
                                     .then((res) => res.json())
                                     .then((data) => {
                                         if (data.error) {
+                                            setWarning(data.error);
                                             console.log(data.error);
                                         } else {
                                             console.log(data.message);
+                                            setWarning('');
+                                            window.location.href = "/account";
                                         }
                                     })
                             } else {
@@ -71,13 +78,15 @@ function UpdateEmail() {
 
     return (
         <div className="wrapper">
+            <h1>Change Email</h1>
             <form onSubmit={updateEmail}>
                 <label htmlFor="email">New Email:<br />
                     <input type="text" name="email" placeholder="Enter your email" required>
                     </input>
-                </label><br />
+                </label><br /><br />
                 <button type="submit">Change Email</button>
             </form>
+            <p>{warning}</p>
         </div>
     )    
 }

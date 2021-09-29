@@ -1,8 +1,9 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import authContext from './AuthContext';
 
 function UpdatePassword() {
     const { auth, setAuth } = useContext(authContext);
+    const [warning, setWarning] = useState('');
 
     let updatePassword = (e) => {
         e.preventDefault();
@@ -30,9 +31,12 @@ function UpdatePassword() {
                         .then((res) => res.json())
                         .then((data) => {
                             if (data.error) {
+                                setWarning(data.error);
                                 console.log(data.error);
                             } else {
                                 console.log(data.message);
+                                setWarning('');
+                                window.location.href = "/account";
                             }
                         })
                 } else {
@@ -55,9 +59,12 @@ function UpdatePassword() {
                                     .then((res) => res.json())
                                     .then((data) => {
                                         if (data.error) {
+                                            setWarning(data.error);
                                             console.log(data.error);
                                         } else {
                                             console.log(data.message);
+                                            setWarning('');
+                                            window.location.href = "/account";
                                         }
                                     })
                             } else {
@@ -71,11 +78,12 @@ function UpdatePassword() {
 
     return (
         <div className="wrapper">
+            <h1>Change Password</h1>
             <form onSubmit={updatePassword}>
                 <label htmlFor="password">New Password:<br />
                     <input type="text" name="password" placeholder="Enter your password" required>
                     </input>
-                </label><br />
+                </label><br /><br />
                 <button type="submit">Change Password</button>
             </form>
         </div>
