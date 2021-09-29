@@ -114,7 +114,7 @@ function NavBar() {
                     {
                         auth ?
                             <li>
-                                    <Link className="navlink" to="#" onClick={openCreate}>Reminders</Link>
+                                    <Link className="navlink" to="#" onClick={openCreate}>Create</Link>
                             </li> : null
                     }
                     {

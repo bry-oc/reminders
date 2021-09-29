@@ -9,7 +9,6 @@ function Account(){
 
     useEffect(() => {
         const url = '/api/user/authentication';
-
         fetch(url, {
             method: 'GET',
             credentials: 'include'
@@ -53,9 +52,10 @@ function Account(){
                     console.log(data.username);
                     setUsername(data.username);
                     setEmail(data.email);
+                    setLoading(false);
                 }
             })
-        setLoading(false);
+        
     }
 
     return(
