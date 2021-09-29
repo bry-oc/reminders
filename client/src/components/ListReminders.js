@@ -296,8 +296,9 @@ function ListReminders() {
             .then((data) => {
                 if (data.error) {
                     console.log(data.error)
+                    window.location.reload();
                 } else {
-                    window.location.href = "/reminder/list";
+                    window.location.reload();
                 }
             })
     }
