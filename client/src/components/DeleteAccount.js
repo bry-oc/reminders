@@ -1,9 +1,11 @@
-import React, { useEffect, useState} from "react";
+import React, { useContext, useEffect, useState} from "react";
+import authContext from './AuthContext';
 import $ from "jquery";
 
 function DeleteAccount() {
+    const { auth, setAuth } = useContext(authContext);
     const [modalVisible, setModalVisible] = useState(false);
-
+    
     useEffect(() => {
         if (modalVisible) {
             $(document).on("click", function (e) {
@@ -11,8 +13,8 @@ function DeleteAccount() {
 
                 // if the target of the click isn't the container nor a descendant of the container
                 if (!container.is(e.target) && container.has(e.target).length === 0) {
-                    closeDelete();
-                    setModalVisible(false);
+                    let modalDeleteClose = document.getElementById("modal-delete");
+                    modalDeleteClose.style.display = "none";
                     $(document).off("click");
                 }
             });
@@ -23,19 +25,13 @@ function DeleteAccount() {
         setModalVisible(true);
         let modalDelete = document.getElementById("modal-delete");
         modalDelete.style.display = "flex";
-        document.body.style.overflow = "hidden";
     }
 
     function closeDelete() {
         setModalVisible(false);
         let modalDeleteClose = document.getElementById("modal-delete");
         modalDeleteClose.style.display = "none";
-        document.body.style.overflow = "auto";
     }
-
-    
-    
-    
 
     return (
         <div>

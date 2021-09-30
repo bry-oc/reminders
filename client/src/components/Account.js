@@ -72,18 +72,10 @@ function Account(){
                     <p>{email}</p>
                     <p><b>Username:</b></p>
                     <p>{username}</p><br />
-                    <form action="/username/edit">
-                        <input type="submit" value="Change Username" />
-                    </form><br />
-                    <form action="/email/edit">
-                        <input type="submit" value="Change Email" />
-                    </form><br />
-                    <form action="/password/edit">
-                        <input type="submit" value="Change Password" />
-                    </form><br />
-                    <form action="/account/delete">
-                        <input type="submit" value="Delete Account" />
-                    </form>
+                    <button onClick={() => window.location.href="/username/edit"}>Change Username</button><br/>
+                    <button onClick={() => window.location.href = "/email/edit"}>Change Email</button><br />
+                    <button onClick={() => window.location.href = "/password/edit"}>Change Password</button><br />
+                    <button onClick={() => window.location.href = "/user/delete"}>Delete Account</button>                    
                 </div>
             )}
         </div>

@@ -19,8 +19,11 @@ function NavBar() {
 
                 // if the target of the click isn't the container nor a descendant of the container
                 if (!container.is(e.target) && container.has(e.target).length === 0) {
-                    closeLogout();
-                    closeCreate();
+                    let modalLogoutClose = document.getElementById("modal-logout");
+                    modalLogoutClose.style.display = "none";
+                    let modalCreateClose = document.getElementById("modal-create");
+                    modalCreateClose.style.display = "none";
+                    document.body.style.overflow = "auto";
                     setModalVisible(false);
                     $(document).off("click");
                 }
@@ -152,7 +155,7 @@ function NavBar() {
                             </li> : null
                     }
                     {
-                        auth ? 
+                        auth ?
                             <li>
                                 <Link id="logout" className="navlink" to="#" onClick={openLogout}>Logout</Link>
                             </li> : null
