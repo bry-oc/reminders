@@ -391,7 +391,7 @@ function ListReminders() {
             </div>
             <div className="modal-wrapper" id="modal-view">
                 {loading ? (
-                    <div className="wrapper modal">
+                    <div className="wrapper modal reminder">
                         <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
                         <h2>View Reminder</h2>
                         <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
@@ -399,7 +399,7 @@ function ListReminders() {
                     ) 
                     :
                     (
-                        <div className="wrapper modal">
+                        <div className="wrapper modal reminder">
                             <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
                             <h2>View Reminder</h2>
                             <h3>Name: </h3>
@@ -417,7 +417,7 @@ function ListReminders() {
             </div>
             <div className="modal-wrapper" id="modal-update">
                 {loading ? (
-                    <div className="wrapper modal">
+                    <div className="wrapper modal reminder">
                         <i className="fa fa-times-circle fa-2x" onClick={closeEdit}></i><br />
                         <h2>Edit Reminder</h2>
                         <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
@@ -425,7 +425,7 @@ function ListReminders() {
                 )
                 :
                 (
-                    <div className="wrapper modal">
+                    <div className="wrapper modal reminder">
                         <i className="fa fa-times-circle fa-2x" onClick={closeEdit}></i><br />
                         <h2>Edit Reminder</h2>
                         <form onSubmit={fetchUpdateReminder}>
@@ -461,7 +461,7 @@ function ListReminders() {
             </div >
             <div className="modal-wrapper" id="modal-delete">
                 {loading ? (
-                    <div className="wrapper modal">
+                    <div className="wrapper modal reminder">
                         <i className="fa fa-times-circle fa-2x" onClick={closeDelete}></i><br />
                         <h2>Delete Reminder</h2>
                         <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
@@ -469,7 +469,7 @@ function ListReminders() {
                 )
                     :
                 (
-                    <div className="wrapper modal">
+                    <div className="wrapper modal reminder">
                         <i className="fa fa-times-circle fa-2x" onClick={closeDelete}></i><br />
                         <h2>Delete Reminder</h2>
                         <h3>Reminder Name: </h3>
