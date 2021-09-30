@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import authContext from './AuthContext';
+import $ from "jquery";
 
 function ListReminders() {
     const [reminders, setReminders] = useState([]);
@@ -13,6 +14,7 @@ function ListReminders() {
     const [reminderRepeat, setReminderRepeat] = useState('');
     const [loading, setLoading] = useState(true);
     const [tableLoading, setTableLoading] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         let url = '/api/user/authentication';
@@ -74,10 +76,25 @@ function ListReminders() {
                         })
                 }
             })
-
     }, []);
 
+    useEffect(() => {
+        if (modalVisible) {
+            $(document).on("click", function (e) {
+                var container = $(".modal");
+                if (!container.is(e.target) && container.has(e.target).length === 0) {
+                    closeDelete();
+                    closeEdit();
+                    closeView();
+                    setModalVisible(false);
+                    $(document).off("click");
+                }
+            });
+        }
+    }, [modalVisible])
+
     let openView = (e) => {
+        setModalVisible(true);
         let modalView = document.getElementById("modal-view");
         modalView.style.display = "flex";
         document.body.style.overflow = "hidden";
@@ -145,7 +162,8 @@ function ListReminders() {
                     setReminderDate(reminderDate);
                     setReminderTime(reminderTime);
                 }
-                setLoading(false);                
+                setLoading(false);  
+                setModalVisible(true);
             })
     }
 
@@ -163,6 +181,7 @@ function ListReminders() {
         let modalViewClose = document.getElementById("modal-view");
         modalViewClose.style.display = "none";
         document.body.style.overflow = "auto";
+        setModalVisible(false);
     }
 
     let openEdit = (e) => {
@@ -245,6 +264,7 @@ function ListReminders() {
         setReminderTime('');
         setReminderRepeat('');
         setLoading(true);
+        setModalVisible(false);
     }
 
     let openDelete = (e) => {
@@ -284,6 +304,7 @@ function ListReminders() {
                         })
                 }
             })
+        setModalVisible(true);
     }
 
     function fetchDeleteReminder() {
@@ -303,7 +324,7 @@ function ListReminders() {
             })
     }
 
-    let closeDelete = (e) => {
+    let closeDelete = (e) => {        
         let modalDeleteClose = document.getElementById("modal-delete");
         modalDeleteClose.style.display = "none";
         document.body.style.overflow = "auto";
@@ -313,6 +334,7 @@ function ListReminders() {
         setReminderTime('');
         setReminderRepeat('');
         setLoading(true);
+        setModalVisible(false);
     }
 
     //sort by date/time

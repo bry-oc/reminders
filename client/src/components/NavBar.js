@@ -1,6 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import authContext from './AuthContext';
+import $ from "jquery";
 
 function NavBar() {
     const { auth, setAuth } = useContext(authContext);
@@ -9,6 +10,23 @@ function NavBar() {
     const [reminderDate, setReminderDate] = useState('');
     const [reminderTime, setReminderTime] = useState('');
     const [reminderRepeat, setReminderRepeat] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+
+    useEffect(() => {
+        if (modalVisible) {
+            $(document).on("click", function (e) {
+                var container = $(".modal");
+
+                // if the target of the click isn't the container nor a descendant of the container
+                if (!container.is(e.target) && container.has(e.target).length === 0) {
+                    closeLogout();
+                    closeCreate();
+                    setModalVisible(false);
+                    $(document).off("click");
+                }
+            });
+        }
+    }, [modalVisible])
 
     let logout = () => {
         const url = "/api/logout";
@@ -40,24 +58,28 @@ function NavBar() {
     }
 
     function openLogout() {
+        setModalVisible(true);
         let modalLogout = document.getElementById("modal-logout");
         modalLogout.style.display="flex";
         document.body.style.overflow = "hidden";
     }
 
     function closeLogout() {
+        setModalVisible(false);
         let modalLogoutClose = document.getElementById("modal-logout");
         modalLogoutClose.style.display = "none";
         document.body.style.overflow = "auto";
     }
     
     function openCreate() {
+        setModalVisible(true);
         let modalCreate = document.getElementById("modal-create");
         modalCreate.style.display = "flex";
         document.body.style.overflow = "hidden";
     }
 
     function closeCreate() {
+        setModalVisible(false);
         let modalCreateClose = document.getElementById("modal-create");
         modalCreateClose.style.display = "none";
         document.body.style.overflow = "auto";
@@ -132,7 +154,7 @@ function NavBar() {
                     {
                         auth ? 
                             <li>
-                                <Link id="logout" className="navlink" to="/" onClick={openLogout}>Logout</Link>
+                                <Link id="logout" className="navlink" to="#" onClick={openLogout}>Logout</Link>
                             </li> : null
                     }               
                 </ul>
@@ -174,7 +196,7 @@ function NavBar() {
             </div>
             <div className="modal-wrapper" id="modal-logout">
                 <div className="wrapper modal" id="logout">
-                    <p>Logout?</p>
+                    <h2>Logout?</h2>
                     <button type="submit" onClick={logout}>Yes</button><br/>
                     <button type="submit" onClick={closeLogout}>No</button>
                 </div>
