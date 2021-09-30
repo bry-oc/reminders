@@ -35,7 +35,7 @@ nav {
 .modal-wrapper {    
     box-sizing: border-box;
     display: none;
-    z-index: 2;
+    z-index: 1;
     position: fixed;
     justify-content: center;
     align-items: center;
@@ -47,6 +47,7 @@ nav {
     background-color: rgba(0,0,0,0.4);
 }
 .modal {
+    z-index: 2;
     border: 1px solid black;
     padding: 40px;
     background-color: white;
@@ -54,7 +55,6 @@ nav {
     padding-top: 0;
     margin: auto;
     width: 320px;
-    min-height: 500px;
     p {
         font-size: 18px;
     }
@@ -85,6 +85,8 @@ nav {
         left: 49%;        
     }
 }
+    
+
 
 @media screen and (max-width: 600px) {
   .navbar a {

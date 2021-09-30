@@ -762,7 +762,7 @@ module.exports = function (app) {
         });
     
     app.route('/api/logout')
-        .get(authorization, async (req, res) => {
+        .get(async (req, res) => {
             try {
                 const refreshToken = req.cookies['refresh'];
                 //blacklist their refresh token

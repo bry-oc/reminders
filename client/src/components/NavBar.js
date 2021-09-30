@@ -38,6 +38,18 @@ function NavBar() {
             nav.className = "navbar";
         }
     }
+
+    function openLogout() {
+        let modalLogout = document.getElementById("modal-logout");
+        modalLogout.style.display="flex";
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeLogout() {
+        let modalLogoutClose = document.getElementById("modal-logout");
+        modalLogoutClose.style.display = "none";
+        document.body.style.overflow = "auto";
+    }
     
     function openCreate() {
         let modalCreate = document.getElementById("modal-create");
@@ -120,7 +132,7 @@ function NavBar() {
                     {
                         auth ? 
                             <li>
-                                <Link id="logout" className="navlink" to="/" onClick={logout}>Logout</Link>
+                                <Link id="logout" className="navlink" to="/" onClick={openLogout}>Logout</Link>
                             </li> : null
                     }               
                 </ul>
@@ -158,6 +170,13 @@ function NavBar() {
                         </label><br /><br />
                         <button type="submit" >Create Reminder</button>
                     </form>
+                </div>
+            </div>
+            <div className="modal-wrapper" id="modal-logout">
+                <div className="wrapper modal" id="logout">
+                    <p>Logout?</p>
+                    <button type="submit" onClick={logout}>Yes</button><br/>
+                    <button type="submit" onClick={closeLogout}>No</button>
                 </div>
             </div>
         </div>
