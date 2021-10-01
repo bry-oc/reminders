@@ -21,6 +21,69 @@ function DeleteAccount() {
         }
     },[modalVisible])
 
+    function fetchDelete() {
+        let url = '/api/user/authentication';
+
+        fetch(url, {
+            method: 'GET',
+            credentials: 'include'
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    setAuth(true);
+                    console.log(auth);
+                    url = '/api/user/account/delete';
+                    fetch(url, {
+                        method: 'DELETE',
+                        credentials: 'include'
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.error) {
+                                setWarning(data.error);
+                                console.log(data.error);
+                            } else {
+                                console.log(data.message);
+                                setWarning('');
+                                window.location.href = "/";
+                            }
+                        })
+                } else {
+                    console.log('refresh!');
+                    const refresh = '/api/token/refresh';
+                    fetch(refresh, {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                        .then((res) => {
+                            if (res.status === 200) {
+                                setAuth(true);
+                                url = '/api/user/account/delete';
+
+                                fetch(url, {
+                                    method: 'DELETE',
+                                    credentials: 'include'
+                                })
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        if (data.error) {
+                                            setWarning(data.error);
+                                            console.log(data.error);
+                                        } else {
+                                            console.log(data.message);
+                                            setWarning('');
+                                            window.location.href = "/";
+                                        }
+                                    })
+                            } else {
+                                console.log(res.status);
+                                setAuth(false);
+                            }
+                        })
+                }
+            })
+    }
+
     function openDelete() {
         setModalVisible(true);
         let modalDelete = document.getElementById("modal-delete");
@@ -43,7 +106,7 @@ function DeleteAccount() {
             <div className="modal-wrapper" id="modal-delete">
                 <div className="wrapper modal" id="delete">
                     <h2>Permanently delete your account?</h2>
-                    <button type="submit">Yes</button><br />
+                    <button type="submit" onClick={fetchDelete}>Yes</button><br />
                     <button type="submit" onClick={closeDelete}>No</button>
                 </div>
             </div>
