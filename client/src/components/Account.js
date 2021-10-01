@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import authContext from './AuthContext';
+import { Link  } from 'react-router-dom';
 
 function Account(){
     const { auth, setAuth } = useContext(authContext);
@@ -72,10 +73,10 @@ function Account(){
                     <p>{email}</p>
                     <p><b>Username:</b></p>
                     <p>{username}</p><br />
-                    <button onClick={() => window.location.href="/username/edit"}>Change Username</button><br/>
-                    <button onClick={() => window.location.href = "/email/edit"}>Change Email</button><br />
-                    <button onClick={() => window.location.href = "/password/edit"}>Change Password</button><br />
-                    <button onClick={() => window.location.href = "/user/delete"}>Delete Account</button>                    
+                    <Link to="/username/edit"><button>Change Username</button></Link><br />
+                    <Link to="/email/edit"><button>Change Email</button></Link><br />
+                    <Link to="/password/edit"><button>Change Password</button></Link><br />
+                    <Link to="/user/delete"><button>Delete Account</button></Link><br />
                 </div>
             )}
         </div>
