@@ -69,10 +69,12 @@ function Account(){
             : 
             (
                 <div>
-                    <p><b>Email:</b></p >
-                    <p>{email}</p>
-                    <p><b>Username:</b></p>
-                    <p>{username}</p><br />
+                    <h1>Account Management</h1>
+                    <div className="userinfo">
+                        <p><b>Username:</b> {username}</p>
+                        <p><b>Email:</b> {email}</p >
+                    </div> 
+                    <br/>
                     <Link to="/username/edit"><button>Change Username</button></Link><br />
                     <Link to="/email/edit"><button>Change Email</button></Link><br />
                     <Link to="/password/edit"><button>Change Password</button></Link><br />

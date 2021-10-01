@@ -1,6 +1,11 @@
 #account {
-    p {
-        text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .userinfo {
+        border: 1px solid black;
+        border-radius: 12px; 
+        padding: 10px;
     }
     form {
         width: 300px;    
