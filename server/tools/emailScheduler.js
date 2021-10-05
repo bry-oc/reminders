@@ -86,7 +86,6 @@ exports.initializeAllReminders = async function() {
     let minutes;
     let hours;
     let day;
-    let repeat;
     let month;
     let scheduled;
 
@@ -103,22 +102,21 @@ exports.initializeAllReminders = async function() {
         hours = date.getHours();
         day = date.getDate();
         month = date.getMonth() + 1;
-        if(reminders[i].repeat !== "none") {
-            if(reminders[i].repeat === "daily") {
-                day = "*";
-                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-            } else if (reminders[i].repeat === "weekly") {
-                day = day + "/7"
-                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-            } else if (reminders[i].repeat === "biweekly") {
-                day = day + "/14"
-                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-            } else if (reminders[i].repeat === "monthly") {
-                month = "*";
-                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-            } else {
-                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-            }
+
+        if (reminders[i].repeat === "daily") {
+            day = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "weekly") {
+            day = day + "/7"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "biweekly") {
+            day = day + "/14"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "monthly") {
+            month = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else {
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
         }
         
         jobs[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function () {
@@ -163,22 +161,21 @@ exports.createReminder = async function(user, reminder) {
     let day = date.getDate();
     let month = date.getMonth() + 1;
     let scheduled;
-    if (reminders[i].repeat !== "none") {
-        if (reminders[i].repeat === "daily") {
-            day = "*";
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else if (reminders[i].repeat === "weekly") {
-            day = day + "/7"
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else if (reminders[i].repeat === "biweekly") {
-            day = day + "/14"
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else if (reminders[i].repeat === "monthly") {
-            month = "*";
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else {
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        }
+    
+    if (reminders[i].repeat === "daily") {
+        day = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminders[i].repeat === "weekly") {
+        day = day + "/7"
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminders[i].repeat === "biweekly") {
+        day = day + "/14"
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminders[i].repeat === "monthly") {
+        month = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else {
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
     }
 
     job[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function(){
@@ -220,22 +217,21 @@ exports.updateReminder = async function(reminder, user) {
     let day = date.getDate();
     let month = date.getMonth() + 1;
     let scheduled;
-    if (reminders[i].repeat !== "none") {
-        if (reminders[i].repeat === "daily") {
-            day = "*";
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else if (reminders[i].repeat === "weekly") {
-            day = day + "/7"
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else if (reminders[i].repeat === "biweekly") {
-            day = day + "/14"
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else if (reminders[i].repeat === "monthly") {
-            month = "*";
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else {
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        }
+
+    if (reminders[i].repeat === "daily") {
+        day = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminders[i].repeat === "weekly") {
+        day = day + "/7"
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminders[i].repeat === "biweekly") {
+        day = day + "/14"
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminders[i].repeat === "monthly") {
+        month = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else {
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
     }
 
     newJob[reminder.reminderid] = schedule.scheduleJob((reminder.reminderid).toString(), scheduled, function () {
