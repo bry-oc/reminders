@@ -601,7 +601,7 @@ module.exports = function (app) {
 
                 //set default values for optional parameters if not provided
                 if(!reminderRepeat) {
-                    reminderRepeat = 'never';
+                    reminderRepeat = 'none';
                 }
                 if(!reminderDescription) {
                     reminderDescription = '';

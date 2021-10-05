@@ -83,6 +83,12 @@ exports.initializeAllReminders = async function() {
     let userID;
     let jobs = {};
     let date;
+    let minutes;
+    let hours;
+    let day;
+    let repeat;
+    let month;
+    let scheduled;
 
     //for each reminder, create a job
     for (let i = 0; i < count; i++) {
@@ -93,7 +99,29 @@ exports.initializeAllReminders = async function() {
         reminderName = reminders[i].name;
         reminderID = reminders[i].reminderid;
         date = reminders[i].date;
-        jobs[reminderID] = schedule.scheduleJob(reminderID.toString(), date, function () {
+        minutes = date.getMinutes();
+        hours = date.getHours();
+        day = date.getDate();
+        month = date.getMonth() + 1;
+        if(reminders[i].repeat !== "none") {
+            if(reminders[i].repeat === "daily") {
+                day = "*";
+                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+            } else if (reminders[i].repeat === "weekly") {
+                day = day + "/7"
+                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+            } else if (reminders[i].repeat === "biweekly") {
+                day = day + "/14"
+                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+            } else if (reminders[i].repeat === "monthly") {
+                month = "*";
+                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+            } else {
+                scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+            }
+        }
+        
+        jobs[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function () {
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -130,8 +158,30 @@ exports.createReminder = async function(user, reminder) {
     const date = new Date(reminder.timestamp);
     let job = {};
     const reminderID = reminder.reminderid;
+    let minutes = date.getMinutes();
+    let hours = date.getHours();
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let scheduled;
+    if (reminders[i].repeat !== "none") {
+        if (reminders[i].repeat === "daily") {
+            day = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "weekly") {
+            day = day + "/7"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "biweekly") {
+            day = day + "/14"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "monthly") {
+            month = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else {
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        }
+    }
 
-    job[reminderID] = schedule.scheduleJob(reminderID.toString(), date, function(){
+    job[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function(){
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -165,8 +215,30 @@ exports.updateReminder = async function(reminder, user) {
     currentJob.cancel();
     let newJob = {};
     const date = new Date(reminder.date);
+    let minutes = date.getMinutes();
+    let hours = date.getHours();
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let scheduled;
+    if (reminders[i].repeat !== "none") {
+        if (reminders[i].repeat === "daily") {
+            day = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "weekly") {
+            day = day + "/7"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "biweekly") {
+            day = day + "/14"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "monthly") {
+            month = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else {
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        }
+    }
 
-    newJob[reminder.reminderid] = schedule.scheduleJob((reminder.reminderid).toString(), date, function () {
+    newJob[reminder.reminderid] = schedule.scheduleJob((reminder.reminderid).toString(), scheduled, function () {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
