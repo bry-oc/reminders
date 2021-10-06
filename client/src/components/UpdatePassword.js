@@ -86,6 +86,7 @@ function UpdatePassword() {
                 </label><br /><br />
                 <button type="submit">Change Password</button>
             </form>
+            <p>{warning}</p>
         </div>
     )
 }
