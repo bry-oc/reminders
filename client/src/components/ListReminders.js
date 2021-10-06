@@ -182,6 +182,7 @@ function ListReminders() {
         modalViewClose.style.display = "none";
         document.body.style.overflow = "auto";
         setModalVisible(false);
+        $(document).off("click");
     }
 
     let openEdit = (e) => {
@@ -265,6 +266,7 @@ function ListReminders() {
         setReminderRepeat('');
         setLoading(true);
         setModalVisible(false);
+        $(document).off("click");
     }
 
     let openDelete = (e) => {
@@ -335,6 +337,7 @@ function ListReminders() {
         setReminderRepeat('');
         setLoading(true);
         setModalVisible(false);
+        $(document).off("click");
     }
 
     //sort by date/time
