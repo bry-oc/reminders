@@ -111,6 +111,7 @@ function DeleteAccount() {
                     <button type="submit" onClick={closeDelete}>No</button>
                 </div>
             </div>
+            <p>{warning}</p>
         </div>
     )
 }

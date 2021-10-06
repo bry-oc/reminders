@@ -25,6 +25,11 @@ function NavBar() {
                     modalCreateClose.style.display = "none";
                     document.body.style.overflow = "auto";
                     setModalVisible(false);
+                    setReminderName("");
+                    setReminderDate("");
+                    setReminderTime("");
+                    setReminderRepeat("none");
+                    setReminderDescription("");
                     $(document).off("click");
                 }
             });
@@ -72,6 +77,7 @@ function NavBar() {
         let modalLogoutClose = document.getElementById("modal-logout");
         modalLogoutClose.style.display = "none";
         document.body.style.overflow = "auto";
+        $(document).off("click");
     }
     
     function openCreate() {
@@ -86,6 +92,12 @@ function NavBar() {
         let modalCreateClose = document.getElementById("modal-create");
         modalCreateClose.style.display = "none";
         document.body.style.overflow = "auto";
+        $(document).off("click");
+        setReminderName("");
+        setReminderDate("");
+        setReminderTime("");
+        setReminderRepeat("none");
+        setReminderDescription("");
     }
 
     function fetchCreateReminder() {
@@ -169,19 +181,19 @@ function NavBar() {
                     <h2>Create Reminder</h2>
                     <form onSubmit={fetchCreateReminder}>
                         <label htmlFor="reminderName" id="name">Name:<br />
-                            <input type="text" value={reminderName} name="reminderName" onChange={(e =>e.target.value)} required>
+                            <input type="text" value={reminderName} name="reminderName" onChange={(e =>setReminderName(e.target.value))} required>
                             </input>
                         </label><br /><br />
                         <label htmlFor="date">Date:<br />
-                            <input type="date" value={reminderDate} min={today} name="reminderDate" onChange={(e => e.target.value)}>
+                            <input type="date" value={reminderDate} min={today} name="reminderDate" onChange={(e => setReminderDate(e.target.value))}>
                             </input>
                         </label><br /><br />
                         <label htmlFor="time">Time:<br />
-                            <input type="time" value={reminderTime} name="reminderTime" onChange={(e => e.target.value)}>
+                            <input type="time" value={reminderTime} name="reminderTime" onChange={(e => setReminderTime(e.target.value))}>
                             </input>
                         </label><br /><br />
                         <label htmlFor="repeat">Repeat:<br />
-                            <select name="reminderRepeat" value={reminderRepeat} onChange={(e => e.target.value)}>
+                            <select name="reminderRepeat" value={reminderRepeat} onChange={(e => setReminderRepeat(e.target.value))}>
                                 <option defaultValue="none" id="none">None</option>
                                 <option value="daily" id="daily">Daily</option>
                                 <option value="weekly" id="weekly">Weekly</option>
@@ -190,7 +202,7 @@ function NavBar() {
                             </select>
                         </label><br /><br />
                         <label htmlFor="description">Description (Optional):<br />
-                            <textarea name="reminderDescription" value={reminderDescription} onChange={(e => e.target.value)}>
+                            <textarea name="reminderDescription" value={reminderDescription} onChange={(e => setReminderDescription(e.target.value))}>
                             </textarea>
                         </label><br /><br />
                         <button type="submit" >Create Reminder</button>
