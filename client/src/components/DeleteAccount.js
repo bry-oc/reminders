@@ -5,6 +5,7 @@ import $ from "jquery";
 function DeleteAccount() {
     const { auth, setAuth } = useContext(authContext);
     const [modalVisible, setModalVisible] = useState(false);
+    const [warning, setWarning] = useState('');
     
     useEffect(() => {
         if (modalVisible) {
