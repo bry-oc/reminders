@@ -97,7 +97,7 @@ exports.initializeAllReminders = async function() {
         username = lookup.rows[0].username;
         reminderName = reminders[i].name;
         reminderID = reminders[i].reminderid;
-        date = reminders[i].date;
+        date = new Date(reminders[i].timestamp);
         minutes = date.getMinutes();
         hours = date.getHours();
         day = date.getDate();
@@ -162,16 +162,16 @@ exports.createReminder = async function(user, reminder) {
     let month = date.getMonth() + 1;
     let scheduled;
     
-    if (reminders[i].repeat === "daily") {
+    if (reminder.repeat === "daily") {
         day = "*";
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-    } else if (reminders[i].repeat === "weekly") {
+    } else if (reminder.repeat === "weekly") {
         day = day + "/7"
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-    } else if (reminders[i].repeat === "biweekly") {
+    } else if (reminder.repeat === "biweekly") {
         day = day + "/14"
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-    } else if (reminders[i].repeat === "monthly") {
+    } else if (reminder.repeat === "monthly") {
         month = "*";
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
     } else {
@@ -218,16 +218,16 @@ exports.updateReminder = async function(reminder, user) {
     let month = date.getMonth() + 1;
     let scheduled;
 
-    if (reminders[i].repeat === "daily") {
+    if (reminder.repeat === "daily") {
         day = "*";
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-    } else if (reminders[i].repeat === "weekly") {
+    } else if (reminder.repeat === "weekly") {
         day = day + "/7"
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-    } else if (reminders[i].repeat === "biweekly") {
+    } else if (reminder.repeat === "biweekly") {
         day = day + "/14"
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-    } else if (reminders[i].repeat === "monthly") {
+    } else if (reminder.repeat === "monthly") {
         month = "*";
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
     } else {

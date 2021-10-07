@@ -11,6 +11,7 @@ function NavBar() {
     const [reminderTime, setReminderTime] = useState('');
     const [reminderRepeat, setReminderRepeat] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
+    const [warning, setWarning] = useState('');
 
     useEffect(() => {
         if (modalVisible) {
@@ -100,8 +101,8 @@ function NavBar() {
         setReminderDescription("");
     }
 
-    function fetchCreateReminder() {
-        const createReminderURL = '/api/reminder/create';
+    let fetchCreateReminder = (e) => {
+        e.preventDefault();
         const formData = new FormData();
 
         formData.append('reminderName', reminderName);
@@ -110,17 +111,66 @@ function NavBar() {
         formData.append('reminderRepeat', reminderRepeat);
         formData.append('reminderDescription', reminderDescription);
 
-        fetch(createReminderURL, {
-            method: 'POST',
-            body: formData,
+        let url = '/api/user/authentication';
+
+        fetch(url, {
+            method: 'GET',
             credentials: 'include'
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.error) {
-                    console.log(data.error);
+            .then((res) => {
+                if (res.status === 200) {
+                    setAuth(true);
+                    console.log(auth);
+                    url = '/api/reminder/create';
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include'
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.error) {
+                                setWarning(data.error);
+                                console.log(data.error);
+                            } else {
+                                console.log(data.message);
+                                setWarning('');
+                                window.location.href = "/reminder/list";
+                            }
+                        })
                 } else {
-                    window.location.href = "/reminder/list";
+                    console.log('refresh!');
+                    const refresh = '/api/token/refresh';
+                    fetch(refresh, {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                        .then((res) => {
+                            if (res.status === 200) {
+                                setAuth(true);
+                                url = '/api/reminder/create';
+
+                                fetch(url, {
+                                    method: 'POST',
+                                    body: formData,
+                                    credentials: 'include'
+                                })
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        if (data.error) {
+                                            setWarning(data.error);
+                                            console.log(data.error);
+                                        } else {
+                                            console.log(data.message);
+                                            setWarning('');
+                                            window.location.href = "/reminder/list";
+                                        }
+                                    })
+                            } else {
+                                console.log(res.status);
+                                setAuth(false);
+                            }
+                        })
                 }
             })
     }
@@ -207,6 +257,7 @@ function NavBar() {
                         </label><br /><br />
                         <button type="submit" >Create Reminder</button>
                     </form>
+                    <p>{warning}</p>
                 </div>
             </div>
             <div className="modal-wrapper" id="modal-logout">
