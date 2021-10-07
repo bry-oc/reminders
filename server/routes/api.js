@@ -560,6 +560,9 @@ module.exports = function (app) {
                 await reminderQuery.deleteAllReminders(userID);
                 //delete account
                 await authQuery.deleteUser(userID);
+                //delete cookies
+                res.clearCookie('refresh');
+                res.clearCookie('jwt');
                 return res.status(200).json({ message: 'Account deleted.' }).end();
             } catch (err) {
                 return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
