@@ -268,6 +268,10 @@ exports.updateReminder = async function(reminder, user) {
 
 exports.deleteReminder = async function(reminderid) {
     const currentJob = schedule.scheduledJobs[reminderid.toString()];
-    currentJob.cancel();
+
+    if (currentJob) {
+        currentJob.cancel();
+    }
+    
     return;
 }

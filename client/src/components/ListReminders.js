@@ -354,7 +354,8 @@ function ListReminders() {
         setModalVisible(true);
     }
 
-    function fetchDeleteReminder() {
+    let fetchDeleteReminder = (e) => {
+        e.preventDefault();
         let url = '/api/user/authentication';
 
         fetch(url, {
