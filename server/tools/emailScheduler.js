@@ -209,7 +209,11 @@ exports.createReminder = async function(user, reminder) {
 exports.updateReminder = async function(reminder, user) {
     //delete ongoing cron job and create new job with updated information
     const currentJob = schedule.scheduledJobs[(reminder.reminderid).toString()];
-    currentJob.cancel();
+    
+    if(currentJob) {
+        currentJob.cancel();
+    }
+    
     let newJob = {};
     const date = new Date(reminder.date);
     let minutes = date.getMinutes();

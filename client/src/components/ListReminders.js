@@ -355,18 +355,64 @@ function ListReminders() {
     }
 
     function fetchDeleteReminder() {
-        const deleteReminderURL = '/api/reminder/delete/' + reminderID;
-        fetch(deleteReminderURL, {
-            method: 'DELETE',
+        let url = '/api/user/authentication';
+
+        fetch(url, {
+            method: 'GET',
             credentials: 'include'
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.error) {
-                    console.log(data.error)
-                    window.location.reload();
+            .then((res) => {
+                if (res.status === 200) {
+                    setAuth(true);
+                    console.log(auth);
+                    url = '/api/reminder/delete/' + reminderID;
+                    fetch(url, {
+                        method: 'DELETE',
+                        credentials: 'include'
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.error) {
+                                setWarning(data.error);
+                                console.log(data.error);
+                            } else {
+                                console.log(data.message);
+                                setWarning('');
+                                window.location.href = "/reminder/list";
+                            }
+                        })
                 } else {
-                    window.location.reload();
+                    console.log('refresh!');
+                    const refresh = '/api/token/refresh';
+                    fetch(refresh, {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                        .then((res) => {
+                            if (res.status === 200) {
+                                setAuth(true);
+                                url = '/api/reminder/delete/' + reminderID;
+
+                                fetch(url, {
+                                    method: 'DELETE',
+                                    credentials: 'include'
+                                })
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        if (data.error) {
+                                            setWarning(data.error);
+                                            console.log(data.error);
+                                        } else {
+                                            console.log(data.message);
+                                            setWarning('');
+                                            window.location.href = "/reminder/list";
+                                        }
+                                    })
+                            } else {
+                                console.log(res.status);
+                                setAuth(false);
+                            }
+                        })
                 }
             })
     }
