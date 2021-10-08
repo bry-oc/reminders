@@ -1,7 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import $ from "jquery";
 
 function Signup() {
     const [message, setMessage] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+
+    useEffect(() => {
+        if (modalVisible) {
+            $(document).on("click", function (e) {
+                var container = $(".modal");
+                if (!container.is(e.target) && container.has(e.target).length === 0) {
+                    closeSignup();
+                    setModalVisible(false);
+                    $(document).off("click");
+                }
+            });
+        }
+    }, [modalVisible])
 
     let signup = (e) => {
         e.preventDefault();
@@ -36,9 +51,16 @@ function Signup() {
     }
 
     function openSignupModal() {
+        setModalVisible(true);
         let modalSignup = document.getElementById("modal-signup");
         modalSignup.style.display = "flex";
-        document.body.style.overflow = "hidden";
+    }
+
+    let closeSignup = (e) => {
+        setModalVisible(false);
+        let modalSignupClose = document.getElementById("modal-signup");
+        modalSignupClose.style.display = "none";
+        $(document).off("click");
     }
 
     return (
@@ -63,6 +85,7 @@ function Signup() {
             </div>
             <div className="modal-wrapper" id="modal-signup">
                 <div className="wrapper modal" id="signup">
+                    <i className="fa fa-times-circle fa-2x" onClick={closeSignup}></i><br />
                     <h2>Signup</h2>
                     <p>{message}</p>
                 </div>
