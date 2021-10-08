@@ -77,6 +77,14 @@ function Signup() {
                         </input>
                     </label><br /><br />
                     <label htmlFor="password">Password:<br />
+                        <p className="rules">May contain alphanumeric and special characters.</p>
+                        <p className="rules">Must contain atleast:</p>
+                        <ul>
+                            <li><p className="rules">One lowercase</p></li>
+                            <li><p className="rules">One uppercase</p></li>
+                            <li><p className="rules">One special character</p></li>
+                            <li><p className="rules">One number</p></li>
+                        </ul>
                         <input type="password" placeholder="Enter your password" id="password" name="password" required>
                         </input>
                     </label><br /><br />
