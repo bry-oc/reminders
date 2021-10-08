@@ -1,9 +1,18 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import $ from "jquery";
 
 function Signup() {
     const [message, setMessage] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
+    const [passwordFocused, setPasswordFocused] = React.useState(false);
+    const onPasswordFocus = () => setPasswordFocused(true);
+    const onPasswordBlur = () => setPasswordFocused(false);
+    const [usernameFocused, setUsernameFocused] = React.useState(false);
+    const onUsernameFocus = () => setUsernameFocused(true);
+    const onUsernameBlur = () => setUsernameFocused(false);
+    const [emailFocused, setEmailFocused] = React.useState(false);
+    const onEmailFocus = () => setEmailFocused(true);
+    const onEmailBlur = () => setEmailFocused(false);
 
     useEffect(() => {
         if (modalVisible) {
@@ -69,23 +78,30 @@ function Signup() {
                 <h1>Create Your Account</h1>
                 <form onSubmit={signup}>
                     <label htmlFor="email">Email:<br />
-                        <input type="text" placeholder="Enter your email" id="email" name="email" required>
+                        {!emailFocused ? (null) : (<div> <p className="rules">Please enter a valid email address.</p></div>)}
+                        <input type="text" placeholder="Enter your email" id="email" name="email" onFocus={onEmailFocus} onBlur={onEmailBlur} required>
                         </input>
                     </label><br /><br />
                     <label htmlFor="username">Username:<br />
-                        <input type="text" placeholder="Enter your username" id="username" name="username" required>
+                        {!usernameFocused ? (null) : (<div>
+                            <p className="rules">May contain only alphanumeric characters.</p>
+                            <ul>
+                                <li><p className="rules">Minimum length of six (6) characters</p></li>
+                                <li><p className="rules">Maximum length of twenty (20) characters</p></li>
+                            </ul> </div>)}
+                        <input type="text" placeholder="Enter your username" id="username" name="username" onFocus={onUsernameFocus} onBlur={onUsernameBlur} required>
                         </input>
                     </label><br /><br />
                     <label htmlFor="password">Password:<br />
-                        <p className="rules">May contain alphanumeric and special characters.</p>
+                        {!passwordFocused ? (null) : (<div> <p className="rules">May contain only alphanumeric and special characters.</p>
                         <p className="rules">Must contain atleast:</p>
                         <ul>
                             <li><p className="rules">One lowercase</p></li>
                             <li><p className="rules">One uppercase</p></li>
                             <li><p className="rules">One special character</p></li>
                             <li><p className="rules">One number</p></li>
-                        </ul>
-                        <input type="password" placeholder="Enter your password" id="password" name="password" required>
+                        </ul> </div>)} 
+                        <input type="password" placeholder="Enter your password" id="password" name="password" onFocus={onPasswordFocus} onBlur={onPasswordBlur} required>
                         </input>
                     </label><br /><br />
                     <button id="submit" type="submit">Create Account</button>
