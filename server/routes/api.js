@@ -378,7 +378,7 @@ module.exports = function (app) {
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
                     //email did not return a match
-                    return res.status(400).json({error: 'User does not exist'});
+                    return res.status(400).json({error: 'User does not exist.'});
                 } else {
                     //create & store id and reset token in password_reset table
                     const username = lookup.rows[0].username;

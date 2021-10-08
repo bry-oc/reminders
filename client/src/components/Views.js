@@ -34,6 +34,9 @@ function Views(){
                 <Route path="/login">
                     <Login/>
                 </Route>
+                <Route path="/password/reset">
+                    <ForgotPassword />
+                </Route>
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/account" component={Account} />)}
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/reminder/list" component={ListReminders} />)}
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/password/reset" component={ForgotPassword} />)}
