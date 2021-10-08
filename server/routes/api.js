@@ -401,7 +401,7 @@ module.exports = function (app) {
                         from: process.env.EMAIL_ACCOUNT,
                         to: email,
                         subject: 'Password Reset Request',
-                        text: 'Hello ' + username + ',\n\nA password reset was requested. Please reset your password by clicking the link: \nhttp://localhost:3001/api/password/reset/' + userID + '/' + resetToken + '\nThis link will expire in two days.  If this password reset was not requested by you, please ignore this email.'
+                        text: 'Hello ' + username + ',\n\nA password reset was requested. Please reset your password by clicking the link: \nhttp://localhost:3000/password/reset/' + userID + '\nYour password reset token is: ' + token + '\nThis token will expire in two days.  If this password reset was not requested by you, please ignore this email.'
                     }
 
                     transporter.sendMail(mailOptions, function (err) {
@@ -418,13 +418,13 @@ module.exports = function (app) {
             }
         });
     //reset password
-    app.route('/api/password/reset/:userid/:token')
+    app.route('/api/password/reset/:userid')
         .post(upload.none(), async (req, res) => {
             try {
                 //receive new password
                 const password = req.body.password;
                 const userID = req.params.userid;
-                const token = req.params.token;
+                const token = req.body.token;
                 const timestamp = new Date().getTime();
                 if(!password) {
                     return res.status(400).json({error: 'Missing required field!'}).end();
