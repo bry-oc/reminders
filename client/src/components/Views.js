@@ -9,6 +9,7 @@ import UpdateUsername from './UpdateUsername';
 import UpdateEmail from './UpdateEmail';
 import UpdatePassword from './UpdatePassword';
 import DeleteAccount from './DeleteAccount';
+import ResetPassword from './ResetPassword';
 import authContext from './AuthContext';
 import React, { useContext } from 'react';
 
@@ -36,6 +37,9 @@ function Views(){
                 </Route>
                 <Route path="/password/reset">
                     <ForgotPassword />
+                </Route>
+                <Route path="/password/recovery/:userid">
+                    <ResetPassword />
                 </Route>
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/account" component={Account} />)}
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/reminder/list" component={ListReminders} />)}

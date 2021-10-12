@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import $ from "jquery";
 
-function ForgotPassword() {
+function ResetPassword() {
     const [message, setMessage] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [success, setSuccess] = useState(false);
+    const { userid } = useParams();
 
     useEffect(() => {
         if (modalVisible && !success) {
@@ -21,9 +22,9 @@ function ForgotPassword() {
     }, [modalVisible])
 
     let resetPassword = (e) => {
-        const userID = req.params.userid;
+        const userID = userid;
         e.preventDefault();
-        const url = '/api/user/password/reset/' + userID;
+        const url = '/api/password/recovery/' + userID;
 
         const token = e.target.token.value;
         const password = e.target.password.value;
@@ -97,4 +98,4 @@ function ForgotPassword() {
     )
 }
 
-export default ForgotPassword;
+export default ResetPassword;
