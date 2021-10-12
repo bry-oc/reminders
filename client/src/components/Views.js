@@ -38,7 +38,7 @@ function Views(){
                 <Route path="/password/reset">
                     <ForgotPassword />
                 </Route>
-                <Route path="/password/recovery/:userid">
+                <Route path="/password/recovery/:userid/:token">
                     <ResetPassword />
                 </Route>
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/account" component={Account} />)}

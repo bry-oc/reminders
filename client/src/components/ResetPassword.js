@@ -6,7 +6,7 @@ function ResetPassword() {
     const [message, setMessage] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [success, setSuccess] = useState(false);
-    const { userid } = useParams();
+    const { userid, token } = useParams();
 
     useEffect(() => {
         if (modalVisible && !success) {
@@ -24,13 +24,11 @@ function ResetPassword() {
     let resetPassword = (e) => {
         const userID = userid;
         e.preventDefault();
-        const url = '/api/password/recovery/' + userID;
+        const url = '/api/password/recovery/' + userID + '/' + token;
 
-        const token = e.target.token.value;
         const password = e.target.password.value;
 
         const formData = new FormData();
-        formData.append('token', token);
         formData.append('password', password);
 
         fetch(url, {
@@ -77,10 +75,6 @@ function ResetPassword() {
                     </label><br /><br />
                     <label>Confirm password:<br />
                         <input name="passwordCofirm" type="text" placeholder="Enter your password" required>
-                        </input>
-                    </label><br /><br />
-                    <label>Reset Token:<br />
-                        <input name="token" type="text" placeholder="Enter your token" required>
                         </input>
                     </label><br /><br />
                     <button type="submit">Reset Password</button>
