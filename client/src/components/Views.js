@@ -10,6 +10,7 @@ import UpdateEmail from './UpdateEmail';
 import UpdatePassword from './UpdatePassword';
 import DeleteAccount from './DeleteAccount';
 import ResetPassword from './ResetPassword';
+import ResendVerification from './ResendVerification';
 import authContext from './AuthContext';
 import React, { useContext } from 'react';
 
@@ -40,6 +41,9 @@ function Views(){
                 </Route>
                 <Route path="/password/recovery/:userid/:token">
                     <ResetPassword />
+                </Route>
+                <Route path="/email/resend/verfication">
+                    <ResendVerification />
                 </Route>
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/account" component={Account} />)}
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/reminder/list" component={ListReminders} />)}
