@@ -259,8 +259,11 @@ module.exports = function (app) {
                 let lookup = await userQuery.getUserByUsername(username);
                 if(lookup.rowCount <= 0) {
                     //user does not exist
-                    return res.status(404).json({error: 'Login failed. Username or password did not match.'}).end();
+                    return res.status(404).json({ error: 'Login failed: Username or password did not match.'}).end();
                 } else {
+                    if(!lookup.rows[0].verified) {
+                        return res.status(401).json({ error: 'Login failed: Email is not verified.' }).end();
+                    }
                     const passwordHash = lookup.rows[0].password;
                     if(await argon2.verify(passwordHash, password)) {                        
                         //password match
@@ -278,7 +281,7 @@ module.exports = function (app) {
                     } else {
                         //password failed
                         //invalid password
-                        return res.status(404).json({error: 'Login failed. Username or password did not match.'}).end();
+                        return res.status(404).json({ error: 'Login failed: Username or password did not match.'}).end();
                     }
                 }
             } catch (err) {

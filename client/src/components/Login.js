@@ -57,10 +57,10 @@ function Login(){
                             <input type="password" placeholder="Enter your password" id="password" name="password" required>
                             </input>
                         </label><br /><br />
-                        <button type="submit">Login</button><br /><br />
-                        <a href={'/password/reset'}>Forgot password?</a><br />
+                        <button type="submit">Login</button>
+                            {warning !== "" ? <p className="warning">{warning}</p> : null}
+                        <br /><a href={'/password/reset'}>Forgot password?</a><br />
                     </form>
-                    { warning !== "" ? <p className="warning">{warning}</p> : null }
                 </div >
             )}
             
