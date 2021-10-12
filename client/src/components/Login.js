@@ -60,7 +60,7 @@ function Login(){
                         <button type="submit">Login</button>
                             {warning !== "" ? <p className="warning">{warning}</p> : null}
                         <br /><a href={'/password/reset'}>Forgot password?</a><br />
-                            <a href={'/email/resend/verfication'}>Resend Verification Email?</a><br />
+                            <a href={'/email/resend/verification'}>Resend Verification Email?</a><br />
                     </form>
                 </div >
             )}
