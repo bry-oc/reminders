@@ -96,19 +96,19 @@ function ViewReminder(props) {
             <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
         </div> ):
         (
-        <div className="wrapper modal">
+        <div className="wrapper modal" id="viewreminder">
             <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
             <h2>View Reminder</h2>            
             <h3>Name: </h3>
-            <p>{reminderName}</p>
+            <p className="remindertext">{reminderName}</p>
             <h3>Date: </h3>
-            <p>{reminderDate}</p>
+            <p className="remindertext">{reminderDate}</p>
             <h3>Time: </h3>
-            <p>{reminderTime}</p>
+            <p className="remindertext">{reminderTime}</p>
             <h3>Repeat: </h3>
-            <p>{reminderRepeat}</p>
+            <p className="remindertext">{reminderRepeat}</p>
             <h3>Description: </h3>
-            <p>{reminderDescription}</p>
+            <p className="remindertext">{reminderDescription}</p>
         </div>
         )
     
