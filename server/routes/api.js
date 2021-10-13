@@ -127,7 +127,7 @@ module.exports = function (app) {
                             from: process.env.EMAIL_ACCOUNT,
                             to: email,
                             subject: 'Account Verification Link',
-                            text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3001/api/emailconfirmation/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
+                            text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3000/email/verification/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
                         }
 
                         transporter.sendMail(mailOptions, function (err) {

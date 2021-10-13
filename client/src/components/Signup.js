@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import $ from "jquery";
 
 function Signup() {
@@ -6,13 +7,38 @@ function Signup() {
     const [modalVisible, setModalVisible] = useState(false);
     const [passwordFocused, setPasswordFocused] = React.useState(false);
     const onPasswordFocus = () => setPasswordFocused(true);
-    const onPasswordBlur = () => setPasswordFocused(false);
+    const onPasswordBlur = () => {
+        $(document).on("click", function (e) {
+            var container = $("#submit");
+            if (!container.is(e.target)) {
+                setPasswordFocused(false);
+                $(document).off("click");
+            }
+        });
+    };
     const [usernameFocused, setUsernameFocused] = React.useState(false);
     const onUsernameFocus = () => setUsernameFocused(true);
-    const onUsernameBlur = () => setUsernameFocused(false);
+    const onUsernameBlur = () => {
+        $(document).on("click", function (e) {
+            var container = $("#submit");
+            if (!container.is(e.target)) {
+                setUsernameFocused(false);
+                $(document).off("click");
+            } 
+        });
+    };
     const [emailFocused, setEmailFocused] = React.useState(false);
     const onEmailFocus = () => setEmailFocused(true);
-    const onEmailBlur = () => setEmailFocused(false);
+    const onEmailBlur = () => {
+        $(document).on("click", function (e) {
+            var container = $("#submit");
+            if (!container.is(e.target)) {
+                setEmailFocused(false);
+                $(document).off("click");
+            } 
+        }); 
+    };
+    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
         if (modalVisible) {
@@ -54,6 +80,7 @@ function Signup() {
                 } else {
                     console.log(data.message);
                     setMessage(data.message);
+                    setSuccess(true);
                     openSignupModal();
                 }
             })
@@ -61,6 +88,9 @@ function Signup() {
 
     function openSignupModal() {
         setModalVisible(true);
+        setEmailFocused(false);
+        setUsernameFocused(false);
+        setPasswordFocused(false);
         let modalSignup = document.getElementById("modal-signup");
         modalSignup.style.display = "flex";
     }
@@ -76,7 +106,7 @@ function Signup() {
         <div>
             <div className="wrapper">
                 <h1>Create Your Account</h1>
-                <form onSubmit={signup}>
+                <form name="signup" onSubmit={signup}>
                     <label htmlFor="email">Email:<br />
                         {!emailFocused ? (null) : (<div> <p className="rules">Please enter a valid email address.</p></div>)}
                         <input type="text" placeholder="Enter your email" id="email" name="email" onFocus={onEmailFocus} onBlur={onEmailBlur} required>
@@ -112,6 +142,7 @@ function Signup() {
                     <i className="fa fa-times-circle fa-2x" onClick={closeSignup}></i><br />
                     <h2>Signup</h2>
                     <p>{message}</p>
+                    {success ? (<Link to="/login"><button>Go to Login</button></Link>) : (null)}
                 </div>
             </div>
         </div>
