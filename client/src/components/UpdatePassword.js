@@ -80,13 +80,21 @@ function UpdatePassword() {
         <div className="wrapper">
             <h1>Change Password</h1>
             <form onSubmit={updatePassword}>
+                <label htmlFor="password">Enter Current Password:<br />
+                    <input type="text" name="password" placeholder="Enter your password" required>
+                    </input>
+                </label><br /><br />
                 <label htmlFor="password">New Password:<br />
                     <input type="text" name="password" placeholder="Enter your password" required>
                     </input>
                 </label><br /><br />
+                <label htmlFor="password">Confirm New Password:<br />
+                    <input type="text" name="password" placeholder="Confirm password" required>
+                    </input>
+                </label><br />
+                <p>{warning}</p>
                 <button type="submit">Change Password</button>
             </form>
-            <p>{warning}</p>
         </div>
     )
 }

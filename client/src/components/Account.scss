@@ -19,4 +19,14 @@
         height: 40px;
         font-size: large;
     }
+    p {
+        text-align: left;
+        color: black;
+    }
 }
+#spinner {
+        float: none;
+        position: fixed;
+        top: 50%;
+        left: 49%;        
+    }

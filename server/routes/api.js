@@ -174,11 +174,11 @@ module.exports = function (app) {
                         return res.status(404).json({error: 'That user does not exist.'}).end();
                     } else if (lookup.rows[0].verified === true) {
                         //the user is already verified
-                        return res.status(200).json({message: 'Your account is already verified.'}).end();
+                        return res.status(200).json({message: 'Your account is verified.'}).end();
                     } else {
                         //update the user to verified
                         await authQuery.updateVerifiedUser(userID);
-                        return res.status(200).json({message: 'Your account is now verified.'}).end();
+                        return res.status(200).json({message: 'Your account is verified.'}).end();
                     }
                 }
             } catch (err) {
@@ -200,7 +200,7 @@ module.exports = function (app) {
                     return res.status(400).json({error: 'That email was not found.'}).end();
                 } else if (lookup.rows[0].verified === true){
                     //the email is already validated
-                    return res.status(200).json({message: 'Your account is already verified.'}).end();
+                    return res.status(200).json({message: 'Your account is verified.'}).end();
                 } else {
                     //the email is not validated, send a verification email
                     //create email token
@@ -229,7 +229,7 @@ module.exports = function (app) {
                         from: process.env.EMAIL_ACCOUNT,
                         to: email,
                         subject: 'Account Verification Link',
-                        text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3001/api/emailconfirmation/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
+                        text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3000/email/verification/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
                     }
 
                     transporter.sendMail(mailOptions, function (err) {

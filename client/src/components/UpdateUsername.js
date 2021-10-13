@@ -82,10 +82,10 @@ function UpdateUsername(){
                 <label htmlFor="username">New Username:<br />
                     <input type="text" name="username" placeholder="Enter your username" required>
                     </input>
-                </label><br /><br />
+                </label><br />
+                <p>{warning}</p><br />
                 <button type="submit">Change Username</button>
             </form>
-            <p>{warning}</p>
         </div>
     )    
 }

@@ -106,7 +106,7 @@ function Signup() {
         <div>
             <div className="wrapper">
                 <h1>Create Your Account</h1>
-                <form name="signup" onSubmit={signup}>
+                <form name="signup" onSubmit={signup} id="signup-form">
                     <label htmlFor="email">Email:<br />
                         {!emailFocused ? (null) : (<div> <p className="rules">Please enter a valid email address.</p></div>)}
                         <input type="text" placeholder="Enter your email" id="email" name="email" onFocus={onEmailFocus} onBlur={onEmailBlur} required>
@@ -141,8 +141,8 @@ function Signup() {
                 <div className="wrapper modal" id="signup">
                     <i className="fa fa-times-circle fa-2x" onClick={closeSignup}></i><br />
                     <h2>Signup</h2>
-                    <p>{message}</p>
-                    {success ? (<Link to="/login"><button>Go to Login</button></Link>) : (null)}
+                    <p id="success">{message}</p>
+                    {success ? (<Link to="/login" id="logout-link"><button onClick={closeSignup}>Go to Login</button></Link>) : (null)}
                 </div>
             </div>
         </div>

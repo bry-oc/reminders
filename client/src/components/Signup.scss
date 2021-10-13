@@ -11,19 +11,24 @@
     height: 100%;    
     overflow: auto;
     background-color: rgba(0,0,0,0.4);
+    #success {
+        color: black;
+    }
 }
-#signup {
+#signup-form {
     z-index: 2;
-    border: 1px solid black;
     padding: 40px;
-    background-color: white;
     border-radius: 12px; 
     padding-top: 0;
     margin: auto;
     width: 320px;
     p {
-        font-size: 18px;
-        text-align: center;
+        font-size: 14px;
+        text-align: left;
+        color: black;
+    }
+    a {
+        text-decoration: none;
     }
     h2 {
         text-align: center;

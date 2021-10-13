@@ -83,10 +83,10 @@ function UpdateEmail() {
                 <label htmlFor="email">New Email:<br />
                     <input type="text" name="email" placeholder="Enter your email" required>
                     </input>
-                </label><br /><br />
+                </label><br />
+                <p>{warning}</p>
                 <button type="submit">Change Email</button>
-            </form>
-            <p>{warning}</p>
+            </form> 
         </div>
     )    
 }
