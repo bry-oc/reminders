@@ -7,7 +7,13 @@ function UpdatePassword() {
 
     let updatePassword = (e) => {
         e.preventDefault();
-        const password = e.target.password.value;
+
+        if(e.target.newpassword !== e.target.newpasswordconfirm) {
+            setWarning('Password confirmation does not match.');
+            return;
+        }
+
+        const password = e.target.newpassword.value;
 
         const formData = new FormData();
         formData.append('password', password);
@@ -81,15 +87,15 @@ function UpdatePassword() {
             <h1>Change Password</h1>
             <form onSubmit={updatePassword}>
                 <label htmlFor="password">Enter Current Password:<br />
-                    <input type="text" name="password" placeholder="Enter your password" required>
+                    <input type="password" name="currentpassword" placeholder="Enter your current password" required>
                     </input>
                 </label><br /><br />
                 <label htmlFor="password">New Password:<br />
-                    <input type="text" name="password" placeholder="Enter your password" required>
+                    <input type="password" name="newpassword" placeholder="Enter your new password" required>
                     </input>
                 </label><br /><br />
                 <label htmlFor="password">Confirm New Password:<br />
-                    <input type="text" name="password" placeholder="Confirm password" required>
+                    <input type="password" name="newpasswordconfirm" placeholder="Enter your new password" required>
                     </input>
                 </label><br />
                 <p>{warning}</p>
