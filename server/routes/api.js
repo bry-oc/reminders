@@ -534,19 +534,36 @@ module.exports = function (app) {
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
-                const password = req.body.password;
+                const newPassword = req.body.newpassword;
+                const currentPassword = req.body.currentpassword;
 
-                if (!password) {
-                    return res.status(400).json({ error: 'Missing required field!' }).end();
+                if (!newPassword || !currentPassword) {
+                    return res.status(400).json({ error: 'Missing required fields!' }).end();
                 }
-
-                if (!serverValidation.isValidPassword(password)) {
-                    return res.status(400).json({ error: 'Invalid password.' }).end();
+              
+                //verify current password
+                let lookup = await userQuery.getUserByUserID(userID);
+                if(lookup.rowCount <= 0) {
+                    //user does not exist
+                    return res.status(404).json({ error: 'User does not exists.'}).end();
+                } else {
+                    const passwordHash = lookup.rows[0].password;
+                    if (await argon2.verify(passwordHash, currentPassword)) {
+                        //password verified
+                        //check new password validation
+                        if (!serverValidation.isValidPassword(newPassword)) {
+                            return res.status(400).json({ error: 'New password does not include password requirements.' }).end();
+                        }
+                        //update the user's password
+                        const newPasswordHash = await argon2.hash(newPassword);
+                        await authQuery.updatePassword(userID, newPasswordHash);
+                        return res.status(200).json({ success: true, message: 'Your password has been successfuly updated.' });
+                    } else {
+                        //password failed
+                        //invalid password
+                        return res.status(404).json({ error: 'Password verification failed.' }).end();
+                    }   
                 }
-                //update the user's password
-                const passwordHash = await argon2.hash(password);
-                await authQuery.updatePassword(userID, passwordHash);
-                return res.status(200).json({ success: true, message: 'Your password has been successfuly updated.' });
             } catch (err) {
                 return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
