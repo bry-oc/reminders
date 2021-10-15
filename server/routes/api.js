@@ -633,10 +633,12 @@ module.exports = function (app) {
                 //get timestamp from the given date and time
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
-                reminderDate = new Date(reminderDate);
-                reminderDate.setHours(reminderHours);
-                reminderDate.setMinutes(reminderMinutes);
-                reminderDate = reminderDate.getTime();               
+                const reminderMonth = reminderDate.split('-')[1];
+                const reminderDay = reminderDate.split('-')[2];
+                const reminderYear = reminderDate.split('-')[0];
+                reminderDate = new Date(reminderYear, reminderMonth - 1, reminderDay, reminderHours, reminderMinutes);
+                reminderDate = reminderDate.getTime();
+                console.log(reminderDate);
                                 
                 //create the reminder and return its id
                 let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
