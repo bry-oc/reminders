@@ -36,6 +36,9 @@
         width: 100%;
         align-self: stretch;
     }    
+    i {
+        pointer-events: none;
+    }
 }
 .modal-wrapper {    
     box-sizing: border-box;
