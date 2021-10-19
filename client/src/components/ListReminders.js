@@ -449,7 +449,6 @@ function ListReminders() {
                     <td>{name}</td>
                     <td>{reminderDate}</td>
                     <td>{reminderTime}</td>
-                    {/*fix icons not setting reminderid*/}
                     <td><button onClick={openView} name={reminderid}><i className="fa fa-ellipsis-h fa-2x"></i></button></td>
                     <td><button onClick={openEdit} name={reminderid}><i className="fa fa-edit fa-2x"></i></button></td>
                     <td><button onClick={openDelete} name={reminderid}><i className="fa fa-trash fa-2x"></i></button></td>
