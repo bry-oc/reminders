@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useParams, useState, useContext } from "react";
 import authContext from './AuthContext';
 import $ from "jquery";
 
@@ -16,6 +16,7 @@ function ListReminders() {
     const [tableLoading, setTableLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
     const [warning, setWarning] = useState('');
+    const { reminderid_param } = useParams();
 
     useEffect(() => {
         let url = '/api/user/authentication';

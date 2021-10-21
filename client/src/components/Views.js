@@ -50,7 +50,7 @@ function Views(){
                     <EmailVerification />
                 </Route>
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/account" component={Account} />)}
-                {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/reminder/list(/:reminderid)" component={ListReminders} />)}
+                {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/reminder/list(/:reminderid_param)" component={ListReminders} />)}
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/password/reset" component={ForgotPassword} />)}
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/username/edit" component={UpdateUsername} />)}
                 {auth === null ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) : (<PrivateRoute path="/email/edit" component={UpdateEmail} />)}
