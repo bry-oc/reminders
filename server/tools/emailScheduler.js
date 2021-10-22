@@ -79,6 +79,7 @@ exports.initializeAllReminders = async function() {
     let email;
     let username;
     let reminderName;
+    let reminderDescription;
     let reminderID;
     let userID;
     let jobs = {};
@@ -96,12 +97,14 @@ exports.initializeAllReminders = async function() {
         email = lookup.rows[0].email;
         username = lookup.rows[0].username;
         reminderName = reminders[i].name;
+        reminderDescription = reminders[i].description;
         reminderID = reminders[i].reminderid;
         date = new Date(reminders[i].timestamp);
         minutes = date.getMinutes();
         hours = date.getHours();
         day = date.getDate();
         month = date.getMonth() + 1;
+        year = date.getFullYear();
 
         if (reminders[i].repeat === "daily") {
             day = "*";
@@ -132,7 +135,7 @@ exports.initializeAllReminders = async function() {
                 from: process.env.EMAIL_ACCOUNT,
                 to: user.email,
                 subject: 'Reminder Notification: ' + reminder.name,
-                html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + reminder.userid + "/reminder/" + reminder.reminderid + "'>here</a>."
+                html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminderName + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminderDescription + "<br/><br>Thank you for using our friendly reminders. :)"
             }
 
 
@@ -191,7 +194,7 @@ exports.createReminder = async function(user, reminder) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + reminder.userid + "/reminder/" + reminder.reminderid + "'>here</a>."
+            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminder.description + "<br/><br>Thank you for using our friendly reminders. :)"
         }
 
 
@@ -251,7 +254,7 @@ exports.updateReminder = async function(reminder, user) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + reminder.userid + "/reminder/" + reminder.reminderid + "'>here</a>."
+            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminder.description + "<br/><br>Thank you for using our friendly reminders. :)"
         }
 
 
