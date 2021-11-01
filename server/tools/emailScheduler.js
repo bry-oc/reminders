@@ -88,6 +88,7 @@ exports.initializeAllReminders = async function() {
     let hours;
     let day;
     let month;
+    let year;
     let scheduled;
 
     //for each reminder, create a job

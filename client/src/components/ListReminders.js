@@ -1,4 +1,5 @@
-import React, { useEffect, useParams, useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { useParams } from "react-router-dom";
 import authContext from './AuthContext';
 import $ from "jquery";
 
@@ -15,8 +16,9 @@ function ListReminders() {
     const [loading, setLoading] = useState(true);
     const [tableLoading, setTableLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
+    const [fetchSuccess, setFetchSuccess] = useState(true);
     const [warning, setWarning] = useState('');
-    const { reminderid_param } = useParams();
+    const { url_id } = useParams();
 
     useEffect(() => {
         let url = '/api/user/authentication';
@@ -42,6 +44,9 @@ function ListReminders() {
                             } else {
                                 console.log(data.reminders);
                                 setReminders(data.reminders);
+                                if (url_id) {
+                                    openView();
+                                }
                             }
                         })
                     setTableLoading(false);
@@ -100,11 +105,11 @@ function ListReminders() {
         let modalView = document.getElementById("modal-view");
         modalView.style.display = "flex";
         document.body.style.overflow = "hidden";
-        setCurrentID(e.target.name);
+        setCurrentID(e !== undefined ? e.target.name : url_id);
 
         setLoading(true);
         setReminderID(currentID);
-        let fetchID = e.target.name;
+        let fetchID = e !== undefined ? e.target.name : url_id;
         const url = '/api/user/authentication';
 
         fetch(url, {
@@ -115,7 +120,7 @@ function ListReminders() {
                 if (res.status === 200) {
                     setAuth(true);
                     fetchGetReminder(fetchID);
-                    console.log(auth);
+                    console.log(fetchID);
                 } else {
                     console.log('refresh!');
                     const refresh = '/api/token/refresh';
@@ -127,6 +132,7 @@ function ListReminders() {
                             if (res.status === 200) {
                                 setAuth(true);
                                 fetchGetReminder(fetchID);
+                                console.log(fetchID);
                             } else {
                                 console.log(res.status);
                                 setAuth(false);
@@ -147,8 +153,10 @@ function ListReminders() {
             .then((data) => {
                 if (data.error) {
                     console.log(data.error);
+                    setFetchSuccess(false);
                 } else {
                     console.log(data.reminder);
+                    setFetchSuccess(true);
                     setReminderID(data.reminderid);
                     setReminderName(data.reminderName);
                     setReminderDescription(data.reminderDescription);
@@ -164,12 +172,12 @@ function ListReminders() {
                     setReminderDate(reminderDate);
                     setReminderTime(reminderTime);
                 }
-                setLoading(false);  
+                setLoading(false);
                 setModalVisible(true);
             })
     }
 
-    function sortByDate(a, b){
+    function sortByDate(a, b) {
         return new Date(parseInt(b.date)) > new Date(parseInt(a.date)) ? -1 : 1;
     }
 
@@ -419,7 +427,7 @@ function ListReminders() {
             })
     }
 
-    let closeDelete = (e) => {        
+    let closeDelete = (e) => {
         let modalDeleteClose = document.getElementById("modal-delete");
         modalDeleteClose.style.display = "none";
         document.body.style.overflow = "auto";
@@ -466,7 +474,7 @@ function ListReminders() {
     const today = year + '-' + month + '-' + day;
 
     return (
-        <div className="list-wrapper">            
+        <div className="list-wrapper">         
             <div className="table-wrapper">     
                 <h1>Reminders</h1>
                 {tableLoading ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) :
@@ -496,20 +504,30 @@ function ListReminders() {
                     </div>
                     ) 
                     :
-                    (
-                        <div className="wrapper modal reminder">
-                            <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
-                            <h2>View Reminder</h2>
-                            <h3>Name: </h3>
-                            <p>{reminderName}</p>
-                            <h3>Date: </h3>
-                            <p>{reminderDate}</p>
-                            <h3>Time: </h3>
-                            <p>{reminderTime}</p>
-                            <h3>Repeat: </h3>
-                            <p>{reminderRepeat}</p>
-                            <h3>Description: </h3>
-                            <p>{reminderDescription}</p>
+                    (   
+                        <div>
+                        {fetchSuccess ? (
+                            <div className="wrapper modal reminder">
+                                <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
+                                <h2>View Reminder</h2>
+                                <h3>Name: </h3>
+                                <p>{reminderName}</p>
+                                <h3>Date: </h3>
+                                <p>{reminderDate}</p>
+                                <h3>Time: </h3>
+                                <p>{reminderTime}</p>
+                                <h3>Repeat: </h3>
+                                <p>{reminderRepeat}</p>
+                                <h3>Description: </h3>
+                                <p>{reminderDescription}</p>
+                            </div>
+                        ) : (
+                            <div className = "wrapper modal reminder">
+                                <i className = "fa fa-times-circle fa-2x" onClick = { closeView }></i><br />
+                                <h2>View Reminder</h2>
+                                <p className= "warning">Reminder Does Not Exists.</p>
+                            </div>
+                        )}
                         </div>
                     )}
             </div>
