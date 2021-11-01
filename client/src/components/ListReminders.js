@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import authContext from './AuthContext';
 import $ from "jquery";
+import DataTable from 'datatables.net';
 
 function ListReminders() {
     const [reminders, setReminders] = useState([]);
@@ -47,6 +48,9 @@ function ListReminders() {
                                 if (url_id) {
                                     openView();
                                 }
+                                $(function () {
+                                    $('#reminder-table').DataTable();
+                                });
                             }
                         })
                     setTableLoading(false);
@@ -73,6 +77,12 @@ function ListReminders() {
                                         } else {
                                             console.log(data.reminders);
                                             setReminders(data.reminders);
+                                            if (url_id) {
+                                                openView();
+                                            }
+                                            $(function () {
+                                                $('#reminder-table').DataTable();
+                                            });
                                         }
                                     })
                             } else {
@@ -454,15 +464,17 @@ function ListReminders() {
             const reminderTime = hour + ':' + minutes;
             reminderDate = year + '-' + month + '-' + day;
             return (
-                <tr key={reminderid}>
-                    <td>{name}</td>
-                    <td>{reminderDate}</td>
-                    <td>{reminderTime}</td>
-                    <td>{sent ? "Yes" : "No"}</td>
-                    <td><button onClick={openView} name={reminderid}><i className="fa fa-ellipsis-h fa-2x"></i></button></td>
-                    <td><button onClick={openEdit} name={reminderid}><i className="fa fa-edit fa-2x"></i></button></td>
-                    <td><button onClick={openDelete} name={reminderid}><i className="fa fa-trash fa-2x"></i></button></td>
-                </tr>
+                
+                    <tr key={reminderid}>
+                        <td>{name}</td>
+                        <td>{reminderDate}</td>
+                        <td>{reminderTime}</td>
+                        <td>{sent ? "Yes" : "No"}</td>
+                        <td><button onClick={openView} name={reminderid}><i className="fa fa-ellipsis-h fa-2x"></i></button></td>
+                        <td><button onClick={openEdit} name={reminderid}><i className="fa fa-edit fa-2x"></i></button></td>
+                        <td><button onClick={openDelete} name={reminderid}><i className="fa fa-trash fa-2x"></i></button></td>
+                    </tr>
+                
             )
         })
     }
@@ -480,8 +492,8 @@ function ListReminders() {
                 {tableLoading ? (<i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>) :
                     (
                         
-                    <table className="table">
-                        <tbody>
+                    <table className="table" id="reminder-table">
+                        <thead>
                             <tr>
                                 <th>Name</th>
                                 <th>Date</th>
@@ -491,6 +503,8 @@ function ListReminders() {
                                 <th>Edit</th>
                                 <th>Delete</th>
                             </tr>
+                        </thead>     
+                        <tbody>                     
                             {TableData()}
                         </tbody>
                     </table> )}
