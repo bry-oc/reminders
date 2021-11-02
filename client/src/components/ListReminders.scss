@@ -12,9 +12,23 @@
         top: 50%;
         left: 49%;        
     }
+    .dataTables_filter {
+        margin: 15px;
+        input {
+            margin-left: 5px;
+        }
+    }
+    .dataTables_info {
+        margin: 15px;
+    }
     h1 {
         text-align: center;
         margin-top: 0;
+    }
+    a {
+        padding: 5px;
+        text-decoration: underline;
+        cursor: pointer;        
     }
     margin-bottom: 40px;
 }
