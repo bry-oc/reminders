@@ -1,0 +1,32 @@
+#account {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .userinfo {
+        border: 1px solid black;
+        border-radius: 12px; 
+        padding: 10px;
+    }
+    form {
+        width: 300px;    
+        margin: auto;
+    }
+    a {
+        text-decoration: none;
+    }
+    input {
+        width: 300px;
+        height: 40px;
+        font-size: large;
+    }
+    p {
+        text-align: left;
+        color: black;
+    }
+}
+#spinner {
+        float: none;
+        position: fixed;
+        top: 50%;
+        left: 49%;        
+    }

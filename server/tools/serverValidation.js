@@ -11,10 +11,8 @@ exports.isValidUsername = function(username) {
     if (username.length < 6 || username.length > 20) {
         return false;
     }
-    //alphanumeric with hyphens or underscores or periods as separators
-    //two periods, hyphens, or underscores consecutively are not allowed
-    //period, hyphen, or underscore at the start is not allowed 
-    const filter = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$/;
+    //alphanumeric minimun length of 6 and max of 20
+    const filter = /^[A-Za-z0-9]+$/;
     return filter.test(username);
 }
 

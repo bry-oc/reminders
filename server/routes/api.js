@@ -127,7 +127,7 @@ module.exports = function (app) {
                             from: process.env.EMAIL_ACCOUNT,
                             to: email,
                             subject: 'Account Verification Link',
-                            text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3001/api/emailconfirmation/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
+                            text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3000/email/verification/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
                         }
 
                         transporter.sendMail(mailOptions, function (err) {
@@ -174,15 +174,15 @@ module.exports = function (app) {
                         return res.status(404).json({error: 'That user does not exist.'}).end();
                     } else if (lookup.rows[0].verified === true) {
                         //the user is already verified
-                        return res.status(200).json({message: 'Your account is already verified.'}).end();
+                        return res.status(200).json({message: 'Your account is verified.'}).end();
                     } else {
                         //update the user to verified
                         await authQuery.updateVerifiedUser(userID);
-                        return res.status(200).json({message: 'Your account is now verified.'}).end();
+                        return res.status(200).json({message: 'Your account is verified.'}).end();
                     }
                 }
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({error: 'Internal Server Error: ' +err}).end();
             }
         });
     
@@ -200,7 +200,7 @@ module.exports = function (app) {
                     return res.status(400).json({error: 'That email was not found.'}).end();
                 } else if (lookup.rows[0].verified === true){
                     //the email is already validated
-                    return res.status(200).json({message: 'Your account is already verified.'}).end();
+                    return res.status(200).json({message: 'Your account is verified.'}).end();
                 } else {
                     //the email is not validated, send a verification email
                     //create email token
@@ -229,7 +229,7 @@ module.exports = function (app) {
                         from: process.env.EMAIL_ACCOUNT,
                         to: email,
                         subject: 'Account Verification Link',
-                        text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3001/api/emailconfirmation/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
+                        text: 'Hello ' + username + ',\n\nThank you for signing up with our app. Please verify your email address by clicking the link: \nhttp://localhost:3000/email/verification/' + userID + '/' + emailToken + '\nThis link will expire in two weeks.  Please request another verification email if needed.'
                     }
 
                     transporter.sendMail(mailOptions, function (err) {
@@ -241,7 +241,7 @@ module.exports = function (app) {
                     });
                 }               
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
@@ -259,8 +259,11 @@ module.exports = function (app) {
                 let lookup = await userQuery.getUserByUsername(username);
                 if(lookup.rowCount <= 0) {
                     //user does not exist
-                    return res.status(404).json({error: 'Login failed. Username or password did not match.'}).end();
+                    return res.status(404).json({ error: 'Login failed: Username or password did not match.'}).end();
                 } else {
+                    if(!lookup.rows[0].verified) {
+                        return res.status(401).json({ error: 'Login failed: Email is not verified.' }).end();
+                    }
                     const passwordHash = lookup.rows[0].password;
                     if(await argon2.verify(passwordHash, password)) {                        
                         //password match
@@ -278,11 +281,11 @@ module.exports = function (app) {
                     } else {
                         //password failed
                         //invalid password
-                        return res.status(404).json({error: 'Login failed. Username or password did not match.'}).end();
+                        return res.status(404).json({ error: 'Login failed: Username or password did not match.'}).end();
                     }
                 }
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
@@ -315,7 +318,7 @@ module.exports = function (app) {
                 } else {
                     const jti = crypto.randomBytes(16).toString('hex');
                     const payload = { jti: jti, userid: decoded.userid, username: decoded.username, email: decoded.email }
-                    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "300s" });
+                    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "10s" });
                     res.cookie('jwt', token, { httpOnly: true, sameSite: true });
                     res.json({ success: true, token: token }).end();;
                 }
@@ -324,7 +327,7 @@ module.exports = function (app) {
                     res.clearCookie('refresh');
                     return res.status(401).json({error: 'Invalid Refresh Token'}).end();
                 }
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
@@ -362,7 +365,7 @@ module.exports = function (app) {
                 if(err.name === "JsonWebTokenError") {
                     return res.status(400).json({error: 'Invalid Refresh Token'}).end();
                 }
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }    
         });
     //reset password request
@@ -378,7 +381,7 @@ module.exports = function (app) {
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
                     //email did not return a match
-                    return res.status(400).json({error: 'User does not exist'});
+                    return res.status(400).json({error: 'User does not exist.'});
                 } else {
                     //create & store id and reset token in password_reset table
                     const username = lookup.rows[0].username;
@@ -401,7 +404,7 @@ module.exports = function (app) {
                         from: process.env.EMAIL_ACCOUNT,
                         to: email,
                         subject: 'Password Reset Request',
-                        text: 'Hello ' + username + ',\n\nA password reset was requested. Please reset your password by clicking the link: \nhttp://localhost:3001/api/password/reset/' + userID + '/' + resetToken + '\nThis link will expire in two days.  If this password reset was not requested by you, please ignore this email.'
+                        text: 'Hello ' + username + ',\n\nA password reset was requested. Please reset your password by clicking the link: \nhttp://localhost:3000/password/recovery/' + userID + '/' + resetToken + '\nThis request will expire in two days.  If this password reset was not requested by you, please ignore this email.'
                     }
 
                     transporter.sendMail(mailOptions, function (err) {
@@ -414,11 +417,11 @@ module.exports = function (app) {
                 }                
             } catch (err) {
                 console.log(err);
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //reset password
-    app.route('/api/password/reset/:userid/:token')
+    app.route('/api/password/recovery/:userid/:token')
         .post(upload.none(), async (req, res) => {
             try {
                 //receive new password
@@ -447,7 +450,7 @@ module.exports = function (app) {
                     return res.status(200).json({message: 'Password has been reset successfully.'}).end();
                 }
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //update username
@@ -475,11 +478,16 @@ module.exports = function (app) {
                 } else {
                     //update the user's username
                     await authQuery.updateUsername(userID, username);
+                    const jti = crypto.randomBytes(16).toString('hex');
+                    const payload = { jti: jti, userid: user.userid, username: username, email: user.email }
+                    const updateToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "10s" });
+                    res.clearCookie('jwt');
+                    res.cookie('jwt', updateToken, { httpOnly: true, sameSite: true });
                     return res.status(200).json({ success: true, message: 'Your username has been changed to ' + username + "."});
                 }
                 
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //update email
@@ -507,10 +515,15 @@ module.exports = function (app) {
                 } else {
                     //update the user's email
                     await authQuery.updateEmail(userID, email);
+                    const jti = crypto.randomBytes(16).toString('hex');
+                    const payload = { jti: jti, userid: user.userid, username: user.username, email: email }
+                    const updateToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "10s" });
+                    res.clearCookie('jwt');
+                    res.cookie('jwt', updateToken, { httpOnly: true, sameSite: true });
                     return res.status(200).json({ success: true, message: 'Your email has been changed to ' + email + "." });
                 }
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //update password
@@ -521,21 +534,38 @@ module.exports = function (app) {
                 const token = req.cookies['jwt'];
                 const user = jwt.verify(token, process.env.JWT_SECRET);
                 const userID = user.userid;
-                const password = req.body.password;
+                const newPassword = req.body.newpassword;
+                const currentPassword = req.body.currentpassword;
 
-                if (!password) {
-                    return res.status(400).json({ error: 'Missing required field!' }).end();
+                if (!newPassword || !currentPassword) {
+                    return res.status(400).json({ error: 'Missing required fields!' }).end();
                 }
-
-                if (!serverValidation.isValidPassword(password)) {
-                    return res.status(400).json({ error: 'Invalid password.' }).end();
+              
+                //verify current password
+                let lookup = await userQuery.getUserByUserID(userID);
+                if(lookup.rowCount <= 0) {
+                    //user does not exist
+                    return res.status(404).json({ error: 'User does not exists.'}).end();
+                } else {
+                    const passwordHash = lookup.rows[0].password;
+                    if (await argon2.verify(passwordHash, currentPassword)) {
+                        //password verified
+                        //check new password validation
+                        if (!serverValidation.isValidPassword(newPassword)) {
+                            return res.status(400).json({ error: 'New password does not include password requirements.' }).end();
+                        }
+                        //update the user's password
+                        const newPasswordHash = await argon2.hash(newPassword);
+                        await authQuery.updatePassword(userID, newPasswordHash);
+                        return res.status(200).json({ success: true, message: 'Your password has been successfuly updated.' });
+                    } else {
+                        //password failed
+                        //invalid password
+                        return res.status(404).json({ error: 'Password verification failed.' }).end();
+                    }   
                 }
-                //update the user's password
-                const passwordHash = await argon2.hash(password);
-                await authQuery.updatePassword(userID, passwordHash);
-                return res.status(200).json({ success: true, message: 'Your password has been successfuly updated.' });
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //user account deletion
@@ -550,9 +580,12 @@ module.exports = function (app) {
                 await reminderQuery.deleteAllReminders(userID);
                 //delete account
                 await authQuery.deleteUser(userID);
+                //delete cookies
+                res.clearCookie('refresh');
+                res.clearCookie('jwt');
                 return res.status(200).json({ message: 'Account deleted.' }).end();
             } catch (err) {
-                return res.status(500).json({ error: 'Internal Server Error' }).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
 
@@ -591,7 +624,7 @@ module.exports = function (app) {
 
                 //set default values for optional parameters if not provided
                 if(!reminderRepeat) {
-                    reminderRepeat = 'never';
+                    reminderRepeat = 'none';
                 }
                 if(!reminderDescription) {
                     reminderDescription = '';
@@ -600,10 +633,12 @@ module.exports = function (app) {
                 //get timestamp from the given date and time
                 const reminderHours = reminderTime.split(':')[0];
                 const reminderMinutes = reminderTime.split(':')[1];
-                reminderDate = new Date(reminderDate);
-                reminderDate.setHours(reminderHours);
-                reminderDate.setMinutes(reminderMinutes);
-                reminderDate = reminderDate.getTime();               
+                const reminderMonth = reminderDate.split('-')[1];
+                const reminderDay = reminderDate.split('-')[2];
+                const reminderYear = reminderDate.split('-')[0];
+                reminderDate = new Date(reminderYear, reminderMonth - 1, reminderDay, reminderHours, reminderMinutes);
+                reminderDate = reminderDate.getTime();
+                console.log(reminderDate);
                                 
                 //create the reminder and return its id
                 let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
@@ -622,7 +657,7 @@ module.exports = function (app) {
                 return res.status(200).json({ success: true, reminderid: reminderID }).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //update reminder
@@ -642,7 +677,13 @@ module.exports = function (app) {
                 let reminderTime = req.body.reminderTime;
 
                 //return error if any fields are missing
-                if (!userID || !reminderID || !reminderName || !reminderDate || !reminderTime || !reminderDescription || !reminderRepeat) {
+                if (!userID || !reminderID || !reminderName || !reminderDate || !reminderTime || reminderDescription === null || reminderDescription === undefined || !reminderRepeat) {
+                    console.log(reminderID);
+                    console.log(reminderName);
+                    console.log(reminderDate);
+                    console.log(reminderTime);
+                    console.log(reminderRepeat);
+                    console.log(reminderDescription);
                     return res.status(400).json({ error: 'Missing required field(s)!' }).end();
                 }
 
@@ -674,7 +715,7 @@ module.exports = function (app) {
                 return res.status(200).json({ success: true, reminderid: reminderID, reminderName: reminderName, reminderDescription: reminderDescription, reminderRepeat: reminderRepeat, reminderTimestamp: reminderTimestamp, reminderDate: reminderDate, reminderTime: reminderTime }).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     //list reminders
@@ -691,9 +732,28 @@ module.exports = function (app) {
                 return res.status(200).json({success: true, reminders: lookup.rows}).end();
             } catch(err) {
                 console.log(err);
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }            
         });    
+    //view reminder
+    app.route('/api/reminder/view/:reminderid')
+        .get(authorization, async (req, res) => {
+            try {
+                //get userid
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                const userID = user.userid;
+                const reminderID = req.params.reminderid;
+                //get reminder and return
+                const lookup = await reminderQuery.getReminder(reminderID, userID);
+                const reminder = lookup.rows[0];
+
+                return res.status(200).json({ success: true, reminderid: reminder.reminderid, reminderName: reminder.name, reminderDescription: reminder.description, reminderRepeat: reminder.repeat, reminderTimestamp: reminder.date }).end();
+            } catch(err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
+            }
+        })
     //delete reminders
     app.route('/api/reminder/delete/:reminderid')
         .delete(upload.none(), authorization, async (req, res) => {
@@ -712,7 +772,7 @@ module.exports = function (app) {
                 await emailScheduler.deleteReminder(reminderID);
                 return res.status(200).json({success: true, message: 'Reminder deleted.'}).end();
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
@@ -722,12 +782,12 @@ module.exports = function (app) {
             try {
                 return res.status(200).json({ success: true, loggedIn: true }).end();
             } catch (err) {
-                return res.status(500).json({error: 'Internal Server Error'}).end();
+                return res.status(500).json({ error: 'Internal Server Error: ' + err}).end();
             }
         });
     
     app.route('/api/logout')
-        .get(authorization, async (req, res) => {
+        .get(async (req, res) => {
             try {
                 const refreshToken = req.cookies['refresh'];
                 //blacklist their refresh token
@@ -744,4 +804,15 @@ module.exports = function (app) {
                 return res.status(500).json({ error: 'Internal Server Error: ' + err }).end();
             }
         });
+    
+    app.route('/api/user/account')
+        .get(authorization, async (req, res) => {
+            try {
+                const token = req.cookies['jwt'];
+                const user = jwt.verify(token, process.env.JWT_SECRET);
+                return res.status(200).json({success: true, username: user.username, email: user.email});
+            } catch (err) {
+                return res.status(500).json({ error: 'Internal Server Error: ' + err }).end();
+            }
+        })
 }

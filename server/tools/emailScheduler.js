@@ -79,10 +79,17 @@ exports.initializeAllReminders = async function() {
     let email;
     let username;
     let reminderName;
+    let reminderDescription;
     let reminderID;
     let userID;
     let jobs = {};
     let date;
+    let minutes;
+    let hours;
+    let day;
+    let month;
+    let year;
+    let scheduled;
 
     //for each reminder, create a job
     for (let i = 0; i < count; i++) {
@@ -91,9 +98,32 @@ exports.initializeAllReminders = async function() {
         email = lookup.rows[0].email;
         username = lookup.rows[0].username;
         reminderName = reminders[i].name;
+        reminderDescription = reminders[i].description;
         reminderID = reminders[i].reminderid;
-        date = reminders[i].date;
-        jobs[reminderID] = schedule.scheduleJob(reminderID.toString(), date, function () {
+        date = new Date(reminders[i].timestamp);
+        minutes = date.getMinutes();
+        hours = date.getHours();
+        day = date.getDate();
+        month = date.getMonth() + 1;
+        year = date.getFullYear();
+
+        if (reminders[i].repeat === "daily") {
+            day = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "weekly") {
+            day = day + "/7"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "biweekly") {
+            day = day + "/14"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "monthly") {
+            month = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else {
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        }
+        
+        jobs[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function () {
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -106,7 +136,7 @@ exports.initializeAllReminders = async function() {
                 from: process.env.EMAIL_ACCOUNT,
                 to: user.email,
                 subject: 'Reminder Notification: ' + reminder.name,
-                html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + reminder.userid + "/reminder/" + reminder.reminderid + "'>here</a>."
+                html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminderName + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminderDescription + "<br/><br>Thank you for using our friendly reminders. :)"
             }
 
 
@@ -130,8 +160,29 @@ exports.createReminder = async function(user, reminder) {
     const date = new Date(reminder.timestamp);
     let job = {};
     const reminderID = reminder.reminderid;
+    let minutes = date.getMinutes();
+    let hours = date.getHours();
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let scheduled;
+    
+    if (reminder.repeat === "daily") {
+        day = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminder.repeat === "weekly") {
+        day = day + "/7"
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminder.repeat === "biweekly") {
+        day = day + "/14"
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminder.repeat === "monthly") {
+        month = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else {
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    }
 
-    job[reminderID] = schedule.scheduleJob(reminderID.toString(), date, function(){
+    job[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function(){
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -144,7 +195,7 @@ exports.createReminder = async function(user, reminder) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + reminder.userid + "/reminder/" + reminder.reminderid + "'>here</a>."
+            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminder.description + "<br/><br>Thank you for using our friendly reminders. :)"
         }
 
 
@@ -162,11 +213,36 @@ exports.createReminder = async function(user, reminder) {
 exports.updateReminder = async function(reminder, user) {
     //delete ongoing cron job and create new job with updated information
     const currentJob = schedule.scheduledJobs[(reminder.reminderid).toString()];
-    currentJob.cancel();
+    
+    if(currentJob) {
+        currentJob.cancel();
+    }
+    
     let newJob = {};
     const date = new Date(reminder.date);
+    let minutes = date.getMinutes();
+    let hours = date.getHours();
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let scheduled;
 
-    newJob[reminder.reminderid] = schedule.scheduleJob((reminder.reminderid).toString(), date, function () {
+    if (reminder.repeat === "daily") {
+        day = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminder.repeat === "weekly") {
+        day = day + "/7"
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminder.repeat === "biweekly") {
+        day = day + "/14"
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else if (reminder.repeat === "monthly") {
+        month = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    } else {
+        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    }
+
+    newJob[reminder.reminderid] = schedule.scheduleJob((reminder.reminderid).toString(), scheduled, function () {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -179,7 +255,7 @@ exports.updateReminder = async function(reminder, user) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + reminder.userid + "/reminder/" + reminder.reminderid + "'>here</a>."
+            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminder.description + "<br/><br>Thank you for using our friendly reminders. :)"
         }
 
 
@@ -196,6 +272,10 @@ exports.updateReminder = async function(reminder, user) {
 
 exports.deleteReminder = async function(reminderid) {
     const currentJob = schedule.scheduledJobs[reminderid.toString()];
-    currentJob.cancel();
+
+    if (currentJob) {
+        currentJob.cancel();
+    }
+    
     return;
 }

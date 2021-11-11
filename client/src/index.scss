@@ -1,13 +1,77 @@
 @import './components/NavBar.scss';
 @import './components/Home.scss';
-body {
-  margin: 0;
+@import './components/Account.scss';
+@import './components/ListReminders.scss';
+@import './components/CreateReminder.scss';
+@import './components/Login.scss';
+@import './components/Signup.scss';
+@import './components/ForgotPassword.scss';
+@import './components/ResendVerification.scss';
+@import './components/EmailVerification.scss';
+@import './components/ViewReminder.scss';
+@import './components/DeleteReminder.scss';
+@import './components/UpdatePassword.scss';
 
+body {
+  margin: 0;  
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -moz-osx-font-smoothing: grayscale;  
+}
+#views {    
+  margin:auto;
+  max-width: 1080px;  
+}
+.wrapper {
+    a {
+            text-decoration: none;
+        }
+    h1 {
+        text-align: center;
+    }
+    h2 {
+        text-align: center;
+    }
+    form {
+        width: 300px;    
+        margin: auto;
+    }
+    input {
+        width: 300px;
+        height: 40px;
+        font-size: large;
+    }
+    label {
+        font-weight: bold;
+    }
+    p {
+        text-align: center;
+        color: red;
+    }
+    button {
+        display: block;
+        margin: auto;
+        width: 310px;
+        height: 40px;
+        font-size: large;
+        border-radius: 12px; 
+        cursor: pointer;    
+    }
+}
+
+
+@media screen and (max-width: 350px) {
+    .wrapper {
+        h1 {
+        word-wrap: break-word;
+        }
+        .wrapper, form, input, label, button {
+            max-width: 100%;
+            overflow: hidden;
+        }
+    }    
 }
 
 

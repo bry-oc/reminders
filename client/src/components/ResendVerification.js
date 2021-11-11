@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import $ from "jquery";
 
-function ForgotPassword() {
+function ResendVerification() {
     const [message, setMessage] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -20,9 +20,9 @@ function ForgotPassword() {
         }
     }, [modalVisible])
 
-    let forgotPassword = (e) => {
+    let verifyEmail = (e) => {
         e.preventDefault();
-        const url = '/api/user/password/reset';
+        const url = '/api/resendemailconfirmation';
 
         const email = e.target.email.value;
 
@@ -51,13 +51,13 @@ function ForgotPassword() {
 
     function openMessage() {
         setModalVisible(true);
-        let modalSignup = document.getElementById("modal-forgotPassword");
+        let modalSignup = document.getElementById("modal-emailverification");
         modalSignup.style.display = "flex";
     }
 
     let closeMessage = (e) => {
         setModalVisible(false);
-        let modalSignupClose = document.getElementById("modal-forgotPassword");
+        let modalSignupClose = document.getElementById("modal-emailverification");
         modalSignupClose.style.display = "none";
         $(document).off("click");
     }
@@ -65,19 +65,19 @@ function ForgotPassword() {
     return (
         <div>
             <div className="wrapper">
-                <h1>Password Recovery</h1>
-                <form onSubmit={forgotPassword}>
+                <h1>Email Verification</h1>
+                <form onSubmit={verifyEmail}>
                     <label>Email:<br />
                         <input name="email" type="text" placeholder="Enter your email" required>
                         </input>
                     </label><br /><br />
-                    <button type="submit">Reset Password</button>
+                    <button type="submit">Resend Verification Email</button>
                 </form>
             </div>
-            <div className="modal-wrapper" id="modal-forgotPassword">
-                <div className="wrapper modal" id="forgotPassword">
+            <div className="modal-wrapper" id="modal-emailverification">
+                <div className="wrapper modal" id="emailverification">
                     <i className="fa fa-times-circle fa-2x" onClick={closeMessage}></i><br />
-                    <h2>Password Recovery</h2>
+                    <h2>Email Verification</h2>
                     <p className="message">{message}</p>
                     {success ? (<Link to="/login"><button>Go to Login</button></Link>) : (null)}
                 </div>
@@ -86,4 +86,4 @@ function ForgotPassword() {
     )
 }
 
-export default ForgotPassword;
+export default ResendVerification;

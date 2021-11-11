@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/bry-oc/reminders#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "argon2": "^0.28.2",
     "chai": "^4.3.4",
     "chai-http": "^4.3.0",

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import $ from "jquery";
 
-function ForgotPassword() {
+function ResetPassword() {
     const [message, setMessage] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [success, setSuccess] = useState(false);
+    const { userid, token } = useParams();
 
     useEffect(() => {
         if (modalVisible && !success) {
@@ -20,14 +21,15 @@ function ForgotPassword() {
         }
     }, [modalVisible])
 
-    let forgotPassword = (e) => {
+    let resetPassword = (e) => {
+        const userID = userid;
         e.preventDefault();
-        const url = '/api/user/password/reset';
+        const url = '/api/password/recovery/' + userID + '/' + token;
 
-        const email = e.target.email.value;
+        const password = e.target.password.value;
 
         const formData = new FormData();
-        formData.append('email', email);
+        formData.append('password', password);
 
         fetch(url, {
             method: 'POST',
@@ -65,10 +67,14 @@ function ForgotPassword() {
     return (
         <div>
             <div className="wrapper">
-                <h1>Password Recovery</h1>
-                <form onSubmit={forgotPassword}>
-                    <label>Email:<br />
-                        <input name="email" type="text" placeholder="Enter your email" required>
+                <h1>Reset Password</h1>
+                <form onSubmit={resetPassword}>
+                    <label>Enter new password:<br />
+                        <input name="password" type="text" placeholder="Enter your password" required>
+                        </input>
+                    </label><br /><br />
+                    <label>Confirm password:<br />
+                        <input name="passwordCofirm" type="text" placeholder="Enter your password" required>
                         </input>
                     </label><br /><br />
                     <button type="submit">Reset Password</button>
@@ -77,7 +83,7 @@ function ForgotPassword() {
             <div className="modal-wrapper" id="modal-forgotPassword">
                 <div className="wrapper modal" id="forgotPassword">
                     <i className="fa fa-times-circle fa-2x" onClick={closeMessage}></i><br />
-                    <h2>Password Recovery</h2>
+                    <h2>Password Reset</h2>
                     <p className="message">{message}</p>
                     {success ? (<Link to="/login"><button>Go to Login</button></Link>) : (null)}
                 </div>
@@ -86,4 +92,4 @@ function ForgotPassword() {
     )
 }
 
-export default ForgotPassword;
+export default ResetPassword;

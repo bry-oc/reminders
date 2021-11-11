@@ -1,4 +1,8 @@
+import authContext from './AuthContext';
+import React, { useContext } from "react";
+
 function CreateReminder(){
+    const { auth, setAuth } = useContext(authContext);
 
     let createReminder = (e) => {
         e.preventDefault();
@@ -15,25 +19,68 @@ function CreateReminder(){
         formData.append('reminderRepeat', reminderRepeat);
         formData.append('reminderDescription', reminderDescription);
 
-        const url = '/api/reminder/create'
+        let url = '/api/user/authentication';
 
         fetch(url, {
-            method: 'POST',
-            body: formData,
+            method: 'GET',
             credentials: 'include'
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if(data.error){
-                    console.log(data.error);
+            .then((res) => {
+                if (res.status === 200) {
+                    setAuth(true);
+                    console.log(auth);
+                    url = '/api/reminder/create';
+
+                    fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'include'
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.error) {
+                                console.log(data.error);
+                            } else {
+                                console.log(data.reminderid);
+                            }
+                        })
                 } else {
-                    console.log(data.reminderid);
+                    console.log('refresh!');
+                    const refresh = '/api/token/refresh';
+                    fetch(refresh, {
+                        method: 'GET',
+                        credentials: 'include'
+                    })
+                        .then((res) => {
+                            if (res.status === 200) {
+                                setAuth(true);
+                                url = '/api/reminder/create';
+
+                                fetch(url, {
+                                    method: 'POST',
+                                    body: formData,
+                                    credentials: 'include'
+                                })
+                                    .then((res) => res.json())
+                                    .then((data) => {
+                                        if (data.error) {
+                                            console.log(data.error);
+                                        } else {
+                                            console.log(data.reminderid);
+                                        }
+                                    })
+                            } else {
+                                console.log(res.status);
+                                setAuth(false);
+                            }
+                        })
                 }
             })
-            
+        
     }
     return (
-        <div className="wrapper">
+        <div className="wrapper create">
+            <h1>Create Reminder</h1>
             <form onSubmit={createReminder}>
                 <label htmlFor="name">Name:<br />
                     <input type="text" placeholder="Enter reminder name" id="name" required>

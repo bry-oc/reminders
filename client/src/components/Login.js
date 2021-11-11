@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 
 function Login(){
     const [warning, setWarning] = React.useState("");
+    const [isLoading, setLoading] = React.useState(false);
     const { auth, setAuth } = useContext(authContext);
 
     let login = (e) => {
@@ -24,10 +25,12 @@ function Login(){
         .then((res) => res.json())
         .then((data) => {
             if(data.error) {
+                setLoading(false);
                 setWarning(data.error);
                 console.log(data.error);
             } else {
                 setAuth(true);
+                setLoading(false);
                 console.log(auth);
                 console.log(data);
                 window.location.href = "/account";
@@ -35,21 +38,34 @@ function Login(){
         })
     }
     return (
-        <div className="wrapper">
-            <p>Please Login.</p>
-            <form onSubmit={login}>
-                <label htmlFor="username">Username:<br/>
-                    <input type="text" placeholder="Enter your username" id="username" name="username" required>
-                    </input>
-                </label><br />
-                <label htmlFor="password">Password:<br />
-                    <input type="password" placeholder="Enter your password" id="password" name="password" required>
-                    </input>
-                </label><br />
-                <a href={'/password/reset'}>Forgot password?</a><br/>
-                <button type="submit">Login</button>
-            </form>
-            {warning !== "" ? <p className="warning">{warning}</p> : null}
+        <div className="wrapper" id="login">
+            {isLoading ? (
+                <div>
+                    <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
+                </div>
+            )
+            :
+            (
+                <div>
+                    <h1>Reminder App Login</h1>
+                    <form onSubmit={login}>
+                        <label htmlFor="username">Username:<br />
+                            <input type="text" placeholder="Enter your username" id="username" name="username" required>
+                            </input>
+                        </label><br /><br />
+                        <label htmlFor="password">Password:<br />
+                            <input type="password" placeholder="Enter your password" id="password" name="password" required>
+                            </input>
+                        </label><br /><br />
+                        <button type="submit">Login</button>
+                            {warning !== "" ? <p className="warning">{warning}</p> : null}
+                        <br /><a href={'/password/reset'}>Forgot password?</a><br />
+                            <a href={'/email/resend/verification'}>Resend Verification Email?</a><br />
+                    </form>
+                </div >
+            )}
+            
+            
         </div>
     )    
 }

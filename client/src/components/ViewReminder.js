@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import authContext from './AuthContext';
-function DeleteReminder(props){
+
+function ViewReminder(props) {
     const { auth, setAuth } = useContext(authContext);
     const [reminderID, setReminderID] = useState(0);
     const [reminderName, setReminderName] = useState('');
@@ -8,9 +9,11 @@ function DeleteReminder(props){
     const [reminderDate, setReminderDate] = useState('');
     const [reminderTime, setReminderTime] = useState('');
     const [reminderRepeat, setReminderRepeat] = useState('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setReminderID(props.reminderid);
+        setLoading(true);
+        setReminderID(props.reminderid);        
         const url = '/api/user/authentication';
 
         fetch(url, {
@@ -32,31 +35,16 @@ function DeleteReminder(props){
                         .then((res) => {
                             if (res.status === 200) {
                                 setAuth(true);
-                                fetchGetReminder();
+                                fetchGetReminder(); 
                             } else {
                                 console.log(res.status);
                                 setAuth(false);
+                                setLoading(false);
                             }
                         })
                 }
             })
     }, [props.reminderid]);
-
-    function fetchDeleteReminder() {
-        const deleteReminderURL = '/api/reminder/delete' + props.reminderid;
-        fetch(deleteReminderURL, {
-            method: 'DELETE',
-            credentials: 'include'
-        })
-        .then((res) => res.json())
-        .then((data) => {
-            if(data.error){
-                console.log(data.error)
-            } else {
-                window.location.href = "/reminder/list";
-            }
-        })
-    }
 
     function fetchGetReminder() {
         const updateReminderURL = '/api/reminder/view/' + props.reminderid;
@@ -83,34 +71,47 @@ function DeleteReminder(props){
                     const reminderDate = year + '-' + month + '-' + day;
                     const reminderTime = hour + ':' + minutes;
                     setReminderDate(reminderDate);
-                    setReminderTime(reminderTime);
+                    setReminderTime(reminderTime);                    
                 }
+                setLoading(false);
             })
     }
 
-    let closeDelete = (e) => {
-        let modalDeleteClose = document.getElementById("modal-delete");
-        modalDeleteClose.style.display = "none";
+    let closeView = (e) => {
+        setReminderDescription('');
+        setReminderName('');
+        setReminderDate('');
+        setReminderTime('');
+        setReminderRepeat('');       
+        setLoading(true);
+        let modalViewClose = document.getElementById("modal-view");
+        modalViewClose.style.display = "none";
         document.body.style.overflow = "auto";
     }
 
-    return (
-        <div className="wrapper modal">            
-            <i className="fa fa-times-circle fa-2x" onClick={closeDelete}></i><br />
-            <h2>Delete Reminder</h2>
-            <h3>Reminder Name: </h3>
-            <p>{reminderName}</p>
-            <h3>Reminder Date: </h3>
-            <p>{reminderDate}</p>
-            <h3>Reminder Time: </h3>
-            <p>{reminderTime}</p>
-            <h3>Reminder Repeat: </h3>
-            <p>{reminderRepeat}</p>
-            <h3>Reminder Description: </h3>
-            <p>{reminderDescription}</p>
-            <button type="submit" onClick={fetchDeleteReminder}>Delete Reminder</button>
+    return loading ? (
+        <div className="wrapper modal">
+            <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />            
+            <h2>View Reminder</h2>
+            <i className="fa fa-spinner fa-pulse fa-2x" id="spinner"></i>
+        </div> ):
+        (
+        <div className="wrapper modal" id="viewreminder">
+            <i className="fa fa-times-circle fa-2x" onClick={closeView}></i><br />
+            <h2>View Reminder</h2>            
+            <h3>Name: </h3>
+            <p className="remindertext">{reminderName}</p>
+            <h3>Date: </h3>
+            <p className="remindertext">{reminderDate}</p>
+            <h3>Time: </h3>
+            <p className="remindertext">{reminderTime}</p>
+            <h3>Repeat: </h3>
+            <p className="remindertext">{reminderRepeat}</p>
+            <h3>Description: </h3>
+            <p className="remindertext">{reminderDescription}</p>
         </div>
-    )
+        )
+    
 }
 
-export default DeleteReminder;
+export default ViewReminder;
