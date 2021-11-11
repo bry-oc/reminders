@@ -638,12 +638,10 @@ module.exports = function (app) {
                 const reminderYear = reminderDate.split('-')[0];
                 reminderDate = new Date(reminderYear, reminderMonth - 1, reminderDay, reminderHours, reminderMinutes);
                 reminderDate = reminderDate.getTime();
-                console.log(reminderDate);
                                 
                 //create the reminder and return its id
                 let lookup = await reminderQuery.createReminder(userID, reminderName, reminderDescription, reminderRepeat, reminderDate);
                 const reminderID = lookup.rows[0].reminderid;
-
 
                 //create job for the reminder email
                 const reminder = {
@@ -652,8 +650,9 @@ module.exports = function (app) {
                     date: reminderDate,
                     userid: userID
                 }
-
+            
                 await emailScheduler.createReminder(user, reminder);
+
                 return res.status(200).json({ success: true, reminderid: reminderID }).end();
             } catch(err) {
                 console.log(err);

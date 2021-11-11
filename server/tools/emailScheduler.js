@@ -157,15 +157,22 @@ exports.initializeAllReminders = async function() {
 
 exports.createReminder = async function(user, reminder) {
     //create cron job when reminder is created
-    const date = new Date(reminder.timestamp);
+    console.log(reminder.date);
+    const date = new Date(reminder.date);
+    console.log(date);
     let job = {};
     const reminderID = reminder.reminderid;
     let minutes = date.getMinutes();
     let hours = date.getHours();
     let day = date.getDate();
     let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
     let scheduled;
-    
+    console.log(minutes);
+    console.log(hours);
+    console.log(day);
+    console.log(month);
     if (reminder.repeat === "daily") {
         day = "*";
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
@@ -181,6 +188,7 @@ exports.createReminder = async function(user, reminder) {
     } else {
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
     }
+    console.log(scheduled);
 
     job[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function(){
         const transporter = nodemailer.createTransport({
@@ -207,7 +215,7 @@ exports.createReminder = async function(user, reminder) {
             }
         });
     });
-    return job;
+    return;
 }
 
 exports.updateReminder = async function(reminder, user) {
@@ -224,6 +232,7 @@ exports.updateReminder = async function(reminder, user) {
     let hours = date.getHours();
     let day = date.getDate();
     let month = date.getMonth() + 1;
+    let year = date.getFullYear();
     let scheduled;
 
     if (reminder.repeat === "daily") {
