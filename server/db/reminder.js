@@ -23,7 +23,7 @@ exports.getReminder = async function(reminderID, userID) {
 }
 
 exports.updateReminder = async function(userID, reminderID, name, description, repeat, date) {
-    return await pool.query('UPDATE "reminder" SET "name" = $1, "description" = $2, "repeat" = $3, "date" = $4 WHERE "userid" = $5 AND "reminderid" = $6', [name, description, repeat, date, userID, reminderID]);
+    return await pool.query('UPDATE "reminder" SET "name" = $1, "description" = $2, "repeat" = $3, "date" = $4, "sent" = $5 WHERE "userid" = $6 AND "reminderid" = $7', [name, description, repeat, date, , false, userID, reminderID]);
 }
 exports.deleteReminder = async function(userID, reminderID) {
     return await pool.query('DELETE FROM "reminder" WHERE "userid" = $1 AND "reminderid" = $2', [userID, reminderID]);

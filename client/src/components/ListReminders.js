@@ -49,7 +49,18 @@ function ListReminders() {
                                     openView();
                                 }
                                 $(function () {
-                                    $('#reminder-table').DataTable();
+                                    $('#reminder-table').DataTable({
+                                        "order": [[1, 'asc'], [2, 'asc']],
+                                        "aoColumns": [
+                                            null,
+                                            null,
+                                            null,
+                                            null,
+                                            { "bSortable": false },
+                                            { "bSortable": false },
+                                            { "bSortable": false }
+                                        ]
+                                    });
                                 });
                             }
                         })
@@ -81,7 +92,19 @@ function ListReminders() {
                                                 openView();
                                             }
                                             $(function () {
-                                                $('#reminder-table').DataTable();
+                                                $('#reminder-table').DataTable({
+                                                    "order": [[1, 'asc'], [2, 'asc']],
+                                                    "aoColumns": [
+                                                        null,
+                                                        null,
+                                                        null,
+                                                        null,
+                                                        { "bSortable": false },
+                                                        { "bSortable": false },
+                                                        { "bSortable": false }
+                                                    ]
+                                                });
+                                                
                                             });
                                         }
                                     })
@@ -499,9 +522,9 @@ function ListReminders() {
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Sent</th>
-                                <th>View</th>
-                                <th>Edit</th>
-                                <th>Delete</th>
+                                <th className="user-controls">View</th>
+                                <th className="user-controls">Edit</th>
+                                <th className="user-controls">Delete</th>
                             </tr>
                         </thead>     
                         <tbody>                     

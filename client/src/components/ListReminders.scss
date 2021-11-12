@@ -14,12 +14,20 @@
     }
     .dataTables_filter {
         margin: 15px;
+        display: flex;
+        justify-content: center;
         input {
+            text-align: center;
             margin-left: 5px;
         }
     }
     .dataTables_info {
         margin: 15px;
+    }
+    .dataTables_paginate, .paging_simple_numbers {
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
     h1 {
         text-align: center;
