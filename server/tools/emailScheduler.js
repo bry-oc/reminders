@@ -48,7 +48,7 @@ exports.checkMissedReminders = async function() {
             from: process.env.EMAIL_ACCOUNT,
             to: email,
             subject: 'Reminder Notification: ' + reminderName,
-            html: 'Hello ' + username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminderName + "<br/><br>More information about this event can be found <a href='https://localhost:3000/user/" + userID + "/reminder/" + reminderID + "'>here</a>.<br/><br>Unfortunately, the server was experiencing technical difficulties and missed the requested reminder time.<br/><br>We apologize for the inconvenience."
+            html: 'Hello ' + username + ',<br/><br>This is a reminder for the following event: ' + reminderName + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminderDescription + "<br/><br>Unfortunately, the server was experiencing technical difficulties and missed the requested reminder time.<br/><br>We apologize for the inconvenience."
         }
 
         
@@ -100,12 +100,12 @@ exports.initializeAllReminders = async function() {
         reminderName = reminders[i].name;
         reminderDescription = reminders[i].description;
         reminderID = reminders[i].reminderid;
-        date = new Date(reminders[i].timestamp);
-        minutes = date.getMinutes();
-        hours = date.getHours();
-        day = date.getDate();
-        month = date.getMonth() + 1;
+        date = new Date(reminders[i].date);
+        day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+        month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
         year = date.getFullYear();
+        hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+        minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
 
         if (reminders[i].repeat === "daily") {
             day = "*";
@@ -136,7 +136,7 @@ exports.initializeAllReminders = async function() {
                 from: process.env.EMAIL_ACCOUNT,
                 to: user.email,
                 subject: 'Reminder Notification: ' + reminder.name,
-                html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminderName + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminderDescription + "<br/><br>Thank you for using our friendly reminders. :)"
+                html: 'Hello ' + user.username + ',<br/><br>This is a reminder for the following event: ' + reminderName + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminderDescription + "<br/><br>Thank you for using our friendly reminders. :)"
             }
 
 
@@ -162,17 +162,13 @@ exports.createReminder = async function(user, reminder) {
     console.log(date);
     let job = {};
     const reminderID = reminder.reminderid;
-    let minutes = date.getMinutes();
-    let hours = date.getHours();
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
+    let day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    let month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
     let year = date.getFullYear();
+    let hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+    let minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
 
     let scheduled;
-    console.log(minutes);
-    console.log(hours);
-    console.log(day);
-    console.log(month);
     if (reminder.repeat === "daily") {
         day = "*";
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
@@ -203,7 +199,7 @@ exports.createReminder = async function(user, reminder) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminder.description + "<br/><br>Thank you for using our friendly reminders. :)"
+            html: 'Hello ' + user.username + ',<br/><br>This is a reminder for the following event: ' + reminder.name + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + "<br/>Description: " + reminder.description + "<br/><br>Thank you for using our friendly reminders. :)"
         }
 
 
@@ -228,11 +224,11 @@ exports.updateReminder = async function(reminder, user) {
     
     let newJob = {};
     const date = new Date(reminder.date);
-    let minutes = date.getMinutes();
-    let hours = date.getHours();
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
+    let day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    let month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
     let year = date.getFullYear();
+    let hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+    let minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
     let scheduled;
 
     if (reminder.repeat === "daily") {
@@ -264,7 +260,7 @@ exports.updateReminder = async function(reminder, user) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br><br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminder.description + "<br/><br>Thank you for using our friendly reminders. :)"
+            html: 'Hello ' + user.username + ',<br/><br>This is a reminder for the following event: ' + reminder.name + "<br/><br>Date: " + month + "/" + day + "/" + year + "<br/><br>Time: " + hours + ":" + minutes + "<br/><br>Description: " + reminder.description + "<br/><br>Thank you for using our friendly reminders. :)"
         }
 
 
