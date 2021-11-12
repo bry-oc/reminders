@@ -269,12 +269,21 @@ function ListReminders() {
 
     let fetchUpdateReminder = (e) => {
         e.preventDefault();
+
+        const reminderHours = reminderTime.split(':')[0];
+        const reminderMinutes = reminderTime.split(':')[1];
+        let reminderTimestamp = new Date(reminderDate.replace('-', '/'));
+        console.log(reminderTimestamp);
+        reminderTimestamp.setHours(reminderHours);
+        reminderTimestamp.setMinutes(reminderMinutes);
+        reminderTimestamp = reminderTimestamp.getTime();
+        console.log(reminderTimestamp);
+
         const formData = new FormData();
 
         formData.append('reminderid', reminderID);
         formData.append('reminderName', reminderName);
-        formData.append('reminderDate', reminderDate);
-        formData.append('reminderTime', reminderTime);
+        formData.append('reminderTimestamp', reminderTimestamp);
         formData.append('reminderRepeat', reminderRepeat);
         formData.append('reminderDescription', reminderDescription);
 
@@ -476,7 +485,7 @@ function ListReminders() {
 
     //sort by date/time
     function TableData() {
-        return reminders.sort(sortByDate).map((reminder) => {
+        return reminders.map((reminder) => {
             const { reminderid, name, date, sent } = reminder;
             let reminderDate = new Date(parseInt(date));
             const day = reminderDate.getDate() < 10 ? "0" + reminderDate.getDate() : reminderDate.getDate();

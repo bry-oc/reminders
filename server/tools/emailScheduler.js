@@ -24,8 +24,16 @@ exports.checkMissedReminders = async function() {
     let email;
     let username;
     let reminderName;
+    let reminderDescription;
     let reminderID;
     let userID;
+    let date;
+    let minutes;
+    let hours;
+    let day;
+    let month;
+    let year;
+    let scheduled;
 
     //for each reminder, send an email and update db
     for(let i = 0; i < count; i++) {
@@ -34,7 +42,30 @@ exports.checkMissedReminders = async function() {
         email = lookup.rows[0].email;
         username = lookup.rows[0].username;
         reminderName = reminders[i].name;
+        reminderDescription = reminders[i].description;
         reminderID = reminders[i].reminderid;
+        date = new Date(reminders[i].date);
+        day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+        month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
+        year = date.getFullYear();
+        hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+        minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+
+        if (reminders[i].repeat === "daily") {
+            day = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "weekly") {
+            day = day + "/7"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "biweekly") {
+            day = day + "/14"
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else if (reminders[i].repeat === "monthly") {
+            month = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        } else {
+            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        }
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
