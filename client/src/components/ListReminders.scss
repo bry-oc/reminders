@@ -4,7 +4,7 @@
     table {     
         z-index: 0;   
         width: 720px;
-        margin:auto;        
+        margin:auto;      
     }    
     #spinner {
         float: none;
@@ -48,7 +48,11 @@
     td, th {
         border-bottom: 1px solid black;
         padding: 10px;   
-        min-height: 100vh;       
+        min-height: 100vh;    
+    }
+    td:first-child {
+        width: 20%;
+        word-break: break-word;
     }
     tr:last-child > td {
         border-bottom: none;

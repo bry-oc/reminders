@@ -50,8 +50,7 @@ function ListReminders() {
                                     openView();
                                 }
                                 $(function () {
-                                    $('#reminder-table').DataTable({
-                                        "order": [[1, 'asc'], [2, 'asc']],
+                                    $('#reminder-table').DataTable({                                        
                                         "aoColumns": [
                                             null,
                                             null,
@@ -60,7 +59,8 @@ function ListReminders() {
                                             { "bSortable": false },
                                             { "bSortable": false },
                                             { "bSortable": false }
-                                        ]
+                                        ],
+                                        columnDefs: [{ type: 'time', 'targets': [2] }]
                                     });
                                 });
                             }
@@ -93,8 +93,7 @@ function ListReminders() {
                                                 openView();
                                             }
                                             $(function () {
-                                                $('#reminder-table').DataTable({
-                                                    "order": [[1, 'asc'], [2, 'asc']],
+                                                $('#reminder-table').DataTable({                                                    
                                                     "aoColumns": [
                                                         null,
                                                         null,
@@ -103,7 +102,8 @@ function ListReminders() {
                                                         { "bSortable": false },
                                                         { "bSortable": false },
                                                         { "bSortable": false }
-                                                    ]
+                                                    ],
+                                                    columnDefs: [{ type: 'time', 'targets': [2] }]
                                                 });
                                                 
                                             });
@@ -559,9 +559,9 @@ function ListReminders() {
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Sent</th>
-                                <th className="user-controls">View</th>
-                                <th className="user-controls">Edit</th>
-                                <th className="user-controls">Delete</th>
+                                <th>View</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
                             </tr>
                         </thead>     
                         <tbody>                     
@@ -667,7 +667,7 @@ function ListReminders() {
                         <h3>Reminder Date: </h3>
                         <p>{reminderDate}</p>
                         <h3>Reminder Time: </h3>
-                        <p>{reminderTime}</p>
+                        <p>{reminderDisplayTime}</p>
                         <h3>Reminder Repeat: </h3>
                         <p>{reminderRepeat}</p>
                         <h3>Reminder Description: </h3>
