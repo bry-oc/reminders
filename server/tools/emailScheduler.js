@@ -33,6 +33,7 @@ exports.checkMissedReminders = async function() {
     let day;
     let month;
     let year;
+    let noonTime = "AM";
 
     //for each reminder, send an email and update db
     for(let i = 0; i < count; i++) {
@@ -50,6 +51,13 @@ exports.checkMissedReminders = async function() {
         hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
         minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
 
+        if(date.getHours() >= 12) {
+            if(date.getHours() > 12) {
+                hours = hours - 12;
+            }
+            noonTime = "PM";
+        }
+
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -62,7 +70,7 @@ exports.checkMissedReminders = async function() {
             from: process.env.EMAIL_ACCOUNT,
             to: email,
             subject: 'Reminder Notification: ' + reminderName,
-            html: 'Hello ' + username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminderName + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + "<br/>Description: " + reminderDescription + "<br/><br/>Unfortunately, the server was experiencing technical difficulties and missed the requested reminder time.<br/>We apologize for the inconvenience."
+            html: 'Hello ' + username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminderName + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + " " + noonTime + "<br/>Description: " + reminderDescription + "<br/><br/>Unfortunately, the server was experiencing technical difficulties and missed the requested reminder time.<br/>We apologize for the inconvenience."
         }
 
         
@@ -106,6 +114,7 @@ exports.initializeAllReminders = async function() {
     let scheduled;
     let scheduledDay;
     let scheduledMonth;
+    let noonTime = "AM";
 
     //for each reminder, create a job
     for (let i = 0; i < count; i++) {
@@ -122,6 +131,13 @@ exports.initializeAllReminders = async function() {
         year = date.getFullYear();
         hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
         minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+
+        if (date.getHours() >= 12) {
+            if (date.getHours() > 12) {
+                hours = hours - 12;
+            }
+            noonTime = "PM";
+        }
 
         if (reminders[i].repeat === "daily") {
             scheduledDay = "*";
@@ -152,7 +168,7 @@ exports.initializeAllReminders = async function() {
                 from: process.env.EMAIL_ACCOUNT,
                 to: user.email,
                 subject: 'Reminder Notification: ' + reminder.name,
-                html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminderName + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + "<br/>Description: " + reminderDescription + "<br/><br/>Thank you for using our friendly reminders. :)"
+                html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminderName + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + " " + noonTime + "<br/>Description: " + reminderDescription + "<br/><br/>Thank you for using our friendly reminders. :)"
             }
 
 
@@ -183,10 +199,18 @@ exports.createReminder = async function(user, reminder) {
     let year = date.getFullYear();
     let hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
     let minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+    let noonTime = "AM";
     let scheduledDay;
     let scheduledMonth;
-
     let scheduled;
+
+    if (date.getHours() >= 12) {
+        if (date.getHours() > 12) {
+            hours = hours - 12;
+        }
+        noonTime = "PM";
+    }
+
     if (reminder.repeat === "daily") {
         scheduledDay = "*";
         scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
@@ -216,7 +240,7 @@ exports.createReminder = async function(user, reminder) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminder.name + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + "<br/>Description: " + reminder.description + "<br/><br/>Thank you for using our friendly reminders. :)"
+            html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminder.name + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + " " + noonTime + "<br/>Description: " + reminder.description + "<br/><br/>Thank you for using our friendly reminders. :)"
         }
 
 
@@ -249,6 +273,14 @@ exports.updateReminder = async function(reminder, user) {
     let scheduled;
     let scheduledDay;
     let scheduledMonth;
+    let noonTime = "AM";
+
+    if (date.getHours() >= 12) {
+        if (date.getHours() > 12) {
+            hours = hours - 12;
+        }
+        noonTime = "PM";
+    }
 
     if (reminder.repeat === "daily") {
         scheduledDay = "*";
@@ -279,7 +311,7 @@ exports.updateReminder = async function(reminder, user) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminder.name + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + "<br/>Description: " + reminder.description + "<br/><br/>Thank you for using our friendly reminders. :)"
+            html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminder.name + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + " " + noonTime + "<br/>Description: " + reminder.description + "<br/><br/>Thank you for using our friendly reminders. :)"
         }
 
 
