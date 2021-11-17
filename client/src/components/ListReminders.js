@@ -13,6 +13,7 @@ function ListReminders() {
     const [reminderDescription, setReminderDescription] = useState('');
     const [reminderDate, setReminderDate] = useState('');
     const [reminderTime, setReminderTime] = useState('');
+    const [reminderDisplayTime, setReminderDisplayTime] = useState('');
     const [reminderRepeat, setReminderRepeat] = useState('');
     const [loading, setLoading] = useState(true);
     const [tableLoading, setTableLoading] = useState(true);
@@ -198,12 +199,26 @@ function ListReminders() {
                     const day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
                     const month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
                     const year = date.getFullYear();
-                    const hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+                    let hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
                     const minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-                    const reminderDate = year + '-' + month + '-' + day;
-                    const reminderTime = hour + ':' + minutes;
+                    const reminderDate = year + '-' + month + '-' + day;                    
+                    const reminderTime = hour + ':' + minutes;                    
                     setReminderDate(reminderDate);
                     setReminderTime(reminderTime);
+                    let noonTime;
+
+                    if (date.getHours() == 0) {
+                        hour = 12;
+                        noonTime = "AM";
+                    } else if (date.getHours() >= 12) {
+                        if (date.getHours() > 12) {
+                            hour = hour - 12;
+                        }
+                        noonTime = "PM";
+                    } else {
+                        noonTime = "AM";
+                    }
+                    setReminderDisplayTime(hour + ":" + minutes + " " + noonTime);
                 }
                 setLoading(false);
                 setModalVisible(true);
@@ -491,16 +506,29 @@ function ListReminders() {
             const day = reminderDate.getDate() < 10 ? "0" + reminderDate.getDate() : reminderDate.getDate();
             const month = (reminderDate.getMonth() + 1) < 10 ? "0" + (reminderDate.getMonth() + 1) : (reminderDate.getMonth() + 1);
             const year = reminderDate.getFullYear();
-            const hour = reminderDate.getHours() < 10 ? "0" + reminderDate.getHours() : reminderDate.getHours();
-            const minutes = reminderDate.getMinutes() < 10 ? "0" + reminderDate.getMinutes() : reminderDate.getMinutes();
+            let hour = reminderDate.getHours() < 10 ? "0" + reminderDate.getHours() : reminderDate.getHours();
+            const minutes = reminderDate.getMinutes() < 10 ? "0" + reminderDate.getMinutes() : reminderDate.getMinutes();            
+            let noonTime;
+            if (reminderDate.getHours() == 0) {
+                hour = 12;
+                noonTime = "AM";
+            } else if (reminderDate.getHours() >= 12) {
+                if (reminderDate.getHours() > 12) {
+                    hour = hour - 12;
+                }
+                noonTime = "PM";
+            } else {
+                noonTime = "AM";
+            }
             const reminderTime = hour + ':' + minutes;
             reminderDate = year + '-' + month + '-' + day;
+           
             return (
                 
                     <tr key={reminderid}>
                         <td>{name}</td>
                         <td>{reminderDate}</td>
-                        <td>{reminderTime}</td>
+                        <td>{reminderTime + " " + noonTime}</td>
                         <td>{sent ? "Yes" : "No"}</td>
                         <td><button onClick={openView} name={reminderid}><i className="fa fa-ellipsis-h fa-2x"></i></button></td>
                         <td><button onClick={openEdit} name={reminderid}><i className="fa fa-edit fa-2x"></i></button></td>
@@ -561,7 +589,7 @@ function ListReminders() {
                                 <h3>Date: </h3>
                                 <p>{reminderDate}</p>
                                 <h3>Time: </h3>
-                                <p>{reminderTime}</p>
+                                <p>{reminderDisplayTime}</p>
                                 <h3>Repeat: </h3>
                                 <p>{reminderRepeat}</p>
                                 <h3>Description: </h3>
