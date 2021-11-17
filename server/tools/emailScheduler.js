@@ -33,7 +33,6 @@ exports.checkMissedReminders = async function() {
     let day;
     let month;
     let year;
-    let scheduled;
 
     //for each reminder, send an email and update db
     for(let i = 0; i < count; i++) {
@@ -44,28 +43,12 @@ exports.checkMissedReminders = async function() {
         reminderName = reminders[i].name;
         reminderDescription = reminders[i].description;
         reminderID = reminders[i].reminderid;
-        date = new Date(reminders[i].date);
+        date = new Date(parseInt(reminders[i].date));
         day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
         month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
         year = date.getFullYear();
         hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
         minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-
-        if (reminders[i].repeat === "daily") {
-            day = "*";
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else if (reminders[i].repeat === "weekly") {
-            day = day + "/7"
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else if (reminders[i].repeat === "biweekly") {
-            day = day + "/14"
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else if (reminders[i].repeat === "monthly") {
-            month = "*";
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        } else {
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
-        }
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -121,6 +104,8 @@ exports.initializeAllReminders = async function() {
     let month;
     let year;
     let scheduled;
+    let scheduledDay;
+    let scheduledMonth;
 
     //for each reminder, create a job
     for (let i = 0; i < count; i++) {
@@ -131,7 +116,7 @@ exports.initializeAllReminders = async function() {
         reminderName = reminders[i].name;
         reminderDescription = reminders[i].description;
         reminderID = reminders[i].reminderid;
-        date = new Date(reminders[i].date);
+        date = new Date(parseInt(reminders[i].date));
         day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
         month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
         year = date.getFullYear();
@@ -139,21 +124,21 @@ exports.initializeAllReminders = async function() {
         minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
 
         if (reminders[i].repeat === "daily") {
-            day = "*";
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+            scheduledDay = "*";
+            scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
         } else if (reminders[i].repeat === "weekly") {
-            day = day + "/7"
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+            scheduledDay = day + "/7"
+            scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
         } else if (reminders[i].repeat === "biweekly") {
-            day = day + "/14"
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+            scheduledDay = day + "/14"
+            scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
         } else if (reminders[i].repeat === "monthly") {
-            month = "*";
-            scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+            scheduledMonth = "*";
+            scheduled = minutes + " " + hours + " " + day + " " + scheduledMonth + " *";
         } else {
             scheduled = minutes + " " + hours + " " + day + " " + month + " *";
         }
-        
+
         jobs[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function () {
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
@@ -198,24 +183,25 @@ exports.createReminder = async function(user, reminder) {
     let year = date.getFullYear();
     let hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
     let minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+    let scheduledDay;
+    let scheduledMonth;
 
     let scheduled;
     if (reminder.repeat === "daily") {
-        day = "*";
-        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        scheduledDay = "*";
+        scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
     } else if (reminder.repeat === "weekly") {
-        day = day + "/7"
-        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        scheduledDay = day + "/7"
+        scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
     } else if (reminder.repeat === "biweekly") {
-        day = day + "/14"
-        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        scheduledDay = day + "/14"
+        scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
     } else if (reminder.repeat === "monthly") {
-        month = "*";
-        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        scheduledMonth = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + scheduledMonth + " *";
     } else {
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
     }
-    console.log(scheduled);
 
     job[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function(){
         const transporter = nodemailer.createTransport({
@@ -261,19 +247,21 @@ exports.updateReminder = async function(reminder, user) {
     let hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
     let minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
     let scheduled;
+    let scheduledDay;
+    let scheduledMonth;
 
     if (reminder.repeat === "daily") {
-        day = "*";
-        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        scheduledDay = "*";
+        scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
     } else if (reminder.repeat === "weekly") {
-        day = day + "/7"
-        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        scheduledDay = day + "/7"
+        scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
     } else if (reminder.repeat === "biweekly") {
-        day = day + "/14"
-        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        scheduledDay = day + "/14"
+        scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
     } else if (reminder.repeat === "monthly") {
-        month = "*";
-        scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        scheduledMonth = "*";
+        scheduled = minutes + " " + hours + " " + day + " " + scheduledMonth + " *";
     } else {
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
     }
