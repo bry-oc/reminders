@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import authContext from './AuthContext';
 import $ from "jquery";
 import DataTable from 'datatables.net';
+import moment from 'moment';
 
 function ListReminders() {
     const [reminders, setReminders] = useState([]);
@@ -50,18 +51,28 @@ function ListReminders() {
                                     openView();
                                 }
                                 $(function () {
-                                    $('#reminder-table').DataTable({                                        
-                                        "aoColumns": [
+                                    var example = $('#reminder-table').DataTable({                                        
+                                        aoColumns: [
                                             null,
                                             null,
-                                            null,
+                                            { "type": "dom-date" },
                                             null,
                                             { "bSortable": false },
                                             { "bSortable": false },
                                             { "bSortable": false }
-                                        ],
-                                        columnDefs: [{ type: 'time', 'targets': [2] }]
+                                        ]
                                     });
+                                });
+                                $.extend($.fn.dataTableExt.oSort, {
+                                    "dom-date-pre": function (a) {
+                                        return moment(a, "hh:mm A")
+                                    },
+                                    "dom-date-asc": function (a, b) {
+                                        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+                                    },
+                                    "dom-date-desc": function (a, b) {
+                                        return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+                                    }
                                 });
                             }
                         })
@@ -92,20 +103,29 @@ function ListReminders() {
                                             if (url_id) {
                                                 openView();
                                             }
-                                            $(function () {
-                                                $('#reminder-table').DataTable({                                                    
-                                                    "aoColumns": [
+                                            $(function () {    
+                                                var example = $('#reminder-table').DataTable(                                     {
+                                                    aoColumns: [
                                                         null,
                                                         null,
-                                                        null,
+                                                        { "type": "dom-date"},
                                                         null,
                                                         { "bSortable": false },
                                                         { "bSortable": false },
                                                         { "bSortable": false }
-                                                    ],
-                                                    columnDefs: [{ type: 'time', 'targets': [2] }]
+                                                    ]
                                                 });
-                                                
+                                            });
+                                            $.extend($.fn.dataTableExt.oSort, {
+                                                "dom-date-pre": function (a) {
+                                                    return moment(a, "hh:mm A")
+                                                },
+                                                "dom-date-asc": function (a, b) {
+                                                    return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+                                                },
+                                                "dom-date-desc": function (a, b) {
+                                                    return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+                                                }
                                             });
                                         }
                                     })
@@ -212,7 +232,7 @@ function ListReminders() {
                         noonTime = "AM";
                     } else if (date.getHours() >= 12) {
                         if (date.getHours() > 12) {
-                            hour = hour - 12;
+                            hour = "0" + (hour - 12);
                         }
                         noonTime = "PM";
                     } else {
@@ -514,7 +534,7 @@ function ListReminders() {
                 noonTime = "AM";
             } else if (reminderDate.getHours() >= 12) {
                 if (reminderDate.getHours() > 12) {
-                    hour = hour - 12;
+                    hour = "0" + (hour - 12);
                 }
                 noonTime = "PM";
             } else {
