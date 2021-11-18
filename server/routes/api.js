@@ -171,7 +171,7 @@ module.exports = function (app) {
                     lookup = await userQuery.getUserByUserID(userID);
                     if (lookup.rowCount <= 0) {
                         //the user was not found
-                        return res.status(404).json({error: 'That user does not exist.'}).end();
+                        return res.status(404).json({ error: 'An account associated with that username was not found.'}).end();
                     } else if (lookup.rows[0].verified === true) {
                         //the user is already verified
                         return res.status(200).json({message: 'Your account is verified.'}).end();
@@ -197,7 +197,7 @@ module.exports = function (app) {
                 }
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
-                    return res.status(400).json({error: 'That email was not found.'}).end();
+                    return res.status(400).json({ error: 'An account associated with that email was not found.'}).end();
                 } else if (lookup.rows[0].verified === true){
                     //the email is already validated
                     return res.status(200).json({message: 'Your account is verified.'}).end();
@@ -381,7 +381,7 @@ module.exports = function (app) {
                 let lookup = await userQuery.getUserByEmail(email);
                 if(lookup.rowCount <= 0) {
                     //email did not return a match
-                    return res.status(400).json({error: 'User does not exist.'});
+                    return res.status(400).json({ error: 'An account associated with that email was not found.'});
                 } else {
                     //create & store id and reset token in password_reset table
                     const username = lookup.rows[0].username;
@@ -545,7 +545,7 @@ module.exports = function (app) {
                 let lookup = await userQuery.getUserByUserID(userID);
                 if(lookup.rowCount <= 0) {
                     //user does not exist
-                    return res.status(404).json({ error: 'User does not exists.'}).end();
+                    return res.status(404).json({ error: 'An account associated with that username was not found.'}).end();
                 } else {
                     const passwordHash = lookup.rows[0].password;
                     if (await argon2.verify(passwordHash, currentPassword)) {
