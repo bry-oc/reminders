@@ -51,7 +51,8 @@ function ListReminders() {
                                     openView();
                                 }
                                 $(function () {
-                                    var example = $('#reminder-table').DataTable({                                        
+                                    $('#reminder-table').DataTable({    
+                                        "order": [[1, 'asc'], [2, 'asc']],
                                         aoColumns: [
                                             null,
                                             null,
@@ -104,7 +105,8 @@ function ListReminders() {
                                                 openView();
                                             }
                                             $(function () {    
-                                                var example = $('#reminder-table').DataTable(                                     {
+                                                $('#reminder-table').DataTable({
+                                                    "order": [[1, 'asc'], [2, 'asc']],
                                                     aoColumns: [
                                                         null,
                                                         null,
