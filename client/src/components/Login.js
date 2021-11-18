@@ -1,5 +1,6 @@
 import authContext from './AuthContext';
 import React, { useContext } from "react";
+import $ from 'jquery';
 
 function Login(){
     const [warning, setWarning] = React.useState("");
@@ -37,6 +38,11 @@ function Login(){
             }
         })
     }
+
+    $(document).on("click", "input", function () {
+        setWarning('');
+    });
+
     return (
         <div className="wrapper" id="login">
             {isLoading ? (
