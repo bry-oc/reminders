@@ -15,6 +15,7 @@ function ListReminders() {
     const [reminderDate, setReminderDate] = useState('');
     const [reminderTime, setReminderTime] = useState('');
     const [reminderDisplayTime, setReminderDisplayTime] = useState('');
+    const [reminderDisplayDate, setReminderDisplayDate] = useState('');
     const [reminderRepeat, setReminderRepeat] = useState('');
     const [loading, setLoading] = useState(true);
     const [tableLoading, setTableLoading] = useState(true);
@@ -241,6 +242,7 @@ function ListReminders() {
                         noonTime = "AM";
                     }
                     setReminderDisplayTime(hour + ":" + minutes + " " + noonTime);
+                    setReminderDisplayDate(month + "/" + day + "/" + year);
                 }
                 setLoading(false);
                 setModalVisible(true);
@@ -543,7 +545,7 @@ function ListReminders() {
                 noonTime = "AM";
             }
             const reminderTime = hour + ':' + minutes;
-            reminderDate = year + '-' + month + '-' + day;
+            reminderDate = month + "/" + day + "/" + year;
            
             return (
                 
@@ -609,7 +611,7 @@ function ListReminders() {
                                 <h3>Name: </h3>
                                 <p>{reminderName}</p>
                                 <h3>Date: </h3>
-                                <p>{reminderDate}</p>
+                                <p>{reminderDisplayDate}</p>
                                 <h3>Time: </h3>
                                 <p>{reminderDisplayTime}</p>
                                 <h3>Repeat: </h3>
@@ -687,7 +689,7 @@ function ListReminders() {
                         <h3>Reminder Name: </h3>
                         <p>{reminderName}</p>
                         <h3>Reminder Date: </h3>
-                        <p>{reminderDate}</p>
+                        <p>{reminderDisplayDate}</p>
                         <h3>Reminder Time: </h3>
                         <p>{reminderDisplayTime}</p>
                         <h3>Reminder Repeat: </h3>
