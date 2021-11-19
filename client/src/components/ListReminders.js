@@ -53,6 +53,7 @@ function ListReminders() {
                                 }
                                 $(function () {
                                     $('#reminder-table').DataTable({    
+                                        "lengthMenu": [[25, 50, 75, 100, -1], [25, 50, 75, 100, "All"]],
                                         "order": [[1, 'asc'], [2, 'asc']],
                                         aoColumns: [
                                             null,
