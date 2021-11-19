@@ -49,20 +49,20 @@ suite('Unit tests', function() {
             assert.equal(validator.isValidUsername('df yvpoyroiyqwuryvvwyeorviyqwoieryoweqiry'), false, 'df yvpoyroiyqwuryvvwyeorviyqwoieryoweqir');
         });
         test('Validation test for valid dates', function () {
-            assert.equal(validator.isValidDate('01/01/1900'), true, '01/01/1900');
-            assert.equal(validator.isValidDate('01/02/0000'), true, '01/02/0000');
-            assert.equal(validator.isValidDate('02/29/1940'), true, '02/29/1940');
-            assert.equal(validator.isValidDate('11/11/2000'), true, '11/11/2000');
-            assert.equal(validator.isValidDate('12/22/2020'), true, '12/22/2020');
-            assert.equal(validator.isValidDate('02/01/1335'), true, '02/01/1335');
-            assert.equal(validator.isValidDate('03/10/1995'), true, '03/10/1995');
-            assert.equal(validator.isValidDate('04/30/1450'), true, '04/30/1450');
-            assert.equal(validator.isValidDate('05/31/1777'), true, '05/31/1777');
-            assert.equal(validator.isValidDate('06/17/1811'), true, '06/17/1811');
-            assert.equal(validator.isValidDate('07/22/1269'), true, '07/22/1269');
-            assert.equal(validator.isValidDate('08/15/1780'), true, '08/15/1780');
-            assert.equal(validator.isValidDate('09/24/1902'), true, '09/24/1902');
-            assert.equal(validator.isValidDate('10/18/1667'), true, '10/18/1667');
+            assert.equal(validator.isValidDate('1900/01/01'), true, '1900/01/01');
+            assert.equal(validator.isValidDate('0000/01/02'), true, '0000/01/02');
+            assert.equal(validator.isValidDate('1940/02/09'), true, '1940/02/09');
+            assert.equal(validator.isValidDate('2000/11/11'), true, '2000/11/11');
+            assert.equal(validator.isValidDate('2020/12/22'), true, '2020/12/22');
+            assert.equal(validator.isValidDate('1335/02/01'), true, '1335/02/01');
+            assert.equal(validator.isValidDate('1995/03/10'), true, '1995/03/10');
+            assert.equal(validator.isValidDate('1450/04/30'), true, '1450/04/30');
+            assert.equal(validator.isValidDate('1777/05/31'), true, '1777/05/31');
+            assert.equal(validator.isValidDate('1811/06/17'), true, '1811/06/17');
+            assert.equal(validator.isValidDate('1269/07/22'), true, '1269/07/22');
+            assert.equal(validator.isValidDate('1780/08/15'), true, '1780/08/15');
+            assert.equal(validator.isValidDate('1902/09/24'), true, '1902/09/24');
+            assert.equal(validator.isValidDate('1667/10/18'), true, '1667/10/18');
         });
         test('Validation test for invalid dates', function () {
             assert.equal(validator.isValidDate(''), false, 'empty');
@@ -90,13 +90,33 @@ suite('Unit tests', function() {
             assert.equal(validator.isValidTime('12:59'), true, '12:59');
         });
         test('Validation test for invalid times', function () {
-            assert.equal(validator.isValidTime('00:00'), false, '00:10');
             assert.equal(validator.isValidTime(''), false, 'empty');
             assert.equal(validator.isValidTime('101:10'), false, '101:10');
             assert.equal(validator.isValidTime('01-45'), false, '01-45');
             assert.equal(validator.isValidTime('10-30-00'), false, '10-30-00');
-            assert.equal(validator.isValidTime('13:30'), false, '13:30');
             assert.equal(validator.isValidTime('10:60'), false, '10:60');
+        });
+        test('Validation test for valid timestamps', function () {
+            assert.equal(validator.isValidTimestamp(189489794), true, '189489794');
+            assert.equal(validator.isValidTimestamp(789877), true, '789877');
+            assert.equal(validator.isValidTimestamp(1), true, '1');
+            assert.equal(validator.isValidTimestamp(54640045045045), true, '54640045045045');
+        });
+        test('Validation test for invalid timestamps', function () {
+            assert.equal(validator.isValidTimestamp(-189489794), false, '-189489794');
+            assert.equal(validator.isValidTimestamp("nmsdfasdz"), false, 'nmsdfasdz');
+            assert.equal(validator.isValidTimestamp("eleven"), false, 'eleven');
+        });
+        test('Validation test for valid reminder ids', function () {
+            assert.equal(validator.isValidReminderID(189489794), true, '189489794');
+            assert.equal(validator.isValidReminderID(789877), true, '789877');
+            assert.equal(validator.isValidReminderID(1), true, '1');
+            assert.equal(validator.isValidReminderID(54640045045045), true, '54640045045045');
+        });
+        test('Validation test for invalid reminder ids', function () {
+            assert.equal(validator.isValidReminderID(-189489794), false, '-189489794');
+            assert.equal(validator.isValidReminderID("nmsdfasdz"), false, 'nmsdfasdz');
+            assert.equal(validator.isValidReminderID("eleven"), false, 'eleven');
         });
     })    
 })
