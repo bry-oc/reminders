@@ -688,6 +688,9 @@ module.exports = function (app) {
                     return res.status(400).json({ error: 'Missing required field(s)!' }).end();
                 }
 
+                if(!serverValidation.isValidTimestamp(reminderTimestamp)) {
+                    return res.status(400).json({error: 'Invalid timestamp.'}).end();
+                } 
                 /*
                 //validate date and time
                 if (!serverValidation.isValidDate(reminderDate)) {
@@ -767,7 +770,7 @@ module.exports = function (app) {
                 const userID = user.userid;
                 const reminderID = parseInt(req.params.reminderid);
                 //return error if reminder id is invalid
-                if(!reminderID || typeof(reminderID) != 'number') {
+                if(!reminderID || !serverValidation.isValidReminderID(reminderID)) {
                     return res.status(400).json({error: 'Invalid reminder id.'}).end();
                 }
                 //delete reminder and the scheduled email

@@ -42,3 +42,13 @@ exports.isValidTime = function(time) {
     const filter = /^(0?[0-9]|1[0-9]|2[0-3])[:](0?[0-9]|[1-5][0-9])$/
     return filter.test(time);
 }
+
+exports.isValidTimestamp = function(time) {
+    const filter = /^(\d+)$/
+    return filter.test(time);
+}
+
+exports.isValidReminderID = function(reminderid) {
+    const filter = /^(\d+)$/
+    return filter.test(reminderid);
+}

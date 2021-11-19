@@ -20,7 +20,7 @@ suite('User login tests', function () {
             })
             .end(function (err, res) {
                 assert.equal(res.status, 404);
-                assert.equal(res.body.error, 'Login failed. Username or password did not match.');
+                assert.equal(res.body.error, 'Login failed: Username or password did not match.');
                 done();
             })
     });
@@ -94,9 +94,10 @@ suite('Create reminders tests', function () {
                     .type('form')
                     .send({
                         reminderName: "test_reminder",
-                        reminderDate: "01/02/2022",
+                        reminderDate: "2030-01-01",
                         reminderTime: "02:30",
-                        timezone: 0
+                        reminderDescription: '',
+                        reminderRepeat: 'none'
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
@@ -120,7 +121,8 @@ suite('Create reminders tests', function () {
                         reminderName: "test_reminder",
                         reminderDate: "01/40/2022",
                         reminderTime: "02:30",
-                        timezone: 0
+                        reminderDescription: '',
+                        reminderRepeat: 'none'
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 400);
@@ -141,9 +143,10 @@ suite('Create reminders tests', function () {
                     .type('form')
                     .send({
                         reminderName: "test_reminder",
-                        reminderDate: "01/02/2022",
-                        reminderTime: "32:30",
-                        timezone: 0
+                        reminderDate: "2030-01-01",
+                        reminderTime: "02x30",
+                        reminderDescription: '',
+                        reminderRepeat: 'none'
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 400);
@@ -167,9 +170,10 @@ suite('Update reminder tests', function () {
                     .type('form')
                     .send({
                         reminderName: "test_reminder",
-                        reminderDate: "01/02/2022",
+                        reminderDate: "2030-01-01",
                         reminderTime: "02:30",
-                        timezone: 0
+                        reminderDescription: '',
+                        reminderRepeat: 'none'
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
@@ -182,11 +186,9 @@ suite('Update reminder tests', function () {
                             .send({
                                 reminderid: reminderid,
                                 reminderName: "updated_test_reminder",
-                                reminderDate: "01/03/2022",
-                                reminderTime: "05:00",
+                                reminderTimestamp: 2637356869,
                                 reminderDescription: "new_description",
-                                reminderRepeat: "never",
-                                timezone: 0
+                                reminderRepeat: "none",
                             })
                             .end(function (err, res) {
                                 assert.equal(res.status, 401);
@@ -207,9 +209,10 @@ suite('Update reminder tests', function () {
                     .type('form')
                     .send({
                         reminderName: "test_reminder",
-                        reminderDate: "01/02/2022",
+                        reminderDate: "2030-01-01",
                         reminderTime: "02:30",
-                        timezone: 0
+                        reminderDescription: '',
+                        reminderRepeat: 'none'
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
@@ -225,7 +228,7 @@ suite('Update reminder tests', function () {
                     })
             })
     });
-    test('Update reminder with an invalid date', function (done) {
+    test('Update reminder with an invalid timestamp', function (done) {
         agent.post('/api/login')
             .type('form')
             .send({
@@ -237,9 +240,10 @@ suite('Update reminder tests', function () {
                     .type('form')
                     .send({
                         reminderName: "test_reminder",
-                        reminderDate: "01/02/2022",
+                        reminderDate: "2030-01-01",
                         reminderTime: "02:30",
-                        timezone: 0
+                        reminderDescription: '',
+                        reminderRepeat: 'none'
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
@@ -251,55 +255,13 @@ suite('Update reminder tests', function () {
                             .send({
                                 reminderid: reminderid,
                                 reminderName: "updated_test_reminder",
-                                reminderDate: "01/88/2022",
-                                reminderTime: "05:00",
+                                reminderTimestamp: "2030-11-11",
                                 reminderDescription: "new_description",
-                                reminderRepeat: "never",
-                                timezone: 0
+                                reminderRepeat: "none",
                             })
                             .end(function (err, res) {
                                 assert.equal(res.status, 400);
-                                assert.equal(res.body.error, 'Invalid date.');
-                                done();
-                            })
-                    })
-            })
-    });
-    test('Update reminder with an invalid time', function (done) {
-        agent.post('/api/login')
-            .type('form')
-            .send({
-                username: process.env.TEST_ACCOUNT,
-                password: process.env.TEST_PASSWORD
-            })
-            .end(function (req, res) {
-                agent.post('/api/reminder/create')
-                    .type('form')
-                    .send({
-                        reminderName: "test_reminder",
-                        reminderDate: "01/02/2022",
-                        reminderTime: "02:30",
-                        timezone: 0
-                    })
-                    .end(function (err, res) {
-                        assert.equal(res.status, 200);
-                        assert.equal(res.body.success, true);
-                        assert.exists(res.body.reminderid);
-                        const reminderid = res.body.reminderid;
-                        agent.post('/api/reminder/update')
-                            .type('form')
-                            .send({
-                                reminderid: reminderid,
-                                reminderName: "updated_test_reminder",
-                                reminderDate: "01/03/2022",
-                                reminderTime: "88:00",
-                                reminderDescription: "new_description",
-                                reminderRepeat: "never",
-                                timezone: 0
-                            })
-                            .end(function (err, res) {
-                                assert.equal(res.status, 400);
-                                assert.equal(res.body.error, 'Invalid time.');
+                                assert.equal(res.body.error, 'Invalid timestamp.');
                                 done();
                             })
                     })
@@ -317,9 +279,10 @@ suite('Update reminder tests', function () {
                     .type('form')
                     .send({
                         reminderName: "test_reminder",
-                        reminderDate: "01/02/2022",
+                        reminderDate: "2030-01-01",
                         reminderTime: "02:30",
-                        timezone: 0
+                        reminderDescription: "new_description",
+                        reminderRepeat: "none"
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
@@ -331,20 +294,16 @@ suite('Update reminder tests', function () {
                             .send({
                                 reminderid: reminderid,
                                 reminderName: "updated_test_reminder",
-                                reminderDate: "01/03/2022",
-                                reminderTime: "05:00",
+                                reminderTimestamp: 2637356869,
                                 reminderDescription: "new_description",
-                                reminderRepeat: "never",
-                                timezone: 0
+                                reminderRepeat: "none"
                             })
                             .end(function (err, res) {
                                 assert.equal(res.status, 200);
                                 assert.equal(res.body.success, true);
                                 assert.equal(res.body.reminderName, 'updated_test_reminder');
-                                assert.equal(res.body.reminderDate, '01/03/2022');
-                                assert.equal(res.body.reminderTime, '05:00');
                                 assert.equal(res.body.reminderDescription, 'new_description');
-                                assert.equal(res.body.reminderRepeat, 'never');
+                                assert.equal(res.body.reminderRepeat, 'none');
                                 done();
                             })
                     })
@@ -365,9 +324,10 @@ suite('delete reminder tests', function () {
                     .type('form')
                     .send({
                         reminderName: "test_reminder",
-                        reminderDate: "01/02/2022",
+                        reminderDate: "2030-01-01",
                         reminderTime: "02:30",
-                        timezone: 0
+                        reminderDescription: "new_description",
+                        reminderRepeat: "none"
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
@@ -394,7 +354,7 @@ suite('delete reminder tests', function () {
             .end(function (req, res) {                
                     agent.delete('/api/reminder/delete/-999')
                     .end(function (err, res) {
-                        assert.equal(res.status, 500);
+                        assert.equal(res.status, 400);
                         done();
                     })
             })
@@ -445,9 +405,10 @@ suite('delete reminder tests', function () {
                     .type('form')
                     .send({
                         reminderName: "test_reminder",
-                        reminderDate: "01/02/2022",
+                        reminderDate: "2030-01-01",
                         reminderTime: "02:30",
-                        timezone: 0
+                        reminderDescription: "new_description",
+                        reminderRepeat: "none"
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200);
@@ -535,7 +496,8 @@ suite('account testing', function() {
                 agent.post('/api/user/password/update')
                     .type('form')
                     .send({
-                        password: process.env.TEST_PASSWORD2
+                        currentpassword: process.env.TEST_PASSWORD,
+                        newpassword: process.env.TEST_PASSWORD2
                     })
                     .end(function (err, res) {
                         assert.equal(res.status, 200, 'update password');
@@ -543,7 +505,8 @@ suite('account testing', function() {
                         agent.post('/api/user/password/update')
                             .type('form')
                             .send({
-                                password: process.env.TEST_PASSWORD
+                                currentpassword: process.env.TEST_PASSWORD2,
+                                newpassword: process.env.TEST_PASSWORD
                             })
                             .end(function (err, res) {
                                 assert.equal(res.status, 200, 'return password');
