@@ -34,7 +34,7 @@ function Login(){
                 setLoading(false);
                 console.log(auth);
                 console.log(data);
-                window.location.href = "/account";
+                window.location.href = "/reminder/list";
             }
         })
     }
