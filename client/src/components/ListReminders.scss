@@ -25,6 +25,9 @@
     .dataTables_info {
         margin: 15px;
     }
+    .dataTables_length {
+        display: none;
+    }
     .dataTables_paginate, .paging_simple_numbers {
         display: flex;
         justify-content: center;

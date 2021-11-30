@@ -526,7 +526,7 @@ function ListReminders() {
     //sort by date/time
     function TableData() {
         return reminders.map((reminder) => {
-            const { reminderid, name, date, sent } = reminder;
+            const { reminderid, name, date, repeat } = reminder;
             let reminderDate = new Date(parseInt(date));
             const day = reminderDate.getDate() < 10 ? "0" + reminderDate.getDate() : reminderDate.getDate();
             const month = (reminderDate.getMonth() + 1) < 10 ? "0" + (reminderDate.getMonth() + 1) : (reminderDate.getMonth() + 1);
@@ -554,7 +554,7 @@ function ListReminders() {
                         <td>{name}</td>
                         <td>{reminderDate}</td>
                         <td>{reminderTime + " " + noonTime}</td>
-                        <td>{sent ? "Yes" : "No"}</td>
+                        <td>{repeat.charAt(0).toUpperCase() + repeat.slice(1)}</td>
                         <td><button onClick={openView} name={reminderid}><i className="fa fa-ellipsis-h fa-2x"></i></button></td>
                         <td><button onClick={openEdit} name={reminderid}><i className="fa fa-edit fa-2x"></i></button></td>
                         <td><button onClick={openDelete} name={reminderid}><i className="fa fa-trash fa-2x"></i></button></td>
@@ -583,7 +583,7 @@ function ListReminders() {
                                 <th>Name</th>
                                 <th>Date</th>
                                 <th>Time</th>
-                                <th>Sent</th>
+                                <th>Repeat</th>
                                 <th>View</th>
                                 <th>Edit</th>
                                 <th>Delete</th>
