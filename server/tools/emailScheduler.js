@@ -70,7 +70,7 @@ exports.checkMissedReminders = async function() {
             from: process.env.EMAIL_ACCOUNT,
             to: email,
             subject: 'Reminder Notification: ' + reminderName,
-            html: 'Hello ' + username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminderName + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + " " + noonTime + "<br/>Description: " + reminderDescription + "<br/><br/>Unfortunately, the server was experiencing technical difficulties and missed the requested reminder time.<br/>We apologize for the inconvenience."
+            html: 'Hello ' + username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminderName + "<br/>Description: " + reminderDescription + "<br/><br/>Unfortunately, the server was experiencing technical difficulties and missed the requested reminder time.<br/>We apologize for the inconvenience."
         }
 
         
@@ -168,7 +168,7 @@ exports.initializeAllReminders = async function() {
                 from: process.env.EMAIL_ACCOUNT,
                 to: user.email,
                 subject: 'Reminder Notification: ' + reminder.name,
-                html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminderName + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + " " + noonTime + "<br/>Description: " + reminderDescription + "<br/><br/>Thank you for using our friendly reminders. :)"
+                html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminderName + "<br/>Description: " + reminderDescription + "<br/><br/>Thank you for using our friendly reminders. :)"
             }
 
 
@@ -240,7 +240,7 @@ exports.createReminder = async function(user, reminder) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminder.name + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + " " + noonTime + "<br/>Description: " + reminder.description + "<br/><br/>Thank you for using our friendly reminders. :)"
+            html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminder.name + "<br/>Description: " + reminder.description + "<br/><br/>Thank you for using our friendly reminders. :)"
         }
 
 
@@ -311,7 +311,7 @@ exports.updateReminder = async function(reminder, user) {
             from: process.env.EMAIL_ACCOUNT,
             to: user.email,
             subject: 'Reminder Notification: ' + reminder.name,
-            html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminder.name + "<br/>Date: " + month + "/" + day + "/" + year + "<br/>Time: " + hours + ":" + minutes + " " + noonTime + "<br/>Description: " + reminder.description + "<br/><br/>Thank you for using our friendly reminders. :)"
+            html: 'Hello ' + user.username + ',<br/><br/>This is a reminder for the following event:<br/>Name: ' + reminder.name + "<br/>Description: " + reminder.description + "<br/><br/>Thank you for using our friendly reminders. :)"
         }
 
 
