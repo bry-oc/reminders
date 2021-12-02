@@ -647,6 +647,7 @@ module.exports = function (app) {
                 const reminder = {
                     reminderid: reminderID,
                     name: reminderName,
+                    repeat: reminderRepeat,
                     date: reminderDate,
                     userid: userID
                 }
@@ -712,6 +713,7 @@ module.exports = function (app) {
                 const reminder = {
                     reminderid: reminderID,
                     name: reminderName,
+                    repeat: reminderRepeat,
                     date: reminderTimestamp,
                     userid: userID
                 }

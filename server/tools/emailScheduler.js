@@ -132,13 +132,6 @@ exports.initializeAllReminders = async function() {
         hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
         minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
 
-        if (date.getHours() >= 12) {
-            if (date.getHours() > 12) {
-                hours = hours - 12;
-            }
-            noonTime = "PM";
-        }
-
         if (reminders[i].repeat === "daily") {
             scheduledDay = "*";
             scheduled = minutes + " " + hours + " " + scheduledDay + " " + month + " *";
@@ -153,6 +146,13 @@ exports.initializeAllReminders = async function() {
             scheduled = minutes + " " + hours + " " + day + " " + scheduledMonth + " *";
         } else {
             scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+        }
+
+        if (date.getHours() >= 12) {
+            if (date.getHours() > 12) {
+                hours = hours - 12;
+            }
+            noonTime = "PM";
         }
 
         jobs[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function () {
@@ -190,7 +190,7 @@ exports.initializeAllReminders = async function() {
 exports.createReminder = async function(user, reminder) {
     //create cron job when reminder is created
     console.log(reminder.date);
-    const date = new Date(reminder.date);
+    const date = new Date(parseInt(reminder.date));
     console.log(date);
     let job = {};
     const reminderID = reminder.reminderid;
@@ -203,13 +203,12 @@ exports.createReminder = async function(user, reminder) {
     let scheduledDay;
     let scheduledMonth;
     let scheduled;
-
-    if (date.getHours() >= 12) {
-        if (date.getHours() > 12) {
-            hours = hours - 12;
-        }
-        noonTime = "PM";
-    }
+    console.log(date);
+    console.log(day);
+    console.log(month);
+    console.log(year);
+    console.log(hours);
+    console.log(minutes);    
 
     if (reminder.repeat === "daily") {
         scheduledDay = "*";
@@ -225,6 +224,13 @@ exports.createReminder = async function(user, reminder) {
         scheduled = minutes + " " + hours + " " + day + " " + scheduledMonth + " *";
     } else {
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    }
+
+    if (date.getHours() >= 12) {
+        if (date.getHours() > 12) {
+            hours = hours - 12;
+        }
+        noonTime = "PM";
     }
 
     job[reminderID] = schedule.scheduleJob(reminderID.toString(), scheduled, function(){
@@ -264,7 +270,7 @@ exports.updateReminder = async function(reminder, user) {
     }
     
     let newJob = {};
-    const date = new Date(reminder.date);
+    const date = new Date(parseInt(reminder.date));
     let day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
     let month = (date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1);
     let year = date.getFullYear();
@@ -274,13 +280,6 @@ exports.updateReminder = async function(reminder, user) {
     let scheduledDay;
     let scheduledMonth;
     let noonTime = "AM";
-
-    if (date.getHours() >= 12) {
-        if (date.getHours() > 12) {
-            hours = hours - 12;
-        }
-        noonTime = "PM";
-    }
 
     if (reminder.repeat === "daily") {
         scheduledDay = "*";
@@ -296,6 +295,13 @@ exports.updateReminder = async function(reminder, user) {
         scheduled = minutes + " " + hours + " " + day + " " + scheduledMonth + " *";
     } else {
         scheduled = minutes + " " + hours + " " + day + " " + month + " *";
+    }
+
+    if (date.getHours() >= 12) {
+        if (date.getHours() > 12) {
+            hours = hours - 12;
+        }
+        noonTime = "PM";
     }
 
     newJob[reminder.reminderid] = schedule.scheduleJob((reminder.reminderid).toString(), scheduled, function () {
