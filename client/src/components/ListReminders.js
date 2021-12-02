@@ -235,8 +235,12 @@ function ListReminders() {
                         hour = 12;
                         noonTime = "AM";
                     } else if (date.getHours() >= 12) {
-                        if (date.getHours() > 12) {
-                            hour = "0" + (hour - 12);
+                        if (reminderDate.getHours() > 12) {
+                            if (hour - 12 < 10 || hour - 12 === 0) {
+                                hour = "0" + (hour - 12);
+                            } else {
+                                hour = hour - 12;
+                            }
                         }
                         noonTime = "PM";
                     } else {
@@ -539,7 +543,11 @@ function ListReminders() {
                 noonTime = "AM";
             } else if (reminderDate.getHours() >= 12) {
                 if (reminderDate.getHours() > 12) {
-                    hour = "0" + (hour - 12);
+                    if (hour - 12 < 10 || hour - 12 === 0) {
+                        hour = "0" + (hour - 12);
+                    } else {
+                        hour = hour - 12;
+                    }                    
                 }
                 noonTime = "PM";
             } else {
