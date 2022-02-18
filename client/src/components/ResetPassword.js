@@ -70,11 +70,11 @@ function ResetPassword() {
                 <h1>Reset Password</h1>
                 <form onSubmit={resetPassword}>
                     <label>Enter new password:<br />
-                        <input name="password" type="text" placeholder="Enter your password" required>
+                        <input name="password" type="password" placeholder="Enter your password" required>
                         </input>
                     </label><br /><br />
                     <label>Confirm password:<br />
-                        <input name="passwordCofirm" type="text" placeholder="Enter your password" required>
+                        <input name="passwordCofirm" type="password" placeholder="Enter your password" required>
                         </input>
                     </label><br /><br />
                     <button type="submit">Reset Password</button>
