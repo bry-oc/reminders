@@ -66,10 +66,18 @@ function ResetPassword() {
 
     return (
         <div>
-            <div className="wrapper">
+            <div className="wrapper" id="resetpassword">
                 <h1>Reset Password</h1>
                 <form onSubmit={resetPassword}>
                     <label>Enter new password:<br />
+                        <div> <p className="rules">May contain only alphanumeric and special characters.</p>
+                            <p className="rules">Must contain atleast:</p>
+                            <ul>
+                                <li><p className="rules">One lowercase</p></li>
+                                <li><p className="rules">One uppercase</p></li>
+                                <li><p className="rules">One special character</p></li>
+                                <li><p className="rules">One number</p></li>
+                            </ul> </div>
                         <input name="password" type="password" placeholder="Enter your password" required>
                         </input>
                     </label><br /><br />
